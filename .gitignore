@@ -4,3 +4,4 @@ app/build
 *.apk
 .gradle/
 local.properties
+.idea/
