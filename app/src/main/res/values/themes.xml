@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Compose가 테마를 처리하므로 Activity 윈도우용 최소 스타일만 선언 -->
+    <style name="Theme.InteractiveWord" parent="Theme.AppCompat.Light.NoActionBar" />
+</resources>

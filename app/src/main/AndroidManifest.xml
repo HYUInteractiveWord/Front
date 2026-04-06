@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- 네트워크 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- 마이크 녹음 -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <!-- Foreground Service (상시 알림) -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
+
+    <!-- 시스템 오디오 캡처 (MediaProjection) -->
+    <uses-permission android:name="android.permission.CAPTURE_AUDIO_OUTPUT" />
+
+    <!-- 알림 (Android 13+) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.InteractiveWord">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- 오디오 캡처 Foreground Service -->
+        <service
+            android:name=".service.CaptureService"
+            android:foregroundServiceType="mediaProjection"
+            android:exported="false" />
+
+    </application>
+
+</manifest>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">말해봐</string>
+    <string name="notification_channel_capture">오디오 캡처</string>
+    <string name="notification_title_capture">말해봐 - 캡처 대기 중</string>
+    <string name="notification_text_capture">탭하여 한국어 단어를 캡처하세요</string>
+    <string name="notification_action_capture">캡처 시작</string>
+    <string name="notification_action_stop">종료</string>
+</resources>
