@@ -1,9 +1,21 @@
 package com.interactiveword.data.api
 
-import com.interactiveword.data.model.*
+import com.interactiveword.data.model.DictionarySearchResponse
+import com.interactiveword.data.model.LoginRequest
+import com.interactiveword.data.model.Mission
+import com.interactiveword.data.model.PronunciationResponse
+import com.interactiveword.data.model.PronunciationSubmitRequest
+import com.interactiveword.data.model.RegisterRequest
+import com.interactiveword.data.model.ScanProcessRequest
+import com.interactiveword.data.model.ScanUploadResponse
+import com.interactiveword.data.model.TokenResponse
+import com.interactiveword.data.model.User
+import com.interactiveword.data.model.WordCard
+import com.interactiveword.data.model.WordCreateRequest
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.*
+import retrofit2.http.Query
 
 interface ApiService {
 
@@ -13,6 +25,13 @@ interface ApiService {
 
     @POST("api/auth/login")
     suspend fun login(@Body body: LoginRequest): TokenResponse
+
+    @GET("api/auth/me")
+    suspend fun getMe(): User
+
+    // ── Dictionary ─────────────────────────────────────────────────────────
+    @GET("api/dictionary/search")
+    suspend fun searchDictionary(@Query("word") word: String): DictionarySearchResponse
 
     // ── Words ──────────────────────────────────────────────────────────────
     @GET("api/words/")
@@ -33,7 +52,7 @@ interface ApiService {
     suspend fun uploadAudio(
         @Part file: MultipartBody.Part,
         @Part("scan_source") scanSource: RequestBody,
-    ): Map<String, String>   // { "whisper_text": "...", "scan_source": "..." }
+    ): ScanUploadResponse
 
     @POST("api/scan/process")
     suspend fun processScan(@Body body: ScanProcessRequest): Map<String, Any>

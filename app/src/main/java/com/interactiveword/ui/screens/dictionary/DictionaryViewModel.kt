@@ -2,6 +2,7 @@ package com.interactiveword.ui.screens.dictionary
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.interactiveword.data.api.RetrofitClient
 import com.interactiveword.data.repository.WordRepository
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
@@ -23,6 +24,7 @@ data class DictionaryUiState(
 @OptIn(FlowPreview::class)
 class DictionaryViewModel(
     private val repo: WordRepository = WordRepository(),
+    private val api: com.interactiveword.data.api.ApiService = RetrofitClient.api,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DictionaryUiState())
@@ -50,13 +52,13 @@ class DictionaryViewModel(
     private suspend fun search(query: String) {
         _uiState.value = _uiState.value.copy(isLoading = true)
         try {
-            val card = repo.createWord(query, source = "dictionary", dryRun = true)
+            val result = api.searchDictionary(query)
             _uiState.value = _uiState.value.copy(
                 isLoading = false,
                 result = DictionaryResult(
-                    word       = card.koreanWord,
-                    pos        = card.pos,
-                    definition = card.definition,
+                    word       = result.word,
+                    pos        = result.pos,
+                    definition = result.definition,
                 ),
             )
         } catch (e: Exception) {

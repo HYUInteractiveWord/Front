@@ -9,11 +9,13 @@ import androidx.navigation.navArgument
 import com.interactiveword.ui.screens.collection.CollectionScreen
 import com.interactiveword.ui.screens.dictionary.DictionaryScreen
 import com.interactiveword.ui.screens.home.HomeScreen
+import com.interactiveword.ui.screens.login.LoginScreen
 import com.interactiveword.ui.screens.profile.ProfileScreen
 import com.interactiveword.ui.screens.scan.ScanScreen
 import com.interactiveword.ui.screens.wordcard.WordCardScreen
 
 sealed class Screen(val route: String) {
+    object Login      : Screen("login")
     object Home       : Screen("home")
     object Collection : Screen("collection")
     object Scan       : Screen("scan")
@@ -36,8 +38,11 @@ val bottomNavItems = listOf(
 fun AppNavHost(navController: NavHostController) {
     NavHost(
         navController  = navController,
-        startDestination = Screen.Home.route,
+        startDestination = Screen.Login.route,
     ) {
+        composable(Screen.Login.route) {
+            LoginScreen(navController = navController)
+        }
         composable(Screen.Home.route) {
             HomeScreen(navController = navController)
         }
