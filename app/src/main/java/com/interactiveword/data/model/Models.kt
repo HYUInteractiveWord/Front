@@ -46,10 +46,14 @@ data class WordCreateRequest(
     val source: String = "dictionary",
 )
 
-data class DictionarySearchResponse(
-    val word: String,
+data class DictionaryCandidate(
     val pos: String?,
     val definition: String?,
+)
+
+data class DictionarySearchResponse(
+    @SerializedName("search_query") val searchQuery: String,
+    val candidates: Map<String, DictionaryCandidate>,
 )
 
 data class ScanUploadResponse(

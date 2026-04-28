@@ -16,9 +16,9 @@ data class DictionaryResult(
 
 data class DictionaryUiState(
     val query: String = "",
-    val result: DictionaryResult? = null,
+    val candidates: List<DictionaryResult> = emptyList(),
     val isLoading: Boolean = false,
-    val addedSuccess: Boolean = false,
+    val addedWords: Set<String> = emptySet(),
 )
 
 @OptIn(FlowPreview::class)
@@ -33,7 +33,6 @@ class DictionaryViewModel(
     private val queryFlow = MutableStateFlow("")
 
     init {
-        // 500ms 디바운스 후 검색
         viewModelScope.launch {
             queryFlow
                 .debounce(500)
@@ -45,24 +44,20 @@ class DictionaryViewModel(
     }
 
     fun onQueryChange(q: String) {
-        _uiState.value = _uiState.value.copy(query = q, result = null)
+        _uiState.value = _uiState.value.copy(query = q, candidates = emptyList())
         queryFlow.value = q
     }
 
     private suspend fun search(query: String) {
         _uiState.value = _uiState.value.copy(isLoading = true)
         try {
-            val result = api.searchDictionary(query)
-            _uiState.value = _uiState.value.copy(
-                isLoading = false,
-                result = DictionaryResult(
-                    word       = result.word,
-                    pos        = result.pos,
-                    definition = result.definition,
-                ),
-            )
+            val response = api.searchDictionary(query)
+            val candidates = response.candidates.map { (word, info) ->
+                DictionaryResult(word = word, pos = info.pos, definition = info.definition)
+            }
+            _uiState.value = _uiState.value.copy(isLoading = false, candidates = candidates)
         } catch (e: Exception) {
-            _uiState.value = _uiState.value.copy(isLoading = false)
+            _uiState.value = _uiState.value.copy(isLoading = false, candidates = emptyList())
         }
     }
 
@@ -70,7 +65,9 @@ class DictionaryViewModel(
         viewModelScope.launch {
             try {
                 repo.createWord(word, source = "dictionary")
-                _uiState.value = _uiState.value.copy(addedSuccess = true)
+                _uiState.value = _uiState.value.copy(
+                    addedWords = _uiState.value.addedWords + word
+                )
             } catch (_: Exception) {}
         }
     }
