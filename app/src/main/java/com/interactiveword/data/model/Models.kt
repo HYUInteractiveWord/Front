@@ -65,6 +65,12 @@ data class ScanUploadResponse(
     val candidates: Map<String, Map<String, String>>,
 )
 
+data class YouTubeScanRequest(
+    val url: String,
+    @SerializedName("end_sec") val endSec: Double,
+    @SerializedName("duration_sec") val durationSec: Double = 10.0,
+)
+
 data class ScanProcessRequest(
     @SerializedName("extracted_words") val extractedWords: Map<String, Map<String, String>>,
     @SerializedName("scan_source") val scanSource: String = "mic",

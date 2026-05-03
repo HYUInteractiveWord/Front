@@ -3,6 +3,7 @@ package com.interactiveword.data.repository
 import com.interactiveword.data.api.RetrofitClient
 import com.interactiveword.data.model.ScanProcessRequest
 import com.interactiveword.data.model.ScanUploadResponse
+import com.interactiveword.data.model.YouTubeScanRequest
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -18,6 +19,9 @@ class ScanRepository {
         val source = scanSource.toRequestBody("text/plain".toMediaTypeOrNull())
         return api.uploadAudio(body, source)
     }
+
+    suspend fun scanYouTube(url: String, endSec: Double, durationSec: Double = 10.0): ScanUploadResponse =
+        api.scanYouTube(YouTubeScanRequest(url = url, endSec = endSec, durationSec = durationSec))
 
     suspend fun processScan(
         candidates: Map<String, Map<String, String>>,

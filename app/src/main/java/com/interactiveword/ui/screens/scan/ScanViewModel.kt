@@ -26,7 +26,7 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 
-enum class ScanType { MIC, MEDIA }
+enum class ScanType { MIC, MEDIA, YOUTUBE }
 
 data class ScanWordResult(
     val word: String,
@@ -158,9 +158,9 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
             } ?: uri.lastPathSegment ?: "선택된 파일"
 
             _uiState.value = _uiState.value.copy(
-                showMediaSheet      = true,
-                selectedFileName    = name,
-                mediaTotalMs        = totalMs,
+                showMediaSheet       = true,
+                selectedFileName     = name,
+                mediaTotalMs         = totalMs,
                 mediaScanDurationSec = minOf(30, (totalMs / 1000).toInt().coerceAtLeast(10)),
             )
         } catch (e: Exception) {
@@ -293,7 +293,7 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
                 val b = (srcIdx * srcChannels + ch) * 2
                 val lo = pcm[b].toInt() and 0xFF
                 val hi = pcm[b + 1].toInt() and 0xFF
-                sum += (lo or (hi shl 8)).toShort().toInt()  // sign-aware
+                sum += (lo or (hi shl 8)).toShort().toInt()
             }
             val mono = (sum / srcChannels).toInt().coerceIn(-32768, 32767)
             out.write(mono and 0xFF)
@@ -301,6 +301,38 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
         }
         return out.toByteArray()
     }
+
+    // ── [3] YouTube 공유 스캔 ─────────────────────────────────────────────────
+
+    fun startYoutubeScan(url: String) {
+        val endSec = extractTimestampSec(url)
+
+        _uiState.value = _uiState.value.copy(
+            scanType      = ScanType.YOUTUBE,
+            detectedWords = emptyList(),
+            addedWords    = emptySet(),
+            error         = null,
+            isLoading     = true,
+        )
+
+        viewModelScope.launch {
+            try {
+                val response = scanRepo.scanYouTube(url, endSec)
+                val words = response.candidates.map { (word, info) ->
+                    ScanWordResult(word = word, pos = info["pos"], definition = info["definition"])
+                }
+                _uiState.value = _uiState.value.copy(isLoading = false, detectedWords = words)
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false, error = "분석 실패: ${e.message}",
+                )
+            }
+        }
+    }
+
+    // URL 내 ?t=123 파라미터를 endSec으로 변환 (없으면 0 → 처음 10초 스캔)
+    private fun extractTimestampSec(url: String): Double =
+        Regex("[?&]t=(\\d+)").find(url)?.groupValues?.getOrNull(1)?.toDoubleOrNull() ?: 0.0
 
     // ── 공통 ────────────────────────────────────────────────────────────────
 

@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.interactiveword.ShareIntentHolder
 import com.interactiveword.ui.navigation.Screen
 
 @Composable
@@ -29,7 +30,10 @@ fun LoginScreen(navController: NavHostController) {
 
     LaunchedEffect(uiState) {
         if (uiState is LoginUiState.LoggedIn) {
-            navController.navigate(Screen.Home.route) {
+            // 공유 인텐트로 cold start된 경우 바로 스캔 화면으로
+            val destination = if (ShareIntentHolder.pendingYoutubeUrl.value != null)
+                Screen.Scan.route else Screen.Home.route
+            navController.navigate(destination) {
                 popUpTo(Screen.Login.route) { inclusive = true }
             }
         }

@@ -47,6 +47,8 @@ interface ApiService {
     suspend fun deleteWord(@Path("id") id: Int)
 
     // ── Scan ───────────────────────────────────────────────────────────────
+    @POST("api/scan/youtube")
+    suspend fun scanYouTube(@Body body: com.interactiveword.data.model.YouTubeScanRequest): com.interactiveword.data.model.ScanUploadResponse
     @Multipart
     @POST("api/scan/upload")
     suspend fun uploadAudio(

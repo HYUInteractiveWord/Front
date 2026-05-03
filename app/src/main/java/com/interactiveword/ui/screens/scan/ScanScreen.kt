@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.interactiveword.ShareIntentHolder
 import com.interactiveword.ui.theme.BrandAmberLight
 import com.interactiveword.ui.theme.BrandGreenLight
 import com.interactiveword.ui.theme.DarkMutedText
@@ -42,6 +43,14 @@ fun ScanScreen(
 ) {
     val uiState by vm.uiState.collectAsState()
     val context = LocalContext.current
+
+    // Share Intent로 전달된 YouTube URL 자동 처리
+    val pendingUrl by ShareIntentHolder.pendingYoutubeUrl.collectAsState()
+    LaunchedEffect(pendingUrl) {
+        val url = pendingUrl ?: return@LaunchedEffect
+        ShareIntentHolder.pendingYoutubeUrl.value = null  // 소비
+        vm.startYoutubeScan(url)
+    }
 
     // ── 마이크 권한 런처 ─────────────────────────────────────────────────────
     val micPermLauncher = rememberLauncherForActivityResult(
@@ -93,8 +102,11 @@ fun ScanScreen(
                     CircularProgressIndicator(color = BrandGreenLight)
                     Spacer(Modifier.height(16.dp))
                     Text(
-                        if (uiState.scanType == ScanType.MEDIA) "오디오 추출 및 분석 중..."
-                        else "분석 중...",
+                        when (uiState.scanType) {
+                            ScanType.MEDIA   -> "오디오 추출 및 분석 중..."
+                            ScanType.YOUTUBE -> "YouTube 분석 중..."
+                            else             -> "분석 중..."
+                        },
                         style = MaterialTheme.typography.bodyMedium,
                         color = DarkMutedText,
                     )
@@ -135,13 +147,19 @@ fun ScanScreen(
                             onClick  = { mediaPickerLauncher.launch(arrayOf("audio/*", "video/*")) },
                         )
                     }
+
+                    Spacer(Modifier.height(24.dp))
+                    YouTubeShareHint()
                 }
             }
 
             uiState.error?.let { err ->
                 Spacer(Modifier.height(16.dp))
-                Text(err, style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.error)
+                Text(
+                    err,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                )
             }
 
             if (uiState.detectedWords.isNotEmpty()) {
@@ -243,6 +261,28 @@ fun ScanScreen(
 // ── 공통 컴포저블 ──────────────────────────────────────────────────────────────
 
 @Composable
+private fun YouTubeShareHint() {
+    Surface(
+        shape  = MaterialTheme.shapes.extraLarge,
+        color  = MaterialTheme.colorScheme.surface,
+        border = androidx.compose.foundation.BorderStroke(1.dp, DarkOutline),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            Text("YouTube 영상 스캔하기", style = MaterialTheme.typography.titleSmall)
+            Text(
+                "YouTube 앱에서 영상 공유 → InteractiveWord 선택\n자동으로 해당 영상의 단어를 분석합니다",
+                style = MaterialTheme.typography.bodySmall,
+                color = DarkMutedText,
+            )
+        }
+    }
+}
+
+@Composable
 private fun ScanTypeButton(
     label: String,
     subLabel: String,
@@ -342,8 +382,8 @@ private fun DetectedWordItem(
             }
             Column(modifier = Modifier.weight(1f)) {
                 Row(
-                    verticalAlignment      = Alignment.CenterVertically,
-                    horizontalArrangement  = Arrangement.spacedBy(6.dp),
+                    verticalAlignment     = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
                     Text(result.word, style = MaterialTheme.typography.titleMedium)
                     result.pos?.let {
