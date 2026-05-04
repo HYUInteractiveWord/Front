@@ -8,8 +8,8 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
 
-    // 개발 중: 로컬 PC 서버 주소 (에뮬레이터는 10.0.2.2, 실기기는 PC IP)
-    private const val BASE_URL = "http://10.0.2.2:8000/"
+    // 개발 중: adb reverse tcp:8000 tcp:8000 실행 후 localhost 사용 (에뮬레이터/실기기 공통)
+    private const val BASE_URL = "http://localhost:8000/"
 
     // JWT 토큰 - TokenManager에서 주입
     var authToken: String? = null
