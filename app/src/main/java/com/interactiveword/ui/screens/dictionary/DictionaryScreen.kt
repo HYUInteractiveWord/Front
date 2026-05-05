@@ -18,6 +18,9 @@ import androidx.navigation.NavController
 import com.interactiveword.ui.theme.BrandGreenLight
 import com.interactiveword.ui.theme.DarkMutedText
 import com.interactiveword.ui.theme.DarkOutline
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.ImeAction
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,20 +51,39 @@ fun DictionaryScreen(
 
             // 검색 바
             OutlinedTextField(
-                value         = uiState.query,
+                value = uiState.query,
                 onValueChange = { vm.onQueryChange(it) },
-                placeholder   = { Text("한국어 단어 검색...", color = DarkMutedText) },
-                leadingIcon   = {
+                placeholder = { Text("한국어 단어 검색...", color = DarkMutedText) },
+                leadingIcon = {
                     Icon(Icons.Filled.Search, null, tint = DarkMutedText)
                 },
-                modifier      = Modifier.fillMaxWidth(),
-                singleLine    = true,
-                shape         = MaterialTheme.shapes.extraLarge,
-                colors        = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor   = BrandGreenLight,
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Search
+                ),
+                keyboardActions = KeyboardActions(
+                    onSearch = { vm.searchNow() }
+                ),
+                shape = MaterialTheme.shapes.extraLarge,
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = BrandGreenLight,
                     unfocusedBorderColor = DarkOutline,
                 ),
             )
+
+            Spacer(Modifier.height(8.dp))
+
+            Button(
+                onClick = { vm.searchNow() },
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.extraLarge,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = BrandGreenLight,
+                ),
+            ) {
+                Text("검색")
+            }
 
             Spacer(Modifier.height(16.dp))
 
@@ -70,6 +92,16 @@ fun DictionaryScreen(
                 uiState.isLoading -> {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator(color = BrandGreenLight)
+                    }
+                }
+
+                uiState.errorMessage != null -> {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(
+                            "검색 실패: ${uiState.errorMessage}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.error,
+                        )
                     }
                 }
                 uiState.result != null -> {

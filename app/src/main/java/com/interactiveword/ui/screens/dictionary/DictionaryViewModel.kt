@@ -18,6 +18,7 @@ data class DictionaryUiState(
     val result: DictionaryResult? = null,
     val isLoading: Boolean = false,
     val addedSuccess: Boolean = false,
+    val errorMessage: String? = null,
 )
 
 @OptIn(FlowPreview::class)
@@ -50,17 +51,20 @@ class DictionaryViewModel(
     private suspend fun search(query: String) {
         _uiState.value = _uiState.value.copy(isLoading = true)
         try {
-            val card = repo.createWord(query, source = "dictionary", dryRun = true)
+            val result = repo.searchDictionary(query)
             _uiState.value = _uiState.value.copy(
                 isLoading = false,
                 result = DictionaryResult(
-                    word       = card.koreanWord,
-                    pos        = card.pos,
-                    definition = card.definition,
+                    word = result.word,
+                    pos = result.pos,
+                    definition = result.definition,
                 ),
             )
         } catch (e: Exception) {
-            _uiState.value = _uiState.value.copy(isLoading = false)
+            _uiState.value = _uiState.value.copy(
+                isLoading = false,
+                errorMessage = e.message
+            )
         }
     }
 
@@ -70,6 +74,15 @@ class DictionaryViewModel(
                 repo.createWord(word, source = "dictionary")
                 _uiState.value = _uiState.value.copy(addedSuccess = true)
             } catch (_: Exception) {}
+        }
+    }
+
+    fun searchNow() {
+        val query = _uiState.value.query.trim()
+        if (query.isBlank()) return
+
+        viewModelScope.launch {
+            search(query)
         }
     }
 }

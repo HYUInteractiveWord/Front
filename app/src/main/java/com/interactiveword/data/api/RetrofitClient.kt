@@ -26,7 +26,6 @@ object RetrofitClient {
 
     // JWT 토큰 - TokenManager에서 주입
     var authToken: String? = null
-
     val api: ApiService by lazy {
         val logging = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY

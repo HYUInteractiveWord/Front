@@ -3,6 +3,7 @@ package com.interactiveword.data.repository
 import com.interactiveword.data.api.RetrofitClient
 import com.interactiveword.data.model.WordCard
 import com.interactiveword.data.model.WordCreateRequest
+import com.interactiveword.data.model.DictionarySearchResponse
 
 class WordRepository {
     private val api = RetrofitClient.api
@@ -10,6 +11,9 @@ class WordRepository {
     suspend fun getMyWords(): List<WordCard> = api.getMyWords()
 
     suspend fun getWord(id: Int): WordCard = api.getWord(id)
+
+    suspend fun searchDictionary(word: String): DictionarySearchResponse =
+    api.searchDictionary(word)
 
     /**
      * @param dryRun true면 실제 저장 없이 사전 정보만 조회 (Dictionary 검색 미리보기용)

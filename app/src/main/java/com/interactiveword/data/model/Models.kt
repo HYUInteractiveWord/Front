@@ -16,13 +16,26 @@ data class WordCard(
     @SerializedName("korean_word") val koreanWord: String,
     val pos: String?,
     val definition: String?,
+    @SerializedName("definition_english") val definitionEnglish: String? = null,
     @SerializedName("example_sentences") val exampleSentences: List<Any>?,
     @SerializedName("tts_audio_path") val ttsAudioPath: String?,
     val level: Int,
     @SerializedName("best_score") val bestScore: Float,
     @SerializedName("scan_count") val scanCount: Int,
     val source: String,
-    val pronunciation: String? = null,       // 로마자 발음 (로컬 보조 필드)
+    val pronunciation: String? = null,
+
+    @SerializedName("word_point")
+    val wordPoint: Int = 0,
+
+    @SerializedName("speaking_count")
+    val speakingCount: Int = 0,
+
+    @SerializedName("effect_level")
+    val effectLevel: Int = 0,
+
+    @SerializedName("last_practiced_at")
+    val lastPracticedAt: String? = null,
 )
 
 data class Mission(
@@ -66,4 +79,10 @@ data class PronunciationResponse(
     @SerializedName("is_new_best") val isNewBest: Boolean,
     @SerializedName("xp_gained") val xpGained: Int,
     @SerializedName("word_card_level") val wordCardLevel: Int,
+)
+
+data class DictionarySearchResponse(
+    val word: String,
+    val pos: String?,
+    val definition: String?,
 )

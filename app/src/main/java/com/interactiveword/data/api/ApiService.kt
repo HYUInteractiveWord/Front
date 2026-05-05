@@ -54,4 +54,10 @@ interface ApiService {
 
     @POST("api/missions/{id}/complete")
     suspend fun completeMission(@Path("id") id: Int): Mission
+
+    // Dictionary
+    @GET("api/dictionary/search")
+    suspend fun searchDictionary(
+        @Query("word") word: String
+    ): DictionarySearchResponse
 }
