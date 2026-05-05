@@ -10,6 +10,20 @@ object RetrofitClient {
     // 개발 중: 로컬 PC 서버 주소 (에뮬레이터는 10.0.2.2, 실기기는 PC IP)
     private const val BASE_URL = "http://10.0.2.2:8000/"
 
+    fun resolveStaticUrl(path: String?): String? {
+        if (path.isNullOrBlank()) return null
+
+        val normalizedPath = path
+            .replace("\\", "/")
+            .removePrefix("/")
+
+        if (normalizedPath.startsWith("http://") || normalizedPath.startsWith("https://")) {
+            return normalizedPath
+        }
+
+        return BASE_URL.trimEnd('/') + "/" + normalizedPath
+    }
+
     // JWT 토큰 - TokenManager에서 주입
     var authToken: String? = null
 

@@ -1,7 +1,9 @@
 package com.interactiveword.ui.screens.wordcard
 
+import android.media.MediaPlayer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.interactiveword.data.api.RetrofitClient
 import com.interactiveword.data.model.WordCard
 import com.interactiveword.data.repository.WordRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,6 +14,7 @@ import kotlinx.coroutines.launch
 data class WordCardUiState(
     val card: WordCard? = null,
     val isLoading: Boolean = false,
+    val errorMessage: String? = null,
 )
 
 class WordCardViewModel(
@@ -21,23 +24,60 @@ class WordCardViewModel(
     private val _uiState = MutableStateFlow(WordCardUiState())
     val uiState: StateFlow<WordCardUiState> = _uiState.asStateFlow()
 
+    private var mediaPlayer: MediaPlayer? = null
+
     fun loadCard(wordId: Int) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
             try {
                 val card = repo.getWord(wordId)
-                _uiState.value = WordCardUiState(card = card)
+                _uiState.value = WordCardUiState(card = card, isLoading = false)
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(isLoading = false)
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    errorMessage = e.message
+                )
             }
         }
     }
 
     fun playTts() {
-        // TODO: tts_audio_path로 MediaPlayer 재생
+        val path = _uiState.value.card?.ttsAudioPath
+        val url = RetrofitClient.resolveStaticUrl(path)
+
+        if (url == null) {
+            _uiState.value = _uiState.value.copy(errorMessage = "TTS 파일 경로가 없습니다.")
+            return
+        }
+
+        try {
+            mediaPlayer?.release()
+            mediaPlayer = MediaPlayer().apply {
+                setDataSource(url)
+                setOnPreparedListener { it.start() }
+                setOnCompletionListener {
+                    it.release()
+                    mediaPlayer = null
+                }
+                prepareAsync()
+            }
+        } catch (e: Exception) {
+            _uiState.value = _uiState.value.copy(
+                errorMessage = "TTS 재생 실패: ${e.message}"
+            )
+        }
     }
 
     fun startPronunciationPractice() {
-        // TODO: 마이크 녹음 시작 → 백엔드 /pronunciation/submit
+        // 지금은 발음교정 모듈이 붙기 전이라 placeholder만 둠
+        _uiState.value = _uiState.value.copy(
+            errorMessage = "발음 연습 기능은 준비 중입니다."
+        )
+    }
+
+    override fun onCleared() {
+        mediaPlayer?.release()
+        mediaPlayer = null
+        super.onCleared()
     }
 }
