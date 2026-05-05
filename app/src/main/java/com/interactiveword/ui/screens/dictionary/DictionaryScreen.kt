@@ -1,10 +1,12 @@
 package com.interactiveword.ui.screens.dictionary
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -12,15 +14,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.interactiveword.ui.theme.BrandGreenLight
 import com.interactiveword.ui.theme.DarkMutedText
 import com.interactiveword.ui.theme.DarkOutline
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.ui.text.input.ImeAction
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,7 +33,7 @@ fun DictionaryScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("사전 검색") },
+                title = { Text("사전") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
                 ),
@@ -49,21 +49,20 @@ fun DictionaryScreen(
         ) {
             Spacer(Modifier.height(8.dp))
 
-            // 검색 바
             OutlinedTextField(
                 value = uiState.query,
                 onValueChange = { vm.onQueryChange(it) },
                 placeholder = { Text("한국어 단어 검색...", color = DarkMutedText) },
                 leadingIcon = {
-                    Icon(Icons.Filled.Search, null, tint = DarkMutedText)
+                    Icon(Icons.Filled.Search, contentDescription = null, tint = DarkMutedText)
                 },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Search
+                    imeAction = ImeAction.Search,
                 ),
                 keyboardActions = KeyboardActions(
-                    onSearch = { vm.searchNow() }
+                    onSearch = { vm.searchNow() },
                 ),
                 shape = MaterialTheme.shapes.extraLarge,
                 colors = OutlinedTextFieldDefaults.colors(
@@ -87,79 +86,119 @@ fun DictionaryScreen(
 
             Spacer(Modifier.height(16.dp))
 
-            // 결과
             when {
                 uiState.isLoading -> {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center,
+                    ) {
                         CircularProgressIndicator(color = BrandGreenLight)
                     }
                 }
 
                 uiState.errorMessage != null -> {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center,
+                    ) {
                         Text(
-                            "검색 실패: ${uiState.errorMessage}",
+                            text = "검색 실패: ${uiState.errorMessage}",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.error,
                         )
                     }
                 }
-                uiState.result != null -> {
-                    val result = uiState.result!!
-                    Card(
-                        shape  = MaterialTheme.shapes.large,
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surface,
-                        ),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, DarkOutline),
-                        modifier = Modifier.fillMaxWidth(),
+
+                uiState.candidates.isNotEmpty() -> {
+                    Text(
+                        text = "검색 결과 ${uiState.candidates.size}개",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = DarkMutedText,
+                        modifier = Modifier.padding(bottom = 8.dp),
+                    )
+
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
                     ) {
-                        Column(modifier = Modifier.padding(20.dp)) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween,
+                        items(uiState.candidates) { result ->
+                            val added = result.word in uiState.addedWords
+
+                            Card(
+                                shape = MaterialTheme.shapes.large,
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surface,
+                                ),
+                                border = BorderStroke(1.dp, DarkOutline),
                                 modifier = Modifier.fillMaxWidth(),
                             ) {
-                                Text(result.word, style = MaterialTheme.typography.headlineMedium)
-                                result.pos?.let {
-                                    Surface(
-                                        shape = MaterialTheme.shapes.small,
-                                        color = BrandGreenLight.copy(alpha = 0.15f),
+                                Column(modifier = Modifier.padding(16.dp)) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        modifier = Modifier.fillMaxWidth(),
                                     ) {
+                                        Column(modifier = Modifier.weight(1f)) {
+                                            Text(
+                                                text = result.word,
+                                                style = MaterialTheme.typography.titleLarge,
+                                            )
+
+                                            if (!result.pos.isNullOrBlank()) {
+                                                Spacer(Modifier.height(4.dp))
+                                                Text(
+                                                    text = "분류: ${result.pos}",
+                                                    style = MaterialTheme.typography.bodySmall,
+                                                    color = BrandGreenLight,
+                                                )
+                                            }
+                                        }
+
+                                        Button(
+                                            onClick = { vm.addToCollection(result.word) },
+                                            enabled = !added,
+                                            shape = MaterialTheme.shapes.large,
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = BrandGreenLight,
+                                            ),
+                                        ) {
+                                            Text(if (added) "추가됨" else "추가")
+                                        }
+                                    }
+
+                                    if (!result.definition.isNullOrBlank()) {
+                                        Spacer(Modifier.height(12.dp))
                                         Text(
-                                            it,
-                                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                                            style = MaterialTheme.typography.labelMedium,
-                                            color = BrandGreenLight,
+                                            text = result.definition,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = DarkMutedText,
                                         )
                                     }
                                 }
                             }
-                            Spacer(Modifier.height(8.dp))
-                            Text(
-                                result.definition ?: "뜻을 찾을 수 없습니다.",
-                                style = MaterialTheme.typography.bodyMedium,
-                            )
-                            Spacer(Modifier.height(16.dp))
-                            Button(
-                                onClick = { vm.addToCollection(result.word) },
-                                modifier = Modifier.fillMaxWidth(),
-                                shape = MaterialTheme.shapes.extraLarge,
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = BrandGreenLight,
-                                ),
-                            ) {
-                                Icon(Icons.Filled.Add, null, modifier = Modifier.size(18.dp))
-                                Spacer(Modifier.width(8.dp))
-                                Text("단어장에 추가")
-                            }
                         }
                     }
                 }
-                uiState.query.isEmpty() -> {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+
+                uiState.query.isBlank() -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center,
+                    ) {
                         Text(
-                            "알고 싶은 한국어 단어를 검색해보세요",
+                            text = "검색할 단어를 입력하세요.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = DarkMutedText,
+                        )
+                    }
+                }
+
+                else -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            text = "검색 결과가 없습니다.",
                             style = MaterialTheme.typography.bodyMedium,
                             color = DarkMutedText,
                         )

@@ -17,9 +17,5 @@ class UserRepository {
         return response.accessToken
     }
 
-    // TODO: 백엔드에 /api/auth/me 엔드포인트 추가 필요
-    // 현재는 임시로 단어장을 조회해 유저 정보를 간접 확인
-    suspend fun getMe(): User {
-        throw NotImplementedError("/api/auth/me 엔드포인트가 아직 없습니다")
-    }
+    suspend fun getMe(): User = api.getMe()
 }

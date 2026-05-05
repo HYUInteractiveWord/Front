@@ -7,7 +7,7 @@
     <!-- 마이크 녹음 -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
-    <!-- Foreground Service (상시 알림) -->
+    <!-- Foreground Service (오디오 캡처용) -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
 
@@ -24,19 +24,27 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.InteractiveWord">
+        android:theme="@style/Theme.InteractiveWord"
+        android:networkSecurityConfig="@xml/network_security_config">
 
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:launchMode="singleTask"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <!-- YouTube 공유 수신 -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
         </activity>
 
-        <!-- 오디오 캡처 Foreground Service -->
+        <!-- 오디오 캡처 Foreground Service (MediaProjection) -->
         <service
             android:name=".service.CaptureService"
             android:foregroundServiceType="mediaProjection"

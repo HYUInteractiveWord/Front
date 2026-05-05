@@ -4,7 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.interactiveword.data.repository.WordRepository
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
 data class DictionaryResult(
@@ -15,9 +19,10 @@ data class DictionaryResult(
 
 data class DictionaryUiState(
     val query: String = "",
-    val result: DictionaryResult? = null,
+    val candidates: List<DictionaryResult> = emptyList(),
     val isLoading: Boolean = false,
     val addedSuccess: Boolean = false,
+    val addedWords: Set<String> = emptySet(),
     val errorMessage: String? = null,
 )
 
@@ -27,12 +32,11 @@ class DictionaryViewModel(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DictionaryUiState())
-    val uiState: StateFlow<DictionaryUiState> = _uiState.asStateFlow()
+    val uiState: StateFlow<DictionaryUiState> = _uiState
 
     private val queryFlow = MutableStateFlow("")
 
     init {
-        // 500ms 디바운스 후 검색
         viewModelScope.launch {
             queryFlow
                 .debounce(500)
@@ -44,26 +48,57 @@ class DictionaryViewModel(
     }
 
     fun onQueryChange(q: String) {
-        _uiState.value = _uiState.value.copy(query = q, result = null)
+        _uiState.value = _uiState.value.copy(
+            query = q,
+            candidates = emptyList(),
+            errorMessage = null,
+        )
         queryFlow.value = q
     }
 
     private suspend fun search(query: String) {
-        _uiState.value = _uiState.value.copy(isLoading = true)
+        _uiState.value = _uiState.value.copy(
+            isLoading = true,
+            errorMessage = null,
+        )
+
         try {
-            val result = repo.searchDictionary(query)
+            val response = repo.searchDictionary(query)
+
+            val candidateResults = response.candidates.map { (word, info) ->
+                DictionaryResult(
+                    word = word,
+                    pos = info.pos,
+                    definition = info.definition,
+                )
+            }
+
+            val fallbackResult = response.word
+                ?.takeIf { it.isNotBlank() }
+                ?.let {
+                    DictionaryResult(
+                        word = it,
+                        pos = response.pos,
+                        definition = response.definition,
+                    )
+                }
+
+            val results = if (candidateResults.isNotEmpty()) {
+                candidateResults
+            } else {
+                listOfNotNull(fallbackResult)
+            }
+
             _uiState.value = _uiState.value.copy(
                 isLoading = false,
-                result = DictionaryResult(
-                    word = result.word,
-                    pos = result.pos,
-                    definition = result.definition,
-                ),
+                candidates = results,
+                errorMessage = null,
             )
         } catch (e: Exception) {
             _uiState.value = _uiState.value.copy(
                 isLoading = false,
-                errorMessage = e.message
+                candidates = emptyList(),
+                errorMessage = e.message ?: "검색에 실패했습니다.",
             )
         }
     }
@@ -72,8 +107,15 @@ class DictionaryViewModel(
         viewModelScope.launch {
             try {
                 repo.createWord(word, source = "dictionary")
-                _uiState.value = _uiState.value.copy(addedSuccess = true)
-            } catch (_: Exception) {}
+                _uiState.value = _uiState.value.copy(
+                    addedWords = _uiState.value.addedWords + word,
+                    addedSuccess = true,
+                )
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    errorMessage = e.message ?: "단어장 추가에 실패했습니다.",
+                )
+            }
         }
     }
 

@@ -40,7 +40,7 @@ data class WordCard(
 
 data class Mission(
     val id: Int,
-    @SerializedName("user_id") val userId: Int,
+    @SerializedName("user_id") val userId: Int? = null,
     @SerializedName("mission_type") val missionType: String,
     val parameter: String?,
     val progress: Int,
@@ -59,9 +59,39 @@ data class WordCreateRequest(
     val source: String = "dictionary",
 )
 
-data class ScanProcessRequest(
+data class DictionaryCandidateInfo(
+    val pos: String?,
+    val definition: String?,
+)
+
+data class DictionarySearchResponse(
+    val word: String? = null,
+    val pos: String? = null,
+    val definition: String? = null,
+
+    @SerializedName("search_query")
+    val searchQuery: String? = null,
+
+    val candidates: Map<String, DictionaryCandidateInfo> = emptyMap(),
+)
+
+data class ScanUploadResponse(
+    @SerializedName("scan_source") val scanSource: String,
+    @SerializedName("raw_text") val rawText: String,
+    @SerializedName("corrected_text") val correctedText: String,
+    @SerializedName("llm_raw_output") val llmRawOutput: String,
     @SerializedName("extracted_words") val extractedWords: List<String>,
-    @SerializedName("full_text") val fullText: String? = null,
+    val candidates: Map<String, Map<String, String>>,
+)
+
+data class YouTubeScanRequest(
+    val url: String,
+    @SerializedName("end_sec") val endSec: Double,
+    @SerializedName("duration_sec") val durationSec: Double = 10.0,
+)
+
+data class ScanProcessRequest(
+    @SerializedName("extracted_words") val extractedWords: Map<String, Map<String, String>>,
     @SerializedName("scan_source") val scanSource: String = "mic",
 )
 
@@ -79,10 +109,4 @@ data class PronunciationResponse(
     @SerializedName("is_new_best") val isNewBest: Boolean,
     @SerializedName("xp_gained") val xpGained: Int,
     @SerializedName("word_card_level") val wordCardLevel: Int,
-)
-
-data class DictionarySearchResponse(
-    val word: String,
-    val pos: String?,
-    val definition: String?,
 )
