@@ -3,12 +3,8 @@ package com.interactiveword.ui.screens.dictionary
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.interactiveword.data.repository.WordRepository
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
 data class DictionaryResult(
@@ -26,7 +22,6 @@ data class DictionaryUiState(
     val errorMessage: String? = null,
 )
 
-@OptIn(FlowPreview::class)
 class DictionaryViewModel(
     private val repo: WordRepository = WordRepository(),
 ) : ViewModel() {
@@ -34,26 +29,12 @@ class DictionaryViewModel(
     private val _uiState = MutableStateFlow(DictionaryUiState())
     val uiState: StateFlow<DictionaryUiState> = _uiState
 
-    private val queryFlow = MutableStateFlow("")
-
-    init {
-        viewModelScope.launch {
-            queryFlow
-                .debounce(500)
-                .filter { it.isNotBlank() }
-                .collectLatest { query ->
-                    search(query)
-                }
-        }
-    }
-
     fun onQueryChange(q: String) {
         _uiState.value = _uiState.value.copy(
             query = q,
             candidates = emptyList(),
             errorMessage = null,
         )
-        queryFlow.value = q
     }
 
     private suspend fun search(query: String) {
