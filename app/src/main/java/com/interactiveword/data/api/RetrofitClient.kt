@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
 
-    private const val BASE_URL = "http://54.180.79.55:8000/"
+    private const val BASE_URL = "http://52.79.87.236:8000/"
 
     fun resolveStaticUrl(path: String?): String? {
         if (path.isNullOrBlank()) return null
