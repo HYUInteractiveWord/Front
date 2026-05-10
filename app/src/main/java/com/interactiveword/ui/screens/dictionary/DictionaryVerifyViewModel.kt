@@ -33,6 +33,7 @@ data class DictionaryVerifyUiState(
     val isVerifying: Boolean = false,
     val isSaving: Boolean = false,
     val hasRecordedOnce: Boolean = false,
+    val hasVerifiedOnce: Boolean = false,
     val isMatch: Boolean? = null,
     val spokenRaw: String? = null,
     val spokenCorrected: String? = null,
@@ -188,6 +189,7 @@ class DictionaryVerifyViewModel(
 
                 _uiState.value = _uiState.value.copy(
                     isVerifying = false,
+                    hasVerifiedOnce = true,
                     isMatch = result.isMatch,
                     spokenRaw = result.spokenRaw,
                     spokenCorrected = result.spokenCorrected,
@@ -208,7 +210,7 @@ class DictionaryVerifyViewModel(
     }
 
     fun saveToCollection() {
-        if (_uiState.value.isMatch != true || _uiState.value.isSaving) return
+        if (!_uiState.value.hasVerifiedOnce || _uiState.value.isSaving) return
 
         viewModelScope.launch {
             try {

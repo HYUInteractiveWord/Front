@@ -259,7 +259,7 @@ fun DictionaryVerifyScreen(
                             }
                             uiState.isMatch == false -> {
                                 val spoken = uiState.spokenCorrected ?: uiState.spokenRaw ?: "알 수 없음"
-                                "인식 결과: \"$spoken\". 목표 단어와 일치하지 않아 다시 시도해주세요."
+                                "인식 결과: \"$spoken\". 목표 단어와 일치하지 않았지만, 원하면 지금 단어장에 추가할 수 있습니다."
                             }
                             uiState.hasRecordedOnce -> "녹음이 완료되었습니다."
                             else -> "버튼을 눌러 단어를 한 번 발음해보세요."
@@ -317,7 +317,7 @@ fun DictionaryVerifyScreen(
 
                 Button(
                     onClick = { vm.saveToCollection() },
-                    enabled = uiState.isMatch == true && !uiState.isSaving,
+                    enabled = uiState.hasVerifiedOnce && !uiState.isSaving,
                     modifier = Modifier.weight(1f),
                     shape = MaterialTheme.shapes.large,
                     colors = ButtonDefaults.buttonColors(
