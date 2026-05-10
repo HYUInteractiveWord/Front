@@ -18,6 +18,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.interactiveword.ui.navigation.Screen
 import com.interactiveword.ui.theme.BrandGreenLight
 import com.interactiveword.ui.theme.DarkMutedText
 import com.interactiveword.ui.theme.DarkOutline
@@ -155,7 +156,15 @@ fun DictionaryScreen(
                                         }
 
                                         Button(
-                                            onClick = { vm.addToCollection(result.word) },
+                                            onClick = {
+                                                navController.navigate(
+                                                    Screen.DictionaryVerify.createRoute(
+                                                        word = result.word,
+                                                        pos = result.pos,
+                                                        definition = result.definition,
+                                                    )
+                                                )
+                                            },
                                             enabled = !added,
                                             shape = MaterialTheme.shapes.large,
                                             colors = ButtonDefaults.buttonColors(

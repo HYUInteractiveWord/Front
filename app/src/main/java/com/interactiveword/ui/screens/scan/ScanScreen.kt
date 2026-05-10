@@ -29,6 +29,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.interactiveword.ShareIntentHolder
+import com.interactiveword.ui.navigation.Screen
 import com.interactiveword.ui.theme.BrandAmberLight
 import com.interactiveword.ui.theme.BrandGreenLight
 import com.interactiveword.ui.theme.DarkMutedText
@@ -183,7 +184,16 @@ fun ScanScreen(
                         DetectedWordItem(
                             result    = result,
                             added     = result.word in uiState.addedWords,
-                            onAdd     = { vm.addWordToCollection(result.word) },
+                            onAdd     = {
+                                navController.navigate(
+                                    Screen.DictionaryVerify.createRoute(
+                                        word = result.word,
+                                        pos = result.pos,
+                                        definition = result.definition,
+                                        source = "scan",
+                                    )
+                                )
+                            },
                             onDismiss = { vm.dismissWord(result.word) },
                         )
                     }

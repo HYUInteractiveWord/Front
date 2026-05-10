@@ -75,6 +75,27 @@ data class DictionarySearchResponse(
     val candidates: Map<String, DictionaryCandidateInfo> = emptyMap(),
 )
 
+data class DictionaryPreviewRequest(
+    val word: String,
+    val definition: String,
+    val pos: String,
+)
+
+data class DictionaryPreviewResponse(
+    val word: String? = null,
+    val definition: String? = null,
+    @SerializedName("definition_english") val definitionEnglish: String? = null,
+    val pos: String? = null,
+    val pronunciation: String? = null,
+    @SerializedName("audio_path") val audioPath: String? = null,
+)
+
+data class DictionaryVerifyResponse(
+    @SerializedName("is_match") val isMatch: Boolean,
+    @SerializedName("spoken_raw") val spokenRaw: String? = null,
+    @SerializedName("spoken_corrected") val spokenCorrected: String? = null,
+)
+
 data class ScanUploadResponse(
     @SerializedName("scan_source") val scanSource: String,
     @SerializedName("raw_text") val rawText: String,
