@@ -22,16 +22,18 @@ sealed class Screen(val route: String) {
     object Collection : Screen("collection")
     object Scan       : Screen("scan")
     object Dictionary : Screen("dictionary")
-    object DictionaryVerify : Screen("dictionary_verify?word={word}&pos={pos}&definition={definition}") {
+    object DictionaryVerify : Screen("dictionary_verify?word={word}&pos={pos}&definition={definition}&source={source}") {
         fun createRoute(
             word: String,
             pos: String?,
             definition: String?,
+            source: String = "dictionary",
         ): String = buildString {
             append("dictionary_verify")
             append("?word=${Uri.encode(word)}")
             append("&pos=${Uri.encode(pos.orEmpty())}")
             append("&definition=${Uri.encode(definition.orEmpty())}")
+            append("&source=${Uri.encode(source)}")
         }
     }
     object Profile    : Screen("profile")
@@ -81,6 +83,10 @@ fun AppNavHost(navController: NavHostController) {
                     type = NavType.StringType
                     defaultValue = ""
                 },
+                navArgument("source") {
+                    type = NavType.StringType
+                    defaultValue = "dictionary"
+                },
             ),
         ) { backStack ->
             val args = backStack.arguments ?: return@composable
@@ -89,6 +95,7 @@ fun AppNavHost(navController: NavHostController) {
                 word = args.getString("word").orEmpty(),
                 pos = args.getString("pos").orEmpty(),
                 definition = args.getString("definition").orEmpty(),
+                source = args.getString("source").orEmpty(),
             )
         }
         composable(Screen.Profile.route) {

@@ -61,6 +61,7 @@ fun DictionaryVerifyScreen(
     word: String,
     pos: String,
     definition: String,
+    source: String,
 ) {
     val context = LocalContext.current
     val app = context.applicationContext as Application
@@ -70,6 +71,7 @@ fun DictionaryVerifyScreen(
             word = word,
             pos = pos,
             definition = definition,
+            source = source,
         )
     )
     val uiState by vm.uiState.collectAsState()
@@ -101,7 +103,13 @@ fun DictionaryVerifyScreen(
     LaunchedEffect(uiState.saveCompleted) {
         if (uiState.saveCompleted) {
             navController.navigate(Screen.Collection.route) {
-                popUpTo(Screen.Dictionary.route) { inclusive = false }
+                popUpTo(
+                    if (source == "scan") {
+                        Screen.Scan.route
+                    } else {
+                        Screen.Dictionary.route
+                    }
+                ) { inclusive = false }
                 launchSingleTop = true
             }
             vm.consumeSaveCompleted()
