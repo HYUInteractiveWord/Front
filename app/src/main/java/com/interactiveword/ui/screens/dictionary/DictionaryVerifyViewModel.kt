@@ -215,7 +215,12 @@ class DictionaryVerifyViewModel(
         viewModelScope.launch {
             try {
                 _uiState.value = _uiState.value.copy(isSaving = true, errorMessage = null)
-                repo.createWord(_uiState.value.word, source = "dictionary")
+                repo.createWord(
+                    _uiState.value.word,
+                    source = "dictionary",
+                    pos = _uiState.value.pos,
+                    definition = _uiState.value.definition,
+                )
                 _uiState.value = _uiState.value.copy(
                     isSaving = false,
                     saveCompleted = true,

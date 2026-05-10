@@ -20,7 +20,6 @@ data class WordCardUiState(
 class WordCardViewModel(
     private val repo: WordRepository = WordRepository(),
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(WordCardUiState())
     val uiState: StateFlow<WordCardUiState> = _uiState.asStateFlow()
 
@@ -50,6 +49,21 @@ class WordCardViewModel(
             return
         }
 
+        playUrl(url, "TTS 재생 실패")
+    }
+
+    fun playExampleTts(path: String?) {
+        val url = RetrofitClient.resolveStaticUrl(path)
+
+        if (url == null) {
+            _uiState.value = _uiState.value.copy(errorMessage = "예문 TTS 파일 경로가 없습니다.")
+            return
+        }
+
+        playUrl(url, "예문 TTS 재생 실패")
+    }
+
+    private fun playUrl(url: String, errorPrefix: String) {
         try {
             mediaPlayer?.release()
             mediaPlayer = MediaPlayer().apply {
@@ -63,13 +77,12 @@ class WordCardViewModel(
             }
         } catch (e: Exception) {
             _uiState.value = _uiState.value.copy(
-                errorMessage = "TTS 재생 실패: ${e.message}"
+                errorMessage = "$errorPrefix: ${e.message}"
             )
         }
     }
 
     fun startPronunciationPractice() {
-        // 지금은 발음교정 모듈이 붙기 전이라 placeholder만 둠
         _uiState.value = _uiState.value.copy(
             errorMessage = "발음 연습 기능은 준비 중입니다."
         )
