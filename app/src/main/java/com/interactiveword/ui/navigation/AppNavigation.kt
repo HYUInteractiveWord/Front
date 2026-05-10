@@ -1,6 +1,7 @@
 package com.interactiveword.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -35,10 +36,11 @@ val bottomNavItems = listOf(
 )
 
 @Composable
-fun AppNavHost(navController: NavHostController) {
+fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) {
     NavHost(
-        navController  = navController,
+        navController    = navController,
         startDestination = Screen.Login.route,
+        modifier         = modifier,
     ) {
         composable(Screen.Login.route) {
             LoginScreen(navController = navController)

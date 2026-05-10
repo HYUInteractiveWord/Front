@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MenuBook
@@ -101,8 +102,11 @@ private fun MainApp() {
         bottomBar = {
             BottomNavBar(navController = navController, currentRoute = currentRoute)
         },
-    ) { _ ->
-        AppNavHost(navController = navController)
+    ) { padding ->
+        AppNavHost(
+            navController = navController,
+            modifier = Modifier.padding(bottom = padding.calculateBottomPadding()),
+        )
     }
 }
 
@@ -119,7 +123,12 @@ private fun BottomNavBar(
             if (index == 2) {
                 NavigationBarItem(
                     selected = currentRoute == Screen.Scan.route,
-                    onClick  = { navController.navigate(Screen.Scan.route) },
+                    onClick  = {
+                        navController.navigate(Screen.Scan.route) {
+                            popUpTo(Screen.Home.route) { saveState = false }
+                            launchSingleTop = true
+                        }
+                    },
                     icon  = { Icon(Icons.Filled.Mic, contentDescription = "스캔") },
                     label = { Text("스캔") },
                     colors = NavigationBarItemDefaults.colors(
@@ -131,10 +140,14 @@ private fun BottomNavBar(
                 selected = currentRoute == item.screen.route,
                 onClick  = {
                     if (currentRoute != item.screen.route) {
-                        navController.navigate(item.screen.route) {
-                            popUpTo(Screen.Home.route) { saveState = true }
-                            launchSingleTop = true
-                            restoreState    = true
+                        if (item.screen == Screen.Home) {
+                            navController.popBackStack(Screen.Home.route, inclusive = false)
+                        } else {
+                            navController.navigate(item.screen.route) {
+                                popUpTo(Screen.Home.route) { saveState = true }
+                                launchSingleTop = true
+                                restoreState    = true
+                            }
                         }
                     }
                 },

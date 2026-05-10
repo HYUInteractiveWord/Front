@@ -64,6 +64,11 @@ fun ScanScreen(
         else micPermLauncher.launch(Manifest.permission.RECORD_AUDIO)
     }
 
+    // 화면 벗어날 때 녹음 정리
+    DisposableEffect(Unit) {
+        onDispose { vm.stopRecording() }
+    }
+
     // ── 미디어 파일 피커 ──────────────────────────────────────────────────────
     val mediaPickerLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocument()
@@ -170,7 +175,10 @@ fun ScanScreen(
                     modifier = Modifier.align(Alignment.Start),
                 )
                 Spacer(Modifier.height(8.dp))
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                LazyColumn(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
                     items(uiState.detectedWords, key = { it.word }) { result ->
                         DetectedWordItem(
                             result    = result,
