@@ -422,11 +422,11 @@ private fun VocabQuizEntryCard(
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "단어 뜻 테스트",
+                        text = "단어 암기 테스트",
                         style = MaterialTheme.typography.titleMedium,
                     )
                     Text(
-                        text = "뜻을 보고 단어 맞추기",
+                        text = "수집한 단어로 실력을 테스트해보세요",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )

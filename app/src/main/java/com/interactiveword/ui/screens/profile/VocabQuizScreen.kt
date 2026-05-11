@@ -54,7 +54,7 @@ fun VocabQuizScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("단어 뜻 테스트") },
+                title = { Text("단어 암기 테스트") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
                 ),
@@ -101,8 +101,9 @@ fun VocabQuizScreen(
                     padding = padding,
                     currentIndex = uiState.currentIndex,
                     totalQuestions = uiState.totalQuestions,
-                    definition = question.definition,
-                    correctWord = question.correctWord,
+                    questionType = question.type,
+                    prompt = question.prompt,
+                    correctAnswer = question.correctAnswer,
                     options = question.options,
                     selectedAnswer = uiState.selectedAnswer,
                     isAnswerChecked = uiState.isAnswerChecked,
@@ -119,8 +120,9 @@ private fun VocabQuizQuestionState(
     padding: PaddingValues,
     currentIndex: Int,
     totalQuestions: Int,
-    definition: String,
-    correctWord: String,
+    questionType: VocabQuizType,
+    prompt: String,
+    correctAnswer: String,
     options: List<String>,
     selectedAnswer: String?,
     isAnswerChecked: Boolean,
@@ -147,7 +149,11 @@ private fun VocabQuizQuestionState(
                         style = MaterialTheme.typography.titleMedium,
                     )
                     Text(
-                        text = "뜻 → 단어 맞추기",
+                        text = if (questionType == VocabQuizType.DEFINITION_TO_WORD) {
+                            "뜻 → 단어 맞추기"
+                        } else {
+                            "단어 → 뜻 맞추기"
+                        },
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -177,12 +183,16 @@ private fun VocabQuizQuestionState(
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
                     Text(
-                        text = "이 뜻에 맞는 단어를 골라주세요.",
+                        text = if (questionType == VocabQuizType.DEFINITION_TO_WORD) {
+                            "이 뜻에 맞는 단어를 골라주세요."
+                        } else {
+                            "이 단어에 맞는 뜻을 골라주세요."
+                        },
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Text(
-                        text = definition,
+                        text = prompt,
                         style = MaterialTheme.typography.headlineSmall,
                     )
                 }
@@ -192,7 +202,7 @@ private fun VocabQuizQuestionState(
         items(options) { option ->
             val colors = optionCardColors(
                 option = option,
-                correctAnswer = correctWord,
+                correctAnswer = correctAnswer,
                 selectedAnswer = selectedAnswer,
                 isAnswerChecked = isAnswerChecked,
             )
@@ -222,13 +232,13 @@ private fun VocabQuizQuestionState(
         if (isAnswerChecked) {
             item {
                 Text(
-                    text = if (selectedAnswer == correctWord) {
+                    text = if (selectedAnswer == correctAnswer) {
                         "정답입니다."
                     } else {
-                        "정답은 '$correctWord' 입니다."
+                        "정답은 '$correctAnswer' 입니다."
                     },
                     style = MaterialTheme.typography.bodyLarge,
-                    color = if (selectedAnswer == correctWord) BrandGreenLight else ErrorRed,
+                    color = if (selectedAnswer == correctAnswer) BrandGreenLight else ErrorRed,
                 )
             }
             item {
@@ -285,7 +295,7 @@ private fun VocabQuizResultState(
                     color = BrandGreenLight,
                 )
                 Text(
-                    text = "현재 단계에서는 단어 뜻 테스트 점수를 로컬로만 계산합니다.",
+                    text = "현재 단계에서는 단어 암기 테스트 점수를 로컬로만 계산합니다.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -359,7 +369,7 @@ private fun EmptyVocabQuizState(
                     }
                 }
                 Text(
-                    text = "단어 뜻 테스트를 시작할 수 없어요",
+                    text = "단어 암기 테스트를 시작할 수 없어요",
                     style = MaterialTheme.typography.titleLarge,
                 )
                 Text(
