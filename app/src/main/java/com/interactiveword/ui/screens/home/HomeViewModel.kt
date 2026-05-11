@@ -17,14 +17,15 @@ data class HomeUiState(
     val user: User? = null,
     val dailyMissions: List<Mission> = emptyList(),
     val recentWords: List<WordCard> = emptyList(),
+    val wordCount: Int = 0,
     val isCaptureServiceRunning: Boolean = false,
     val isLoading: Boolean = false,
     val error: String? = null,
 )
 
 class HomeViewModel(
-    private val userRepo: UserRepository   = UserRepository(),
-    private val wordRepo: WordRepository   = WordRepository(),
+    private val userRepo: UserRepository = UserRepository(),
+    private val wordRepo: WordRepository = WordRepository(),
     private val missionRepo: MissionRepository = MissionRepository(),
 ) : ViewModel() {
 
@@ -37,18 +38,26 @@ class HomeViewModel(
 
     fun loadData() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true)
+            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+
             try {
-                val words    = wordRepo.getMyWords()
+                val user = userRepo.getMe()
+                val words = wordRepo.getMyWords()
                 val missions = missionRepo.getDailyMissions()
+
                 _uiState.value = _uiState.value.copy(
-                    recentWords   = words.takeLast(4).reversed(),
+                    user = user,
+                    recentWords = words.takeLast(4).reversed(),
+                    wordCount = words.size,
                     dailyMissions = missions,
-                    isLoading     = false,
+                    isLoading = false,
+                    error = null,
                 )
-            } catch (_: Throwable) {
-                // 서버 미연결 시 빈 상태로 표시 (로그인 화면 구현 후 교체)
-                _uiState.value = _uiState.value.copy(isLoading = false)
+            } catch (e: Throwable) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    error = e.message,
+                )
             }
         }
     }
@@ -57,6 +66,5 @@ class HomeViewModel(
         _uiState.value = _uiState.value.copy(
             isCaptureServiceRunning = !_uiState.value.isCaptureServiceRunning,
         )
-        // TODO: 실제 CaptureService 시작/종료 인텐트 전송
     }
 }

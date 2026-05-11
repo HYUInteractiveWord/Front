@@ -15,6 +15,8 @@ import com.interactiveword.data.model.TokenResponse
 import com.interactiveword.data.model.User
 import com.interactiveword.data.model.WordCard
 import com.interactiveword.data.model.WordCreateRequest
+import com.interactiveword.data.model.WordQuizResultResponse
+import com.interactiveword.data.model.WordQuizResultRequest
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.*
@@ -58,6 +60,9 @@ interface ApiService {
 
     @DELETE("api/words/{id}")
     suspend fun deleteWord(@Path("id") id: Int)
+
+    @POST("api/words/quiz-result")
+    suspend fun submitWordQuizResult(@Body body: WordQuizResultRequest): WordQuizResultResponse
 
     // ── Scan ───────────────────────────────────────────────────────────────
     @POST("api/scan/youtube")
