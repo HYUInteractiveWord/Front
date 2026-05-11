@@ -13,7 +13,9 @@ import com.interactiveword.ui.screens.dictionary.DictionaryVerifyScreen
 import com.interactiveword.ui.screens.dictionary.DictionaryScreen
 import com.interactiveword.ui.screens.home.HomeScreen
 import com.interactiveword.ui.screens.login.LoginScreen
+import com.interactiveword.ui.screens.profile.PosQuizScreen
 import com.interactiveword.ui.screens.profile.ProfileScreen
+import com.interactiveword.ui.screens.profile.VocabQuizScreen
 import com.interactiveword.ui.screens.scan.ScanScreen
 import com.interactiveword.ui.screens.wordcard.WordCardScreen
 
@@ -23,6 +25,8 @@ sealed class Screen(val route: String) {
     object Collection : Screen("collection")
     object Scan       : Screen("scan")
     object Dictionary : Screen("dictionary")
+    object PosQuiz    : Screen("pos_quiz")
+    object VocabQuiz  : Screen("vocab_quiz")
     object DictionaryVerify : Screen("dictionary_verify?word={word}&pos={pos}&definition={definition}&source={source}") {
         fun createRoute(
             word: String,
@@ -72,6 +76,12 @@ fun AppNavHost(navController: NavHostController, modifier: Modifier = Modifier) 
         }
         composable(Screen.Dictionary.route) {
             DictionaryScreen(navController = navController)
+        }
+        composable(Screen.PosQuiz.route) {
+            PosQuizScreen(navController = navController)
+        }
+        composable(Screen.VocabQuiz.route) {
+            VocabQuizScreen(navController = navController)
         }
         composable(
             route = Screen.DictionaryVerify.route,
