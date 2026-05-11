@@ -1,6 +1,9 @@
 package com.interactiveword.data.api
 
 import com.interactiveword.data.model.DictionarySearchResponse
+import com.interactiveword.data.model.DictionaryPreviewRequest
+import com.interactiveword.data.model.DictionaryPreviewResponse
+import com.interactiveword.data.model.DictionaryVerifyResponse
 import com.interactiveword.data.model.LoginRequest
 import com.interactiveword.data.model.Mission
 import com.interactiveword.data.model.PronunciationResponse
@@ -32,6 +35,16 @@ interface ApiService {
     // ── Dictionary ─────────────────────────────────────────────────────────
     @GET("api/dictionary/search")
     suspend fun searchDictionary(@Query("word") word: String): DictionarySearchResponse
+
+    @POST("api/dictionary/preview")
+    suspend fun previewDictionary(@Body body: DictionaryPreviewRequest): DictionaryPreviewResponse
+
+    @Multipart
+    @POST("api/dictionary/verify")
+    suspend fun verifyDictionary(
+        @Part file: MultipartBody.Part,
+        @Part("target_word") targetWord: RequestBody,
+    ): DictionaryVerifyResponse
 
     // ── Words ──────────────────────────────────────────────────────────────
     @GET("api/words/")
@@ -75,4 +88,5 @@ interface ApiService {
 
     @POST("api/missions/{id}/complete")
     suspend fun completeMission(@Path("id") id: Int): Mission
+
 }

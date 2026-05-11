@@ -8,12 +8,24 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
 
-    // 개발 중: adb reverse tcp:8000 tcp:8000 실행 후 localhost 사용 (에뮬레이터/실기기 공통)
-    private const val BASE_URL = "http://localhost:8000/"
+    private const val BASE_URL = "http://3.39.234.68:8000/"
+
+    fun resolveStaticUrl(path: String?): String? {
+        if (path.isNullOrBlank()) return null
+
+        val normalizedPath = path
+            .replace("\\", "/")
+            .removePrefix("/")
+
+        if (normalizedPath.startsWith("http://") || normalizedPath.startsWith("https://")) {
+            return normalizedPath
+        }
+
+        return BASE_URL.trimEnd('/') + "/" + normalizedPath
+    }
 
     // JWT 토큰 - TokenManager에서 주입
     var authToken: String? = null
-
     val api: ApiService by lazy {
         val logging = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY

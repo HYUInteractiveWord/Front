@@ -16,13 +16,26 @@ data class WordCard(
     @SerializedName("korean_word") val koreanWord: String,
     val pos: String?,
     val definition: String?,
+    @SerializedName("definition_english") val definitionEnglish: String? = null,
     @SerializedName("example_sentences") val exampleSentences: List<Any>?,
     @SerializedName("tts_audio_path") val ttsAudioPath: String?,
     val level: Int,
     @SerializedName("best_score") val bestScore: Float,
     @SerializedName("scan_count") val scanCount: Int,
     val source: String,
-    val pronunciation: String? = null,       // 로마자 발음 (로컬 보조 필드)
+    val pronunciation: String? = null,
+
+    @SerializedName("word_point")
+    val wordPoint: Int = 0,
+
+    @SerializedName("speaking_count")
+    val speakingCount: Int = 0,
+
+    @SerializedName("effect_level")
+    val effectLevel: Int = 0,
+
+    @SerializedName("last_practiced_at")
+    val lastPracticedAt: String? = null,
 )
 
 data class Mission(
@@ -44,16 +57,45 @@ data class TokenResponse(@SerializedName("access_token") val accessToken: String
 data class WordCreateRequest(
     @SerializedName("korean_word") val koreanWord: String,
     val source: String = "dictionary",
+    val pos: String? = null,
+    val definition: String? = null,
 )
 
-data class DictionaryCandidate(
+data class DictionaryCandidateInfo(
     val pos: String?,
     val definition: String?,
 )
 
 data class DictionarySearchResponse(
-    @SerializedName("search_query") val searchQuery: String,
-    val candidates: Map<String, DictionaryCandidate>,
+    val word: String? = null,
+    val pos: String? = null,
+    val definition: String? = null,
+
+    @SerializedName("search_query")
+    val searchQuery: String? = null,
+
+    val candidates: Map<String, DictionaryCandidateInfo> = emptyMap(),
+)
+
+data class DictionaryPreviewRequest(
+    val word: String,
+    val definition: String,
+    val pos: String,
+)
+
+data class DictionaryPreviewResponse(
+    val word: String? = null,
+    val definition: String? = null,
+    @SerializedName("definition_english") val definitionEnglish: String? = null,
+    val pos: String? = null,
+    val pronunciation: String? = null,
+    @SerializedName("audio_path") val audioPath: String? = null,
+)
+
+data class DictionaryVerifyResponse(
+    @SerializedName("is_match") val isMatch: Boolean,
+    @SerializedName("spoken_raw") val spokenRaw: String? = null,
+    @SerializedName("spoken_corrected") val spokenCorrected: String? = null,
 )
 
 data class ScanUploadResponse(
