@@ -160,16 +160,16 @@ private data class RankBand(
 )
 
 private val rankBands = listOf(
-    RankBand("Bronze", 0, 500),
-    RankBand("Silver", 500, 1500),
-    RankBand("Gold", 1500, 3000),
+    RankBand("브론즈", 0, 500),
+    RankBand("실버", 500, 1500),
+    RankBand("골드", 1500, 3000),
     RankBand("Sapphire", 3000, 6000),
     RankBand("Ruby", 6000, 10000),
     RankBand("Emerald", 10000, 15000),
     RankBand("Amethyst", 15000, 21000),
     RankBand("Pearl", 21000, 28000),
     RankBand("Obsidian", 28000, 36000),
-    RankBand("Diamond", 36000, null),
+    RankBand("다이아", 36000, null),
 )
 
 @Composable

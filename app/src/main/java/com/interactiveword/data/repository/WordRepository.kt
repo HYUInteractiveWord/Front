@@ -5,6 +5,9 @@ import com.interactiveword.data.model.DictionaryPreviewRequest
 import com.interactiveword.data.model.DictionaryPreviewResponse
 import com.interactiveword.data.model.WordCard
 import com.interactiveword.data.model.WordCreateRequest
+import com.interactiveword.data.model.WordQuizResultResponse
+import com.interactiveword.data.model.WordQuizResultRequest
+import com.interactiveword.data.model.WordQuizItemResultRequest
 import com.interactiveword.data.model.DictionarySearchResponse
 import com.interactiveword.data.model.DictionaryVerifyResponse
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -53,4 +56,14 @@ class WordRepository {
         api.createWord(WordCreateRequest(koreanWord = word, source = source))
 
     suspend fun deleteWord(id: Int) = api.deleteWord(id)
+
+    suspend fun submitQuizResult(
+        quizType: String,
+        results: List<WordQuizItemResultRequest>,
+    ): WordQuizResultResponse = api.submitWordQuizResult(
+        WordQuizResultRequest(
+            quizType = quizType,
+            results = results,
+        )
+    )
 }

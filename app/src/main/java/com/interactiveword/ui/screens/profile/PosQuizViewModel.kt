@@ -3,6 +3,7 @@ package com.interactiveword.ui.screens.profile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.interactiveword.data.model.WordCard
+import com.interactiveword.data.model.WordQuizItemResultRequest
 import com.interactiveword.data.repository.WordRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -35,6 +36,10 @@ data class PosQuizUiState(
     val selectedAnswer: String? = null,
     val isAnswerChecked: Boolean = false,
     val correctCount: Int = 0,
+    val answeredResults: List<WordQuizItemResultRequest> = emptyList(),
+    val isResultSubmitted: Boolean = false,
+    val submitResultMessage: String? = null,
+    val submitErrorMessage: String? = null,
     val errorMessage: String? = null,
     val emptyReason: PosQuizEmptyReason = PosQuizEmptyReason.NONE,
 ) {
@@ -69,6 +74,10 @@ class PosQuizViewModel(
             selectedAnswer = answer,
             isAnswerChecked = true,
             correctCount = state.correctCount + if (isCorrect) 1 else 0,
+            answeredResults = state.answeredResults + WordQuizItemResultRequest(
+                wordId = currentQuestion.wordId,
+                isCorrect = isCorrect,
+            ),
         )
     }
 
@@ -76,11 +85,47 @@ class PosQuizViewModel(
         val state = _uiState.value
         if (!state.isAnswerChecked) return
 
-        _uiState.value = state.copy(
+        val nextState = state.copy(
             currentIndex = state.currentIndex + 1,
             selectedAnswer = null,
             isAnswerChecked = false,
         )
+        _uiState.value = nextState
+
+        if (nextState.isFinished) {
+            submitQuizResult()
+        }
+    }
+
+    private fun submitQuizResult() {
+        val state = _uiState.value
+        if (state.isResultSubmitted || state.answeredResults.isEmpty()) return
+
+        viewModelScope.launch {
+            try {
+                val response = wordRepo.submitQuizResult(
+                    quizType = "pos",
+                    results = state.answeredResults,
+                )
+
+                val mission = response.mission
+                val missionText = if (mission != null) {
+                    " · 미션 ${mission.progress}/${mission.target}"
+                } else {
+                    ""
+                }
+
+                _uiState.value = _uiState.value.copy(
+                    isResultSubmitted = true,
+                    submitResultMessage = "획득 XP +${response.quizXpGained}$missionText",
+                    submitErrorMessage = null,
+                )
+            } catch (e: Throwable) {
+                _uiState.value = _uiState.value.copy(
+                    submitErrorMessage = "퀴즈 결과를 서버에 반영하지 못했습니다.",
+                )
+            }
+        }
     }
 
     fun restartQuiz() {
