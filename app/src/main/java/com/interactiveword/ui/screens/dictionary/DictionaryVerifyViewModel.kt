@@ -46,7 +46,6 @@ class DictionaryVerifyViewModel(
     private val initialWord: String,
     private val initialPos: String,
     private val initialDefinition: String,
-    private val initialSource: String,
     private val repo: WordRepository = WordRepository(),
 ) : AndroidViewModel(app) {
 
@@ -58,7 +57,6 @@ class DictionaryVerifyViewModel(
             word: String,
             pos: String,
             definition: String,
-            source: String,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -68,7 +66,6 @@ class DictionaryVerifyViewModel(
                         initialWord = word,
                         initialPos = pos,
                         initialDefinition = definition,
-                        initialSource = source,
                     ) as T
                 }
                 throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
@@ -218,7 +215,12 @@ class DictionaryVerifyViewModel(
         viewModelScope.launch {
             try {
                 _uiState.value = _uiState.value.copy(isSaving = true, errorMessage = null)
-                repo.createWord(_uiState.value.word, source = initialSource)
+                repo.createWord(
+                    _uiState.value.word,
+                    source = "dictionary",
+                    pos = _uiState.value.pos,
+                    definition = _uiState.value.definition,
+                )
                 _uiState.value = _uiState.value.copy(
                     isSaving = false,
                     saveCompleted = true,

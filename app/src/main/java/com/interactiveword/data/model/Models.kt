@@ -57,6 +57,8 @@ data class TokenResponse(@SerializedName("access_token") val accessToken: String
 data class WordCreateRequest(
     @SerializedName("korean_word") val koreanWord: String,
     val source: String = "dictionary",
+    val pos: String? = null,
+    val definition: String? = null,
 )
 
 data class DictionaryCandidateInfo(

@@ -3,6 +3,8 @@ package com.interactiveword.ui.screens.wordcard
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Mic
@@ -22,8 +24,6 @@ import com.interactiveword.ui.components.wordCardEffectStyle
 import com.interactiveword.ui.theme.BrandGreenLight
 import com.interactiveword.ui.theme.DarkMutedText
 import com.interactiveword.ui.theme.DarkOutline
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -107,9 +107,7 @@ fun WordCardScreen(
                                     card.koreanWord,
                                     style = MaterialTheme.typography.headlineMedium,
                                 )
-
                                 Spacer(Modifier.width(8.dp))
-
                                 WordCardEffectBadge(effect)
                             }
 
@@ -145,7 +143,6 @@ fun WordCardScreen(
                                 .fillMaxHeight()
                                 .background(effect.borderColor, shape = MaterialTheme.shapes.small),
                         )
-
                         Spacer(Modifier.width(12.dp))
 
                         Column(modifier = Modifier.weight(1f)) {
@@ -155,7 +152,6 @@ fun WordCardScreen(
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = BrandGreenLight,
                                 )
-
                                 Spacer(Modifier.height(8.dp))
                             }
 
@@ -188,7 +184,6 @@ fun WordCardScreen(
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = DarkMutedText,
                             )
-
                             Text(
                                 text = "$displayPoint / 100 pt",
                                 style = MaterialTheme.typography.bodyMedium,
@@ -209,13 +204,15 @@ fun WordCardScreen(
 
                         if (displayPoint >= 100) {
                             Spacer(Modifier.height(12.dp))
-
                             Card(
                                 shape = MaterialTheme.shapes.medium,
                                 colors = CardDefaults.cardColors(
                                     containerColor = MaterialTheme.colorScheme.surfaceVariant,
                                 ),
-                                border = BorderStroke(1.dp, androidx.compose.ui.graphics.Color(0xFFFFC107)),
+                                border = BorderStroke(
+                                    1.dp,
+                                    androidx.compose.ui.graphics.Color(0xFFFFC107)
+                                ),
                                 modifier = Modifier.fillMaxWidth(),
                             ) {
                                 Row(
@@ -227,9 +224,7 @@ fun WordCardScreen(
                                         style = MaterialTheme.typography.titleMedium,
                                         color = androidx.compose.ui.graphics.Color(0xFFFFC107),
                                     )
-
                                     Spacer(Modifier.width(8.dp))
-
                                     Column {
                                         Text(
                                             text = "MASTER 달성",
@@ -258,7 +253,6 @@ fun WordCardScreen(
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = DarkMutedText,
                             )
-
                             Text(
                                 text = "${card.bestScore.toInt()}%",
                                 style = MaterialTheme.typography.bodyMedium,
@@ -291,24 +285,42 @@ fun WordCardScreen(
                         ),
                         modifier = Modifier.fillMaxWidth(),
                     ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Text(
-                                text = exampleKorean(example),
-                                style = MaterialTheme.typography.bodyMedium,
-                            )
-
-                            val english = exampleEnglish(example)
-                            if (!english.isNullOrBlank()) {
-                                Spacer(Modifier.height(4.dp))
+                        Row(
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
                                 Text(
-                                    text = english,
+                                    text = exampleKorean(example),
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = DarkMutedText,
                                 )
+
+                                val english = exampleEnglish(example)
+                                if (!english.isNullOrBlank()) {
+                                    Spacer(Modifier.height(4.dp))
+                                    Text(
+                                        text = english,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = DarkMutedText,
+                                    )
+                                }
+                            }
+
+                            val ttsPath = exampleTtsPath(example)
+                            if (!ttsPath.isNullOrBlank()) {
+                                Spacer(Modifier.width(8.dp))
+                                IconButton(onClick = { vm.playExampleTts(ttsPath) }) {
+                                    Icon(
+                                        Icons.Filled.VolumeUp,
+                                        contentDescription = "예문 듣기",
+                                        tint = BrandGreenLight,
+                                    )
+                                }
                             }
                         }
                     }
-
                     Spacer(Modifier.height(8.dp))
                 }
             } else {
@@ -343,9 +355,7 @@ fun WordCardScreen(
                         text = "발음 평가",
                         style = MaterialTheme.typography.titleMedium,
                     )
-
                     Spacer(Modifier.height(8.dp))
-
                     Text(
                         text = "아직 발음 평가 기록이 없습니다.\n발음 연습을 시작하면 점수와 그래프가 표시됩니다.",
                         style = MaterialTheme.typography.bodyMedium,
@@ -379,7 +389,6 @@ private fun exampleKorean(example: Any): String {
             if (!value.isNullOrBlank()) return value
         }
     }
-
     return example.toString()
 }
 
@@ -390,6 +399,15 @@ private fun exampleEnglish(example: Any): String? {
             if (!value.isNullOrBlank()) return value
         }
     }
+    return null
+}
 
+private fun exampleTtsPath(example: Any): String? {
+    if (example is Map<*, *>) {
+        for (key in listOf("tts_audio_path", "audio_path", "ttsPath", "tts_path")) {
+            val value = example[key]?.toString()
+            if (!value.isNullOrBlank()) return value
+        }
+    }
     return null
 }

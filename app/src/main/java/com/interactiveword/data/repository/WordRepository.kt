@@ -21,7 +21,7 @@ class WordRepository {
     suspend fun getWord(id: Int): WordCard = api.getWord(id)
 
     suspend fun searchDictionary(word: String): DictionarySearchResponse =
-    api.searchDictionary(word)
+        api.searchDictionary(word)
 
     suspend fun previewDictionaryWord(
         word: String,
@@ -45,12 +45,20 @@ class WordRepository {
         return api.verifyDictionary(body, word)
     }
 
-    /**
-     * @param dryRun true면 실제 저장 없이 사전 정보만 조회 (Dictionary 검색 미리보기용)
-     * 현재 백엔드는 dryRun을 지원하지 않으므로 실제로는 저장됨 - 추후 별도 엔드포인트 추가 필요
-     */
-    suspend fun createWord(word: String, source: String = "dictionary", dryRun: Boolean = false): WordCard =
-        api.createWord(WordCreateRequest(koreanWord = word, source = source))
+    suspend fun createWord(
+        word: String,
+        source: String = "dictionary",
+        pos: String? = null,
+        definition: String? = null,
+        dryRun: Boolean = false,
+    ): WordCard = api.createWord(
+        WordCreateRequest(
+            koreanWord = word,
+            source = source,
+            pos = pos,
+            definition = definition,
+        )
+    )
 
     suspend fun deleteWord(id: Int) = api.deleteWord(id)
 }
