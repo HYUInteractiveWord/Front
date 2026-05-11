@@ -71,7 +71,6 @@ fun DictionaryVerifyScreen(
             word = word,
             pos = pos,
             definition = definition,
-            source = source,
         )
     )
     val uiState by vm.uiState.collectAsState()
