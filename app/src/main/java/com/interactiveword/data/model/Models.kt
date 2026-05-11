@@ -59,6 +59,42 @@ data class WordCreateRequest(
     val source: String = "dictionary",
 )
 
+
+data class WordQuizItemResultRequest(
+    @SerializedName("word_id") val wordId: Int,
+    @SerializedName("is_correct") val isCorrect: Boolean,
+)
+
+data class WordQuizResultRequest(
+    @SerializedName("quiz_type") val quizType: String,
+    val results: List<WordQuizItemResultRequest>,
+)
+
+data class WordQuizUserSummary(
+    val xp: Int,
+    val rank: String,
+    @SerializedName("max_word_slots") val maxWordSlots: Int,
+)
+
+data class WordQuizMissionSummary(
+    @SerializedName("mission_type") val missionType: String,
+    val progress: Int,
+    val target: Int,
+    @SerializedName("is_completed") val isCompleted: Boolean,
+    @SerializedName("xp_reward") val xpReward: Int,
+)
+
+data class WordQuizResultResponse(
+    @SerializedName("quiz_type") val quizType: String,
+    val total: Int,
+    val correct: Int,
+    val score: Int,
+    @SerializedName("perfect_bonus") val perfectBonus: Int,
+    @SerializedName("quiz_xp_gained") val quizXpGained: Int,
+    val user: WordQuizUserSummary?,
+    val mission: WordQuizMissionSummary?,
+)
+
 data class DictionaryCandidateInfo(
     val pos: String?,
     val definition: String?,

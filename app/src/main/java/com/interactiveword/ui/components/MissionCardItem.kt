@@ -99,10 +99,12 @@ fun MissionCardItem(
     }
 }
 
-private fun String.toDisplayName(): String = when (this) {
-    "daily_pronunciation" -> "일일 발음 연습"
-    "daily_scan"          -> "단어 스캔"
-    "collect_pos"         -> "품사별 단어 수집"
-    "collect_topic"       -> "주제별 단어 수집"
-    else                  -> this
+private fun String.toDisplayName(): String {
+    return when (this) {
+        "daily_pronunciation" -> "일일 발음 연습"
+        "daily_scan" -> "단어 스캔"
+        "daily_word_quiz" -> "단어 테스트"
+        "daily_collect_noun" -> "명사 단어 수집"
+        else -> this
+    }
 }
