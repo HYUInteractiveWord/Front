@@ -134,4 +134,5 @@ data class PronunciationResponse(
     @SerializedName("is_new_best") val isNewBest: Boolean,
     @SerializedName("xp_gained") val xpGained: Int,
     @SerializedName("word_card_level") val wordCardLevel: Int,
+    val graphs: Map<String, String>? = null,
 )
