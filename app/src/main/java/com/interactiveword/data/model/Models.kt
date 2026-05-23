@@ -81,6 +81,7 @@ data class DictionaryPreviewRequest(
     val word: String,
     val definition: String,
     val pos: String,
+    @SerializedName("target_language") val targetLanguage: String = "en",
 )
 
 data class DictionaryPreviewResponse(
@@ -116,6 +117,7 @@ data class YouTubeScanRequest(
 data class ScanProcessRequest(
     @SerializedName("extracted_words") val extractedWords: Map<String, Map<String, String>>,
     @SerializedName("scan_source") val scanSource: String = "mic",
+    @SerializedName("target_language") val targetLanguage: String = "en",
 )
 
 data class PronunciationSubmitRequest(
