@@ -120,19 +120,11 @@ data class ScanProcessRequest(
     @SerializedName("target_language") val targetLanguage: String = "en",
 )
 
-data class PronunciationSubmitRequest(
-    @SerializedName("word_card_id") val wordCardId: Int,
-    val score: Float,
-    @SerializedName("user_pitch_data") val userPitchData: List<Float>,
-    @SerializedName("reference_pitch_data") val referencePitchData: List<Float>,
-    @SerializedName("dtw_distance") val dtwDistance: Float?,
-)
-
 data class PronunciationResponse(
     @SerializedName("record_id") val recordId: Int,
     val score: Float,
     @SerializedName("is_new_best") val isNewBest: Boolean,
     @SerializedName("xp_gained") val xpGained: Int,
     @SerializedName("word_card_level") val wordCardLevel: Int,
-    val graphs: Map<String, String>? = null,
+    val graphs: Map<String, String>? = null, // 백엔드에서 반환하는 그래프 이미지 상대 경로 매핑
 )

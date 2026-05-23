@@ -10,11 +10,19 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.io.File
 
 data class WordCardUiState(
     val card: WordCard? = null,
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
+
+    // 💡 추가됨: 발음 평가 관련 상태
+    val isEvaluating: Boolean = false,
+    val evalScore: Float? = null,
+    val isNewBest: Boolean = false,
+    val xpGained: Int? = null,
+    val evalGraphs: Map<String, String>? = null
 )
 
 class WordCardViewModel(
@@ -30,7 +38,7 @@ class WordCardViewModel(
             _uiState.value = _uiState.value.copy(isLoading = true)
             try {
                 val card = repo.getWord(wordId)
-                _uiState.value = WordCardUiState(card = card, isLoading = false)
+                _uiState.value = _uiState.value.copy(card = card, isLoading = false)
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
@@ -82,9 +90,51 @@ class WordCardViewModel(
         }
     }
 
-    fun startPronunciationPractice() {
+    fun submitPronunciation(audioFile: File) {
+        val currentCard = _uiState.value.card
+        if (currentCard == null) {
+            _uiState.value = _uiState.value.copy(errorMessage = "단어 정보가 없습니다.")
+            return
+        }
+
+        viewModelScope.launch {
+            // 평가 진행 중 상태
+            _uiState.value = _uiState.value.copy(isEvaluating = true, errorMessage = null)
+
+            try {
+                // 백엔드로 파일 전송 및 평가 요청
+                val result = repo.submitPronunciation(currentCard, audioFile)
+
+                // 결과 반영
+                _uiState.value = _uiState.value.copy(
+                    isEvaluating = false,
+                    evalScore = result.score,
+                    isNewBest = result.isNewBest,
+                    xpGained = result.xpGained,
+                    evalGraphs = result.graphs
+                )
+
+                // 신기록일 경우 UI 상의 단어 카드 최고 점수 반영
+                if (result.isNewBest) {
+                    val updatedCard = currentCard.copy(bestScore = result.score)
+                    _uiState.value = _uiState.value.copy(card = updatedCard)
+                }
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isEvaluating = false,
+                    errorMessage = "평가 실패: ${e.message}"
+                )
+            }
+        }
+    }
+
+    // 평가 결과 초기화
+    fun clearEvaluation() {
         _uiState.value = _uiState.value.copy(
-            errorMessage = "발음 연습 기능은 준비 중입니다."
+            evalScore = null,
+            isNewBest = false,
+            xpGained = null,
+            evalGraphs = null
         )
     }
 
