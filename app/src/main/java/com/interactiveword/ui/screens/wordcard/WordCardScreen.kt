@@ -1,29 +1,35 @@
 package com.interactiveword.ui.screens.wordcard
 
+import android.media.MediaRecorder
+import android.os.Build
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material.icons.filled.VolumeUp
+import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
+import com.interactiveword.data.api.RetrofitClient
 import com.interactiveword.ui.components.WordCardEffectBadge
 import com.interactiveword.ui.components.wordCardEffectStyle
 import com.interactiveword.ui.theme.BrandGreenLight
 import com.interactiveword.ui.theme.DarkMutedText
 import com.interactiveword.ui.theme.DarkOutline
+import java.io.File
+import java.io.IOException
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,9 +40,22 @@ fun WordCardScreen(
 ) {
     val uiState by vm.uiState.collectAsState()
     val card = uiState.card
+    val context = LocalContext.current
+
+    // 녹음 관련 상태 관리
+    var isRecording by remember { mutableStateOf(false) }
+    var mediaRecorder by remember { mutableStateOf<MediaRecorder?>(null) }
+    var currentRecordFile by remember { mutableStateOf<File?>(null) }
 
     LaunchedEffect(wordId) {
         vm.loadCard(wordId)
+    }
+
+    // 화면 이탈 시 녹음기 정리
+    DisposableEffect(Unit) {
+        onDispose {
+            mediaRecorder?.release()
+        }
     }
 
     Scaffold(
@@ -45,7 +64,8 @@ fun WordCardScreen(
                 title = { Text(card?.koreanWord ?: "단어 카드") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Filled.ArrowBack, "뒤로")
+                        // 💡 수정됨: AutoMirrored 적용
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "뒤로")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -90,6 +110,7 @@ fun WordCardScreen(
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState()),
         ) {
+            // 1. 단어 메인 정보 카드
             Card(
                 shape = MaterialTheme.shapes.large,
                 colors = CardDefaults.cardColors(containerColor = containerColor),
@@ -122,8 +143,9 @@ fun WordCardScreen(
                         }
 
                         IconButton(onClick = { vm.playTts() }) {
+                            // 💡 수정됨: AutoMirrored 적용
                             Icon(
-                                Icons.Filled.VolumeUp,
+                                Icons.AutoMirrored.Filled.VolumeUp,
                                 contentDescription = "발음 듣기",
                                 tint = BrandGreenLight,
                             )
@@ -211,7 +233,7 @@ fun WordCardScreen(
                                 ),
                                 border = BorderStroke(
                                     1.dp,
-                                    androidx.compose.ui.graphics.Color(0xFFFFC107)
+                                    Color(0xFFFFC107)
                                 ),
                                 modifier = Modifier.fillMaxWidth(),
                             ) {
@@ -222,14 +244,14 @@ fun WordCardScreen(
                                     Text(
                                         text = "✦",
                                         style = MaterialTheme.typography.titleMedium,
-                                        color = androidx.compose.ui.graphics.Color(0xFFFFC107),
+                                        color = Color(0xFFFFC107),
                                     )
                                     Spacer(Modifier.width(8.dp))
                                     Column {
                                         Text(
                                             text = "MASTER 달성",
                                             style = MaterialTheme.typography.titleSmall,
-                                            color = androidx.compose.ui.graphics.Color(0xFF5D3B00),
+                                            color = Color(0xFF5D3B00),
                                         )
                                         Text(
                                             text = "이 단어는 최고 숙련도에 도달했습니다.",
@@ -273,6 +295,7 @@ fun WordCardScreen(
 
             Spacer(Modifier.height(16.dp))
 
+            // 2. 예문 섹션
             Text("Learning Examples", style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(8.dp))
 
@@ -312,8 +335,9 @@ fun WordCardScreen(
                             if (!ttsPath.isNullOrBlank()) {
                                 Spacer(Modifier.width(8.dp))
                                 IconButton(onClick = { vm.playExampleTts(ttsPath) }) {
+                                    // 💡 수정됨: AutoMirrored 적용
                                     Icon(
-                                        Icons.Filled.VolumeUp,
+                                        Icons.AutoMirrored.Filled.VolumeUp,
                                         contentDescription = "예문 듣기",
                                         tint = BrandGreenLight,
                                     )
@@ -323,25 +347,11 @@ fun WordCardScreen(
                     }
                     Spacer(Modifier.height(8.dp))
                 }
-            } else {
-                Card(
-                    shape = MaterialTheme.shapes.large,
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    ),
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(
-                        text = "아직 예문 정보가 없습니다.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = DarkMutedText,
-                        modifier = Modifier.padding(16.dp),
-                    )
-                }
             }
 
             Spacer(Modifier.height(16.dp))
 
+            // 3. 발음 평가 결과 표시 섹션 (서버에서 받은 결과 렌더링)
             Card(
                 shape = MaterialTheme.shapes.large,
                 colors = CardDefaults.cardColors(
@@ -352,31 +362,115 @@ fun WordCardScreen(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = "발음 평가",
+                        text = "발음 평가 결과",
                         style = MaterialTheme.typography.titleMedium,
                     )
                     Spacer(Modifier.height(8.dp))
-                    Text(
-                        text = "아직 발음 평가 기록이 없습니다.\n발음 연습을 시작하면 점수와 그래프가 표시됩니다.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = DarkMutedText,
-                    )
+
+                    if (uiState.isEvaluating) {
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                        Text(
+                            "정밀 분석 중...",
+                            color = DarkMutedText,
+                            modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 8.dp)
+                        )
+                    } else if (uiState.evalScore != null) {
+                        Text(
+                            text = "점수: ${uiState.evalScore?.toInt()}점",
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = BrandGreenLight
+                        )
+                        if (uiState.isNewBest) {
+                            Text(text = "🎉 최고 점수 경신!", color = Color(0xFFFFC107))
+                        }
+
+                        // 서버에서 넘어온 그래프 이미지 로딩 (Pitch 파형 비교 그래프)
+                        val pitchGraph = uiState.evalGraphs?.get("pitch_graph")
+                        if (!pitchGraph.isNullOrEmpty()) {
+                            Spacer(Modifier.height(12.dp))
+                            val graphUrl = RetrofitClient.resolveStaticUrl(pitchGraph)
+                            AsyncImage(
+                                model = graphUrl,
+                                contentDescription = "음정 그래프",
+                                modifier = Modifier.fillMaxWidth().height(200.dp)
+                            )
+                        }
+
+                        TextButton(onClick = { vm.clearEvaluation() }) {
+                            Text("기록 지우기", color = DarkMutedText)
+                        }
+                    } else {
+                        Text(
+                            text = "아직 발음 평가 기록이 없습니다.\n아래 녹음 버튼을 눌러 평가를 시작하세요.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = DarkMutedText,
+                        )
+                    }
                 }
             }
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(24.dp))
 
+            // 4. 녹음 및 서버 전송 버튼
             Button(
-                onClick = { vm.startPronunciationPractice() },
+                onClick = {
+                    if (isRecording) {
+                        // 녹음 중지 및 서버 전송
+                        isRecording = false
+                        try {
+                            mediaRecorder?.stop()
+                            mediaRecorder?.release()
+                            mediaRecorder = null
+
+                            // 파일이 정상 생성되었다면 뷰모델을 통해 서버로 쏜다
+                            currentRecordFile?.let { vm.submitPronunciation(it) }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    } else {
+                        // 임시 파일 생성 및 녹음 시작
+                        try {
+                            val tempFile = File.createTempFile("user_record_", ".wav", context.cacheDir)
+                            currentRecordFile = tempFile
+
+                            // 💡 수정됨: 구형 안드로이드 버전 호환성을 위한 MediaRecorder 초기화 분기
+                            mediaRecorder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                MediaRecorder(context)
+                            } else {
+                                @Suppress("DEPRECATION")
+                                MediaRecorder()
+                            }.apply {
+                                setAudioSource(MediaRecorder.AudioSource.MIC)
+                                setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+                                setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
+                                setOutputFile(tempFile.absolutePath)
+                                prepare()
+                                start()
+                            }
+                            isRecording = true
+                        } catch (e: IOException) {
+                            e.printStackTrace()
+                        }
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp),
                 shape = MaterialTheme.shapes.extraLarge,
-                colors = ButtonDefaults.buttonColors(containerColor = BrandGreenLight),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (isRecording) Color.Red else BrandGreenLight
+                ),
             ) {
-                Icon(Icons.Filled.Mic, null, modifier = Modifier.size(20.dp))
+                Icon(
+                    if (isRecording) Icons.Filled.Stop else Icons.Filled.Mic,
+                    null,
+                    modifier = Modifier.size(20.dp)
+                )
                 Spacer(Modifier.width(8.dp))
-                Text("발음 연습 시작", style = MaterialTheme.typography.titleMedium)
+                Text(
+                    if (isRecording) "녹음 종료 및 제출" else "녹음 시작",
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
         }
     }
