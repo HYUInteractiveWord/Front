@@ -10,6 +10,7 @@ import com.interactiveword.data.model.WordQuizResultRequest
 import com.interactiveword.data.model.WordQuizItemResultRequest
 import com.interactiveword.data.model.DictionarySearchResponse
 import com.interactiveword.data.model.DictionaryVerifyResponse
+import com.interactiveword.data.model.PronunciationResponse // 💡 추가됨
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -74,4 +75,21 @@ class WordRepository {
             results = results,
         )
     )
+
+    suspend fun submitPronunciation(wordCard: WordCard, audioFile: File): PronunciationResponse {
+        val idBody = wordCard.id.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+        val wordBody = wordCard.koreanWord.toRequestBody("text/plain".toMediaTypeOrNull())
+        val pathStr = wordCard.ttsAudioPath ?: ""
+        val pathBody = pathStr.toRequestBody("text/plain".toMediaTypeOrNull())
+
+        val requestFile = audioFile.asRequestBody("audio/wav".toMediaTypeOrNull())
+        val filePart = MultipartBody.Part.createFormData("file", audioFile.name, requestFile)
+
+        return api.submitPronunciation(
+            wordCardId = idBody,
+            koreanWord = wordBody,
+            ttsAudioPath = pathBody,
+            file = filePart
+        )
+    }
 }
