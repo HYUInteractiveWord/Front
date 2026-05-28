@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">말해봐</string>
+    <string name="notification_channel_capture">Захват аудио</string>
+    <string name="notification_title_capture">말해봐 - Ожидание захвата</string>
+    <string name="notification_text_capture">Нажмите, чтобы захватить корейские слова</string>
+    <string name="notification_action_capture">Начать захват</string>
+    <string name="notification_action_stop">Остановить</string>
+
+    <!-- Bottom Nav -->
+    <string name="nav_home">Главная</string>
+    <string name="nav_dictionary">Словарь</string>
+    <string name="nav_collection">Словник</string>
+    <string name="nav_missions">Миссии</string>
+    <string name="nav_scan">Сканер</string>
+
+    <!-- Login Screen -->
+    <string name="login_title">Войти</string>
+    <string name="register_title">Регистрация</string>
+    <string name="label_username">Имя пользователя</string>
+    <string name="label_email">Электронная почта</string>
+    <string name="label_password">Пароль</string>
+    <string name="action_login">Войти</string>
+    <string name="action_register">Зарегистрироваться</string>
+    <string name="link_to_register">Нет аккаунта? Зарегистрироваться</string>
+    <string name="link_to_login">Уже есть аккаунт? Войти</string>
+    <string name="label_language">Язык</string>
+
+    <!-- Rank labels -->
+    <string name="rank_bronze">Бронза</string>
+    <string name="rank_silver">Серебро</string>
+    <string name="rank_gold">Золото</string>
+    <string name="rank_platinum">Платина</string>
+    <string name="rank_diamond">Бриллиант</string>
+    <string name="rank_master">Мастер</string>
+
+    <!-- Home Screen -->
+    <string name="home_today_missions">Задания дня</string>
+    <string name="home_recent_words">Недавние слова</string>
+    <string name="home_quick_learning">Быстрое обучение</string>
+    <string name="home_word_scan">Сканировать слова</string>
+    <string name="home_word_scan_sub">Найти слова в медиа</string>
+    <string name="home_pronunciation_practice">Практика произношения</string>
+    <string name="home_pronunciation_practice_sub">Практика с последними словами</string>
+    <string name="home_view_all">Все</string>
+    <string name="home_top_rank">Максимальный ранг</string>
+    <string name="home_xp_to_next_rank">До следующего ранга %d XP</string>
+    <string name="home_stat_words">Собрано слов</string>
+    <string name="home_stat_today_mission">Задания дня</string>
+    <string name="home_stat_word_slots">Слоты слов</string>
+    <string name="home_capture_service">Служба захвата</string>
+
+    <!-- Profile Screen -->
+    <string name="profile_title">Миссии &amp; Профиль</string>
+    <string name="profile_today_missions">Задания дня</string>
+    <string name="profile_all_missions">Все миссии</string>
+    <string name="profile_rank_progress">Прогресс ранга</string>
+    <string name="profile_top_rank_reached">Максимальный ранг достигнут.</string>
+    <string name="profile_xp_to_next_rank">До следующего ранга %d XP</string>
+    <string name="profile_stat_words">Собрано слов</string>
+    <string name="profile_stat_current_rank">Текущий ранг</string>
+    <string name="profile_stat_total_xp">Всего XP</string>
+    <string name="profile_pos_quiz_title">Тест частей речи</string>
+    <string name="profile_pos_quiz_sub">Угадайте часть речи слова</string>
+    <string name="profile_vocab_quiz_title">Тест на запоминание слов</string>
+    <string name="profile_vocab_quiz_sub">Проверьте знания собранных слов</string>
+    <string name="profile_failed_to_load">Не удалось загрузить профиль</string>
+    <string name="profile_daily_mission_status">Статус ежедневных миссий</string>
+    <string name="action_start_test">Начать тест</string>
+
+    <!-- Collection Screen -->
+    <string name="collection_title">Мой словник</string>
+    <string name="collection_empty">Слов пока нет.\nДобавьте через сканер или словарь!</string>
+    <string name="collection_word_count">%d слов</string>
+    <string name="collection_slots">Слоты: %d / %d</string>
+
+    <!-- Dictionary Screen -->
+    <string name="dictionary_title">Словарь</string>
+    <string name="dictionary_search_hint">Поиск корейского слова…</string>
+    <string name="action_search">Поиск</string>
+    <string name="dictionary_search_failed">Ошибка поиска: %s</string>
+    <string name="dictionary_result_count">Результатов: %d</string>
+    <string name="dictionary_category">Категория: %s</string>
+    <string name="dictionary_added">Добавлено</string>
+    <string name="action_add">Добавить</string>
+    <string name="dictionary_enter_word">Введите слово для поиска.</string>
+    <string name="dictionary_no_results">Ничего не найдено.</string>
+
+    <!-- Scan Screen -->
+    <string name="scan_title">Сканер слов</string>
+    <string name="scan_subtitle">Найдите корейские слова в окружающих звуках</string>
+    <string name="scan_mic">Микрофон</string>
+    <string name="scan_mic_sub">Запись окружающего звука</string>
+    <string name="scan_media">Медиа</string>
+    <string name="scan_media_sub">Видео/аудио файлы</string>
+    <string name="scan_loading_audio">Извлечение и анализ аудио…</string>
+    <string name="scan_loading_youtube">Анализ YouTube…</string>
+    <string name="scan_loading">Анализ…</string>
+    <string name="scan_youtube_hint_title">Сканировать видео YouTube</string>
+    <string name="scan_youtube_hint_body">Поделитесь видео в YouTube → Выберите InteractiveWord\nАвтоматически анализирует слова в видео</string>
+    <string name="scan_media_settings">Настройки сканирования</string>
+    <string name="scan_segment_label">Сегмент сканирования (с начала)</string>
+    <string name="scan_seconds">%dс</string>
+    <string name="action_start_scan">Начать сканирование</string>
+    <string name="scan_detected_words">Обнаружено слов: %d</string>
+    <string name="scan_listening">Слушаю…</string>
+    <string name="scan_elapsed">%dс  /  макс. 30с</string>
+    <string name="action_done">Готово</string>
+
+    <!-- WordCard Screen -->
+    <string name="wordcard_title">Карточка слова</string>
+    <string name="wordcard_listen">Слушать произношение</string>
+    <string name="wordcard_category">Категория: %s</string>
+    <string name="wordcard_meaning">Значение: %s</string>
+    <string name="wordcard_no_meaning">Нет информации о значении.</string>
+    <string name="wordcard_points">Очки слова</string>
+    <string name="wordcard_best_score">Лучшая точность произношения</string>
+    <string name="wordcard_practice_count">Практика %d раз · Сканировано %d раз</string>
+    <string name="wordcard_eval_title">Результаты оценки произношения</string>
+    <string name="wordcard_evaluating">Детальный анализ…</string>
+    <string name="wordcard_score">Оценка: %d баллов</string>
+    <string name="wordcard_new_best">🎉 Новый рекорд!</string>
+    <string name="wordcard_clear_record">Очистить запись</string>
+    <string name="wordcard_no_eval">Записей оценки произношения пока нет.\nНажмите кнопку записи ниже, чтобы начать.</string>
+    <string name="wordcard_master_title">Достижение MASTER</string>
+    <string name="wordcard_master_desc">Это слово достигло максимального уровня.</string>
+    <string name="wordcard_stop_and_submit">Остановить и отправить</string>
+    <string name="wordcard_start_recording">Начать запись</string>
+
+    <!-- DictionaryVerify Screen -->
+    <string name="verify_title">Проверка произношения</string>
+    <string name="verify_back">Назад</string>
+    <string name="verify_pronunciation_check">Произношение 1 раз</string>
+    <string name="verify_start_recording">Начать запись микрофона</string>
+    <string name="verify_stop_recording">Остановить запись</string>
+    <string name="verify_recording">Запись… Нажмите ещё раз для проверки.</string>
+    <string name="verify_ai_checking">ИИ проверяет произношение…</string>
+    <string name="verify_match">ИИ распознал \"%s\". Теперь можно добавить в словник.</string>
+    <string name="verify_no_match">Результат: \"%s\". Не совпало с целевым словом, но можно добавить.</string>
+    <string name="verify_complete">Запись завершена.</string>
+    <string name="verify_prompt">Нажмите кнопку и произнесите слово.</string>
+    <string name="verify_raw_text">Оригинал распознавания: %s</string>
+    <string name="verify_corrected">Исправленный результат: %s</string>
+    <string name="action_skip">Пропустить</string>
+    <string name="action_add_to_collection">Добавить в словник</string>
+
+    <!-- Quiz screens (shared) -->
+    <string name="quiz_question_counter">Вопрос %d / %d</string>
+    <string name="quiz_correct_label">Правильно!</string>
+    <string name="quiz_wrong_label">Правильный ответ: \'%s\'</string>
+    <string name="quiz_next_question">Следующий вопрос</string>
+    <string name="quiz_view_results">Смотреть результаты</string>
+    <string name="quiz_complete">Тест завершён</string>
+    <string name="quiz_score">%d / %d правильно</string>
+    <string name="quiz_expected_xp">Ожидаемый XP: +%d</string>
+    <string name="quiz_try_again">Попробовать снова</string>
+    <string name="quiz_back_to_missions">Вернуться к миссиям</string>
+    <string name="quiz_go_to_dictionary">Перейти в словарь</string>
+    <string name="quiz_add_words_hint">Пожалуйста, добавьте хотя бы 1 слово в словник.</string>
+
+    <!-- VocabQuiz -->
+    <string name="vocabquiz_title">Тест на запоминание слов</string>
+    <string name="vocabquiz_def_to_word">Значение → Слово</string>
+    <string name="vocabquiz_word_to_def">Слово → Значение</string>
+    <string name="vocabquiz_def_prompt">Выберите слово для этого значения.</string>
+    <string name="vocabquiz_word_prompt">Выберите значение для этого слова.</string>
+    <string name="vocabquiz_local_note">Оценки теста на запоминание слов пока рассчитываются локально.</string>
+    <string name="vocabquiz_cannot_start">Не удаётся начать тест на запоминание слов</string>
+
+    <!-- PosQuiz -->
+    <string name="posquiz_title">Тест частей речи</string>
+    <string name="posquiz_type_label">Угадать часть речи</string>
+    <string name="posquiz_local_note">Оценки теста частей речи пока рассчитываются локально.</string>
+    <string name="posquiz_cannot_start">Не удаётся начать тест частей речи</string>
+
+    <!-- Mission display names -->
+    <string name="mission_daily_pronunciation">Ежедневное произношение</string>
+    <string name="mission_daily_scan">Сканирование слов</string>
+    <string name="mission_daily_word_quiz">Тест слов</string>
+    <string name="mission_daily_collect_noun">Сбор существительных</string>
+</resources>

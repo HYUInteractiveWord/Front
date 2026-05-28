@@ -17,9 +17,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.interactiveword.R
 import com.interactiveword.ui.navigation.Screen
 import com.interactiveword.ui.components.MissionCardItem
 import com.interactiveword.data.model.User
@@ -39,7 +41,7 @@ fun ProfileScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("미션 & 프로필") },
+                title = { Text(stringResource(R.string.profile_title)) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
                 ),
@@ -67,20 +69,19 @@ fun ProfileScreen(
             if (uiState.user == null && uiState.profileStatusMessage != null) {
                 item {
                     StatusMessageCard(
-                        title = "프로필 정보를 불러오지 못했습니다",
+                        title = stringResource(R.string.profile_failed_to_load),
                         message = uiState.profileStatusMessage.orEmpty(),
                     )
                 }
             }
 
-            // 오늘의 미션
             item {
-                Text("오늘의 미션", style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.profile_today_missions), style = MaterialTheme.typography.titleMedium)
             }
             if (uiState.missionStatusMessage != null) {
                 item {
                     StatusMessageCard(
-                        title = "일일 미션 상태",
+                        title = stringResource(R.string.profile_daily_mission_status),
                         message = uiState.missionStatusMessage.orEmpty(),
                     )
                 }
@@ -109,11 +110,10 @@ fun ProfileScreen(
                 )
             }
 
-            // 전체 미션
             if (uiState.allMissions.size > uiState.dailyMissions.size) {
                 item {
                     Spacer(Modifier.height(4.dp))
-                    Text("전체 미션", style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.profile_all_missions), style = MaterialTheme.typography.titleMedium)
                 }
                 items(uiState.allMissions.drop(uiState.dailyMissions.size)) { mission ->
                     MissionCardItem(mission = mission, icon = Icons.Filled.MenuBook)
@@ -140,15 +140,8 @@ private fun StatusMessageCard(
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-            )
-            Text(
-                text = message,
-                style = MaterialTheme.typography.bodyMedium,
-                color = DarkMutedText,
-            )
+            Text(text = title, style = MaterialTheme.typography.titleMedium)
+            Text(text = message, style = MaterialTheme.typography.bodyMedium, color = DarkMutedText)
         }
     }
 }
@@ -160,16 +153,16 @@ private data class RankBand(
 )
 
 private val rankBands = listOf(
-    RankBand("브론즈", 0, 500),
-    RankBand("실버", 500, 1500),
-    RankBand("골드", 1500, 3000),
-    RankBand("Sapphire", 3000, 6000),
-    RankBand("Ruby", 6000, 10000),
-    RankBand("Emerald", 10000, 15000),
-    RankBand("Amethyst", 15000, 21000),
-    RankBand("Pearl", 21000, 28000),
-    RankBand("Obsidian", 28000, 36000),
-    RankBand("다이아", 36000, null),
+    RankBand("Bronze",    0,     500),
+    RankBand("Silver",    500,   1500),
+    RankBand("Gold",      1500,  3000),
+    RankBand("Sapphire",  3000,  6000),
+    RankBand("Ruby",      6000,  10000),
+    RankBand("Emerald",   10000, 15000),
+    RankBand("Amethyst",  15000, 21000),
+    RankBand("Pearl",     21000, 28000),
+    RankBand("Obsidian",  28000, 36000),
+    RankBand("Diamond",   36000, null),
 )
 
 @Composable
@@ -194,9 +187,9 @@ private fun MissionProfileDashboard(
         "${user.xp} / ${currentBand.maxXpExclusive} XP"
     }
     val remainLabel = if (nextBand == null || currentBand.maxXpExclusive == null) {
-        "최고 랭크에 도달했습니다."
+        stringResource(R.string.profile_top_rank_reached)
     } else {
-        "다음 랭크까지 ${currentBand.maxXpExclusive - user.xp} XP 남음"
+        stringResource(R.string.profile_xp_to_next_rank, currentBand.maxXpExclusive - user.xp)
     }
 
     Card(
@@ -212,15 +205,8 @@ private fun MissionProfileDashboard(
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text(
-                    text = user.username,
-                    style = MaterialTheme.typography.headlineSmall,
-                )
-                Text(
-                    text = user.rank,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = BrandAmberLight,
-                )
+                Text(text = user.username, style = MaterialTheme.typography.headlineSmall)
+                Text(text = user.rank, style = MaterialTheme.typography.titleMedium, color = BrandAmberLight)
             }
 
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -229,29 +215,19 @@ private fun MissionProfileDashboard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Text(
-                        text = "랭크 진행",
+                        text = stringResource(R.string.profile_rank_progress),
                         style = MaterialTheme.typography.bodyMedium,
                         color = DarkMutedText,
                     )
-                    Text(
-                        text = xpLabel,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = DarkMutedText,
-                    )
+                    Text(text = xpLabel, style = MaterialTheme.typography.bodyMedium, color = DarkMutedText)
                 }
                 LinearProgressIndicator(
                     progress = { progress },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(8.dp),
+                    modifier = Modifier.fillMaxWidth().height(8.dp),
                     color = BrandGreenLight,
                     trackColor = DarkOutline,
                 )
-                Text(
-                    text = remainLabel,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = DarkMutedText,
-                )
+                Text(text = remainLabel, style = MaterialTheme.typography.bodySmall, color = DarkMutedText)
             }
 
             Row(
@@ -260,19 +236,19 @@ private fun MissionProfileDashboard(
             ) {
                 DashboardStatCard(
                     modifier = Modifier.weight(1f),
-                    title = "수집 단어",
+                    title = stringResource(R.string.profile_stat_words),
                     value = wordsCount.toString(),
                     icon = Icons.Filled.MenuBook,
                 )
                 DashboardStatCard(
                     modifier = Modifier.weight(1f),
-                    title = "현재 랭크",
+                    title = stringResource(R.string.profile_stat_current_rank),
                     value = user.rank,
                     icon = Icons.Filled.WorkspacePremium,
                 )
                 DashboardStatCard(
                     modifier = Modifier.weight(1f),
-                    title = "총 XP",
+                    title = stringResource(R.string.profile_stat_total_xp),
                     value = user.xp.toString(),
                     icon = Icons.Filled.MilitaryTech,
                 )
@@ -291,9 +267,7 @@ private fun DashboardStatCard(
     Card(
         modifier = modifier,
         shape = MaterialTheme.shapes.large,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.background,
-        ),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
         border = androidx.compose.foundation.BorderStroke(1.dp, DarkOutline),
     ) {
         Column(
@@ -306,138 +280,72 @@ private fun DashboardStatCard(
                 modifier = Modifier.size(36.dp),
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = null,
-                        tint = BrandGreenLight,
-                        modifier = Modifier.size(18.dp),
-                    )
+                    Icon(imageVector = icon, contentDescription = null, tint = BrandGreenLight, modifier = Modifier.size(18.dp))
                 }
             }
-            Text(
-                text = value,
-                style = MaterialTheme.typography.titleMedium,
-            )
-            Text(
-                text = title,
-                style = MaterialTheme.typography.bodySmall,
-                color = DarkMutedText,
-            )
+            Text(text = value, style = MaterialTheme.typography.titleMedium)
+            Text(text = title, style = MaterialTheme.typography.bodySmall, color = DarkMutedText)
         }
     }
 }
 
 @Composable
-private fun PosQuizEntryCard(
-    onStartClick: () -> Unit,
-) {
+private fun PosQuizEntryCard(onStartClick: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.large,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-        ),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         border = androidx.compose.foundation.BorderStroke(1.dp, DarkOutline),
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Surface(
                     shape = MaterialTheme.shapes.medium,
                     color = BrandGreenLight.copy(alpha = 0.15f),
                     modifier = Modifier.size(44.dp),
                 ) {
                     Box(contentAlignment = Alignment.Center) {
-                        Icon(
-                            imageVector = Icons.Filled.AutoStories,
-                            contentDescription = null,
-                            tint = BrandGreenLight,
-                            modifier = Modifier.size(22.dp),
-                        )
+                        Icon(imageVector = Icons.Filled.AutoStories, contentDescription = null, tint = BrandGreenLight, modifier = Modifier.size(22.dp))
                     }
                 }
-
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = "단어 품사 테스트",
-                        style = MaterialTheme.typography.titleMedium,
-                    )
-                    Text(
-                        text = "단어의 품사 맞추기",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+                    Text(text = stringResource(R.string.profile_pos_quiz_title), style = MaterialTheme.typography.titleMedium)
+                    Text(text = stringResource(R.string.profile_pos_quiz_sub), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
-
-            Button(
-                onClick = onStartClick,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text("테스트 시작")
+            Button(onClick = onStartClick, modifier = Modifier.fillMaxWidth()) {
+                Text(stringResource(R.string.action_start_test))
             }
         }
     }
 }
 
 @Composable
-private fun VocabQuizEntryCard(
-    onStartClick: () -> Unit,
-) {
+private fun VocabQuizEntryCard(onStartClick: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.large,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-        ),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         border = androidx.compose.foundation.BorderStroke(1.dp, DarkOutline),
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Surface(
                     shape = MaterialTheme.shapes.medium,
                     color = BrandGreenLight.copy(alpha = 0.15f),
                     modifier = Modifier.size(44.dp),
                 ) {
                     Box(contentAlignment = Alignment.Center) {
-                        Icon(
-                            imageVector = Icons.Filled.MenuBook,
-                            contentDescription = null,
-                            tint = BrandGreenLight,
-                            modifier = Modifier.size(22.dp),
-                        )
+                        Icon(imageVector = Icons.Filled.MenuBook, contentDescription = null, tint = BrandGreenLight, modifier = Modifier.size(22.dp))
                     }
                 }
-
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = "단어 암기 테스트",
-                        style = MaterialTheme.typography.titleMedium,
-                    )
-                    Text(
-                        text = "수집한 단어로 실력을 테스트해보세요",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+                    Text(text = stringResource(R.string.profile_vocab_quiz_title), style = MaterialTheme.typography.titleMedium)
+                    Text(text = stringResource(R.string.profile_vocab_quiz_sub), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
-
-            Button(
-                onClick = onStartClick,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text("테스트 시작")
+            Button(onClick = onStartClick, modifier = Modifier.fillMaxWidth()) {
+                Text(stringResource(R.string.action_start_test))
             }
         }
     }

@@ -7,7 +7,6 @@ import com.interactiveword.data.model.DictionaryVerifyResponse
 import com.interactiveword.data.model.LoginRequest
 import com.interactiveword.data.model.Mission
 import com.interactiveword.data.model.PronunciationResponse
-import com.interactiveword.data.model.PronunciationSubmitRequest
 import com.interactiveword.data.model.RegisterRequest
 import com.interactiveword.data.model.ScanProcessRequest
 import com.interactiveword.data.model.ScanUploadResponse

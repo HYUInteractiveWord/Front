@@ -14,10 +14,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.interactiveword.R
 import com.interactiveword.ui.navigation.Screen
 import com.interactiveword.ui.theme.BrandGreenLight
 import com.interactiveword.ui.theme.DarkMutedText
@@ -34,7 +36,7 @@ fun DictionaryScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("사전") },
+                title = { Text(stringResource(R.string.dictionary_title)) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
                 ),
@@ -53,18 +55,14 @@ fun DictionaryScreen(
             OutlinedTextField(
                 value = uiState.query,
                 onValueChange = { vm.onQueryChange(it) },
-                placeholder = { Text("한국어 단어 검색...", color = DarkMutedText) },
+                placeholder = { Text(stringResource(R.string.dictionary_search_hint), color = DarkMutedText) },
                 leadingIcon = {
                     Icon(Icons.Filled.Search, contentDescription = null, tint = DarkMutedText)
                 },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Search,
-                ),
-                keyboardActions = KeyboardActions(
-                    onSearch = { vm.searchNow() },
-                ),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                keyboardActions = KeyboardActions(onSearch = { vm.searchNow() }),
                 shape = MaterialTheme.shapes.extraLarge,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = BrandGreenLight,
@@ -78,32 +76,24 @@ fun DictionaryScreen(
                 onClick = { vm.searchNow() },
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.extraLarge,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = BrandGreenLight,
-                ),
+                colors = ButtonDefaults.buttonColors(containerColor = BrandGreenLight),
             ) {
-                Text("검색")
+                Text(stringResource(R.string.action_search))
             }
 
             Spacer(Modifier.height(16.dp))
 
             when {
                 uiState.isLoading -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center,
-                    ) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator(color = BrandGreenLight)
                     }
                 }
 
                 uiState.errorMessage != null -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center,
-                    ) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(
-                            text = "검색 실패: ${uiState.errorMessage}",
+                            text = stringResource(R.string.dictionary_search_failed, uiState.errorMessage.orEmpty()),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.error,
                         )
@@ -112,7 +102,7 @@ fun DictionaryScreen(
 
                 uiState.candidates.isNotEmpty() -> {
                     Text(
-                        text = "검색 결과 ${uiState.candidates.size}개",
+                        text = stringResource(R.string.dictionary_result_count, uiState.candidates.size),
                         style = MaterialTheme.typography.labelMedium,
                         color = DarkMutedText,
                         modifier = Modifier.padding(bottom = 8.dp),
@@ -127,9 +117,7 @@ fun DictionaryScreen(
 
                             Card(
                                 shape = MaterialTheme.shapes.large,
-                                colors = CardDefaults.cardColors(
-                                    containerColor = MaterialTheme.colorScheme.surface,
-                                ),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                                 border = BorderStroke(1.dp, DarkOutline),
                                 modifier = Modifier.fillMaxWidth(),
                             ) {
@@ -140,15 +128,11 @@ fun DictionaryScreen(
                                         modifier = Modifier.fillMaxWidth(),
                                     ) {
                                         Column(modifier = Modifier.weight(1f)) {
-                                            Text(
-                                                text = result.word,
-                                                style = MaterialTheme.typography.titleLarge,
-                                            )
-
+                                            Text(text = result.word, style = MaterialTheme.typography.titleLarge)
                                             if (!result.pos.isNullOrBlank()) {
                                                 Spacer(Modifier.height(4.dp))
                                                 Text(
-                                                    text = "분류: ${result.pos}",
+                                                    text = stringResource(R.string.dictionary_category, result.pos),
                                                     style = MaterialTheme.typography.bodySmall,
                                                     color = BrandGreenLight,
                                                 )
@@ -167,21 +151,15 @@ fun DictionaryScreen(
                                             },
                                             enabled = !added,
                                             shape = MaterialTheme.shapes.large,
-                                            colors = ButtonDefaults.buttonColors(
-                                                containerColor = BrandGreenLight,
-                                            ),
+                                            colors = ButtonDefaults.buttonColors(containerColor = BrandGreenLight),
                                         ) {
-                                            Text(if (added) "추가됨" else "추가")
+                                            Text(if (added) stringResource(R.string.dictionary_added) else stringResource(R.string.action_add))
                                         }
                                     }
 
                                     if (!result.definition.isNullOrBlank()) {
                                         Spacer(Modifier.height(12.dp))
-                                        Text(
-                                            text = result.definition,
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            color = DarkMutedText,
-                                        )
+                                        Text(text = result.definition, style = MaterialTheme.typography.bodyMedium, color = DarkMutedText)
                                     }
                                 }
                             }
@@ -190,12 +168,9 @@ fun DictionaryScreen(
                 }
 
                 uiState.query.isBlank() -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center,
-                    ) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(
-                            text = "검색할 단어를 입력하세요.",
+                            text = stringResource(R.string.dictionary_enter_word),
                             style = MaterialTheme.typography.bodyMedium,
                             color = DarkMutedText,
                         )
@@ -203,12 +178,9 @@ fun DictionaryScreen(
                 }
 
                 else -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center,
-                    ) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(
-                            text = "검색 결과가 없습니다.",
+                            text = stringResource(R.string.dictionary_no_results),
                             style = MaterialTheme.typography.bodyMedium,
                             color = DarkMutedText,
                         )

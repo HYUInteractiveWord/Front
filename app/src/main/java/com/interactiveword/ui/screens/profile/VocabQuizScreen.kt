@@ -35,9 +35,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.interactiveword.R
 import com.interactiveword.ui.navigation.Screen
 import com.interactiveword.ui.theme.BrandGreenLight
 import com.interactiveword.ui.theme.DarkOutline
@@ -54,7 +56,7 @@ fun VocabQuizScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("단어 암기 테스트") },
+                title = { Text(stringResource(R.string.vocabquiz_title)) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
                 ),
@@ -64,12 +66,7 @@ fun VocabQuizScreen(
     ) { padding ->
         when {
             uiState.isLoading -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(padding),
-                    contentAlignment = Alignment.Center,
-                ) {
+                Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
             }
@@ -132,9 +129,7 @@ private fun VocabQuizQuestionState(
     val progress = if (totalQuestions > 0) (currentIndex + 1) / totalQuestions.toFloat() else 0f
 
     LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(padding),
+        modifier = Modifier.fillMaxSize().padding(padding),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
@@ -145,14 +140,14 @@ private fun VocabQuizQuestionState(
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Text(
-                        text = "문제 ${currentIndex + 1} / $totalQuestions",
+                        text = stringResource(R.string.quiz_question_counter, currentIndex + 1, totalQuestions),
                         style = MaterialTheme.typography.titleMedium,
                     )
                     Text(
                         text = if (questionType == VocabQuizType.DEFINITION_TO_WORD) {
-                            "뜻 → 단어 맞추기"
+                            stringResource(R.string.vocabquiz_def_to_word)
                         } else {
-                            "단어 → 뜻 맞추기"
+                            stringResource(R.string.vocabquiz_word_to_def)
                         },
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -160,9 +155,7 @@ private fun VocabQuizQuestionState(
                 }
                 LinearProgressIndicator(
                     progress = { progress.coerceIn(0f, 1f) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(6.dp),
+                    modifier = Modifier.fillMaxWidth().height(6.dp),
                     color = BrandGreenLight,
                     trackColor = DarkOutline,
                 )
@@ -173,28 +166,20 @@ private fun VocabQuizQuestionState(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.large,
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                ),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 border = BorderStroke(1.dp, DarkOutline),
             ) {
-                Column(
-                    modifier = Modifier.padding(20.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
-                ) {
+                Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Text(
                         text = if (questionType == VocabQuizType.DEFINITION_TO_WORD) {
-                            "이 뜻에 맞는 단어를 골라주세요."
+                            stringResource(R.string.vocabquiz_def_prompt)
                         } else {
-                            "이 단어에 맞는 뜻을 골라주세요."
+                            stringResource(R.string.vocabquiz_word_prompt)
                         },
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
-                    Text(
-                        text = prompt,
-                        style = MaterialTheme.typography.headlineSmall,
-                    )
+                    Text(text = prompt, style = MaterialTheme.typography.headlineSmall)
                 }
             }
         }
@@ -221,11 +206,7 @@ private fun VocabQuizQuestionState(
                 ),
                 contentPadding = PaddingValues(vertical = 16.dp, horizontal = 18.dp),
             ) {
-                Text(
-                    text = option,
-                    modifier = Modifier.fillMaxWidth(),
-                    style = MaterialTheme.typography.titleMedium,
-                )
+                Text(text = option, modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.titleMedium)
             }
         }
 
@@ -233,20 +214,17 @@ private fun VocabQuizQuestionState(
             item {
                 Text(
                     text = if (selectedAnswer == correctAnswer) {
-                        "정답입니다."
+                        stringResource(R.string.quiz_correct_label)
                     } else {
-                        "정답은 '$correctAnswer' 입니다."
+                        stringResource(R.string.quiz_wrong_label, correctAnswer)
                     },
                     style = MaterialTheme.typography.bodyLarge,
                     color = if (selectedAnswer == correctAnswer) BrandGreenLight else ErrorRed,
                 )
             }
             item {
-                Button(
-                    onClick = onNextClick,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(if (currentIndex + 1 == totalQuestions) "결과 보기" else "다음 문제")
+                Button(onClick = onNextClick, modifier = Modifier.fillMaxWidth()) {
+                    Text(if (currentIndex + 1 == totalQuestions) stringResource(R.string.quiz_view_results) else stringResource(R.string.quiz_next_question))
                 }
             }
         }
@@ -263,54 +241,30 @@ private fun VocabQuizResultState(
     onBackClick: () -> Unit,
 ) {
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(padding)
-            .padding(16.dp),
+        modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp),
         contentAlignment = Alignment.Center,
     ) {
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.large,
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface,
-            ),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             border = BorderStroke(1.dp, DarkOutline),
         ) {
-            Column(
-                modifier = Modifier.padding(20.dp),
-                verticalArrangement = Arrangement.spacedBy(14.dp),
-            ) {
+            Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                Text(text = stringResource(R.string.quiz_complete), style = MaterialTheme.typography.headlineSmall)
+                Text(text = stringResource(R.string.quiz_score, correctCount, totalQuestions), style = MaterialTheme.typography.titleLarge)
+                Text(text = stringResource(R.string.quiz_expected_xp, xp), style = MaterialTheme.typography.bodyLarge, color = BrandGreenLight)
                 Text(
-                    text = "테스트 완료",
-                    style = MaterialTheme.typography.headlineSmall,
-                )
-                Text(
-                    text = "$correctCount / $totalQuestions 정답",
-                    style = MaterialTheme.typography.titleLarge,
-                )
-                Text(
-                    text = "예상 획득 XP: +$xp",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = BrandGreenLight,
-                )
-                Text(
-                    text = "현재 단계에서는 단어 암기 테스트 점수를 로컬로만 계산합니다.",
+                    text = stringResource(R.string.vocabquiz_local_note),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Spacer(Modifier.height(4.dp))
-                Button(
-                    onClick = onRestartClick,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text("다시 풀기")
+                Button(onClick = onRestartClick, modifier = Modifier.fillMaxWidth()) {
+                    Text(stringResource(R.string.quiz_try_again))
                 }
-                OutlinedButton(
-                    onClick = onBackClick,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text("미션으로 돌아가기")
+                OutlinedButton(onClick = onBackClick, modifier = Modifier.fillMaxWidth()) {
+                    Text(stringResource(R.string.quiz_back_to_missions))
                 }
             }
         }
@@ -326,24 +280,16 @@ private fun EmptyVocabQuizState(
     onMoveToDictionary: () -> Unit,
 ) {
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(padding)
-            .padding(16.dp),
+        modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp),
         contentAlignment = Alignment.Center,
     ) {
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.large,
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface,
-            ),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             border = BorderStroke(1.dp, DarkOutline),
         ) {
-            Column(
-                modifier = Modifier.padding(20.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
+            Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 if (emptyReason == VocabQuizEmptyReason.NO_WORDS) {
                     Surface(
                         color = BrandGreenLight.copy(alpha = 0.12f),
@@ -355,41 +301,24 @@ private fun EmptyVocabQuizState(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(10.dp),
                         ) {
-                            Icon(
-                                imageVector = Icons.Filled.MenuBook,
-                                contentDescription = null,
-                                tint = BrandGreenLight,
-                            )
+                            Icon(imageVector = Icons.Filled.MenuBook, contentDescription = null, tint = BrandGreenLight)
                             Text(
-                                text = "단어장에 단어를 1회 이상 추가해주세요.",
+                                text = stringResource(R.string.quiz_add_words_hint),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = BrandGreenLight,
                             )
                         }
                     }
                 }
-                Text(
-                    text = "단어 암기 테스트를 시작할 수 없어요",
-                    style = MaterialTheme.typography.titleLarge,
-                )
-                Text(
-                    text = message,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+                Text(text = stringResource(R.string.vocabquiz_cannot_start), style = MaterialTheme.typography.titleLarge)
+                Text(text = message, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 if (emptyReason == VocabQuizEmptyReason.NO_WORDS) {
-                    Button(
-                        onClick = onMoveToDictionary,
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Text("사전으로 이동")
+                    Button(onClick = onMoveToDictionary, modifier = Modifier.fillMaxWidth()) {
+                        Text(stringResource(R.string.quiz_go_to_dictionary))
                     }
                 }
-                OutlinedButton(
-                    onClick = onBackClick,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text("미션으로 돌아가기")
+                OutlinedButton(onClick = onBackClick, modifier = Modifier.fillMaxWidth()) {
+                    Text(stringResource(R.string.quiz_back_to_missions))
                 }
             }
         }
@@ -423,13 +352,11 @@ private fun optionCardColors(
             border = BrandGreenLight,
             content = BrandGreenLight,
         )
-
         option == selectedAnswer -> VocabOptionColors(
             background = ErrorRed.copy(alpha = 0.14f),
             border = ErrorRed,
             content = ErrorRed,
         )
-
         else -> VocabOptionColors(
             background = MaterialTheme.colorScheme.surface,
             border = DarkOutline,

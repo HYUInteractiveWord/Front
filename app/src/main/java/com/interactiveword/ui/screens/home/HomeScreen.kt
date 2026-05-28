@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -27,6 +28,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.interactiveword.R
 import com.interactiveword.data.model.Mission
 import com.interactiveword.data.model.User
 import com.interactiveword.ui.components.MissionCardItem
@@ -88,7 +90,7 @@ fun HomeScreen(
                     IconButton(onClick = { vm.toggleCaptureService() }) {
                         Icon(
                             Icons.Filled.Notifications,
-                            contentDescription = "알림 캡처 서비스",
+                            contentDescription = stringResource(R.string.home_capture_service),
                             tint = if (uiState.isCaptureServiceRunning) BrandGreenLight else DarkMutedText,
                         )
                     }
@@ -122,7 +124,7 @@ fun HomeScreen(
             if (uiState.dailyMissions.isNotEmpty()) {
                 item {
                     SectionHeader(
-                        title = "오늘의 미션",
+                        title = stringResource(R.string.home_today_missions),
                         onMore = { navController.navigate(Screen.Profile.route) },
                     )
                 }
@@ -137,7 +139,7 @@ fun HomeScreen(
             if (uiState.recentWords.isNotEmpty()) {
                 item {
                     SectionHeader(
-                        title = "최근 단어",
+                        title = stringResource(R.string.home_recent_words),
                         onMore = { navController.navigate(Screen.Collection.route) },
                     )
                 }
@@ -151,22 +153,22 @@ fun HomeScreen(
             }
 
             item {
-                Text("빠른 학습", style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.home_quick_learning), style = MaterialTheme.typography.titleMedium)
                 Spacer(Modifier.height(8.dp))
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     QuickActionCard(
-                        label = "단어 스캔",
-                        subLabel = "미디어에서 단어 찾기",
+                        label = stringResource(R.string.home_word_scan),
+                        subLabel = stringResource(R.string.home_word_scan_sub),
                         icon = Icons.Filled.Mic,
                         modifier = Modifier.weight(1f),
                         onClick = { navController.navigate(Screen.Scan.route) },
                     )
                     QuickActionCard(
-                        label = "발음 연습",
-                        subLabel = "최근 단어로 연습",
+                        label = stringResource(R.string.home_pronunciation_practice),
+                        subLabel = stringResource(R.string.home_pronunciation_practice_sub),
                         icon = Icons.Filled.TrackChanges,
                         modifier = Modifier.weight(1f),
                         onClick = {
@@ -194,6 +196,11 @@ private fun HomeProfileCard(
 
     val completedDaily = dailyMissions.count { it.isCompleted || it.progress >= it.target }
     val totalDaily = dailyMissions.size.coerceAtLeast(1)
+
+    val remainingText = if (remainingXp > 0)
+        stringResource(R.string.home_xp_to_next_rank, remainingXp)
+    else
+        stringResource(R.string.home_top_rank)
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -247,7 +254,7 @@ private fun HomeProfileCard(
                         style = MaterialTheme.typography.bodyMedium,
                     )
                     Text(
-                        text = if (remainingXp > 0) "다음 등급까지 ${remainingXp} XP" else "최고 등급",
+                        text = remainingText,
                         style = MaterialTheme.typography.bodySmall,
                         color = DarkMutedText,
                     )
@@ -268,19 +275,19 @@ private fun HomeProfileCard(
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 ProfileStatItem(
-                    label = "수집 단어",
+                    label = stringResource(R.string.home_stat_words),
                     value = "${wordCount}개",
                     icon = Icons.Filled.MenuBook,
                     modifier = Modifier.weight(1f),
                 )
                 ProfileStatItem(
-                    label = "오늘 미션",
+                    label = stringResource(R.string.home_stat_today_mission),
                     value = "$completedDaily/$totalDaily",
                     icon = Icons.Filled.TrackChanges,
                     modifier = Modifier.weight(1f),
                 )
                 ProfileStatItem(
-                    label = "단어 슬롯",
+                    label = stringResource(R.string.home_stat_word_slots),
                     value = "${user.maxWordSlots}개",
                     icon = Icons.Filled.Bolt,
                     modifier = Modifier.weight(1f),
@@ -348,7 +355,7 @@ private fun SectionHeader(title: String, onMore: () -> Unit) {
     ) {
         Text(title, style = MaterialTheme.typography.titleMedium)
         TextButton(onClick = onMore) {
-            Text("전체보기", style = MaterialTheme.typography.bodySmall, color = BrandGreenLight)
+            Text(stringResource(R.string.home_view_all), style = MaterialTheme.typography.bodySmall, color = BrandGreenLight)
         }
     }
 }
@@ -385,33 +392,32 @@ private fun QuickActionCard(
     }
 }
 
-private fun rankLabel(rank: String): String {
-    return when (rank.lowercase()) {
-        "bronze" -> "브론즈"
-        "silver" -> "실버"
-        "gold" -> "골드"
-        "platinum" -> "플래티넘"
-        "diamond" -> "다이아"
-        "master" -> "마스터"
-        else -> rank
-    }
+@Composable
+private fun rankLabel(rank: String): String = when (rank.lowercase()) {
+    "bronze"   -> stringResource(R.string.rank_bronze)
+    "silver"   -> stringResource(R.string.rank_silver)
+    "gold"     -> stringResource(R.string.rank_gold)
+    "platinum" -> stringResource(R.string.rank_platinum)
+    "diamond"  -> stringResource(R.string.rank_diamond)
+    "master"   -> stringResource(R.string.rank_master)
+    else -> rank
 }
 
 private fun nextRankGoal(rank: String, currentXp: Int): Int {
     val byRank = when (rank.lowercase()) {
-        "bronze" -> 500
-        "silver" -> 1500
-        "gold" -> 3000
+        "bronze"   -> 500
+        "silver"   -> 1500
+        "gold"     -> 3000
         "platinum" -> 5000
-        "diamond" -> 8000
-        "master" -> -1
+        "diamond"  -> 8000
+        "master"   -> -1
         else -> -1
     }
 
     if (byRank > currentXp) return byRank
 
     return when {
-        currentXp < 500 -> 500
+        currentXp < 500  -> 500
         currentXp < 1500 -> 1500
         currentXp < 3000 -> 3000
         currentXp < 5000 -> 5000
@@ -420,13 +426,12 @@ private fun nextRankGoal(rank: String, currentXp: Int): Int {
     }
 }
 
-
 private fun missionIcon(missionType: String): ImageVector {
     return when (missionType) {
         "daily_pronunciation" -> Icons.Filled.Mic
-        "daily_scan" -> Icons.Filled.TrackChanges
-        "daily_word_quiz" -> Icons.Filled.MenuBook
-        "daily_collect_noun" -> Icons.Filled.MenuBook
+        "daily_scan"          -> Icons.Filled.TrackChanges
+        "daily_word_quiz"     -> Icons.Filled.MenuBook
+        "daily_collect_noun"  -> Icons.Filled.MenuBook
         else -> Icons.Filled.TrackChanges
     }
 }

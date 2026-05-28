@@ -51,7 +51,12 @@ data class Mission(
 
 // ── 요청/응답 모델 ──────────────────────────────────────────────────────────
 data class LoginRequest(val username: String, val password: String)
-data class RegisterRequest(val username: String, val email: String, val password: String)
+data class RegisterRequest(
+    val username: String,
+    val email: String,
+    val password: String,
+    @SerializedName("preferred_language") val preferredLanguage: String = "ko",
+)
 data class TokenResponse(@SerializedName("access_token") val accessToken: String)
 
 data class WordCreateRequest(

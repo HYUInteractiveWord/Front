@@ -51,11 +51,11 @@ class LoginViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun register(username: String, email: String, password: String) {
+    fun register(username: String, email: String, password: String, preferredLanguage: String = "ko") {
         viewModelScope.launch {
             _uiState.value = LoginUiState.Loading
             try {
-                userRepo.register(username, email, password)
+                userRepo.register(username, email, password, preferredLanguage)
                 login(username, password)
             } catch (e: Exception) {
                 _uiState.value = LoginUiState.Error(e.message ?: "회원가입 실패")
