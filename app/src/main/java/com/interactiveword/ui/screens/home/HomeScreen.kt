@@ -367,15 +367,21 @@ private fun QuickActionCard(
         shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         border = BorderStroke(1.dp, DarkOutline),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Surface(
                 shape = MaterialTheme.shapes.medium,
-                color = BrandGreenLight.copy(alpha = 0.15f),
+                color = BrandGreenLight,
                 modifier = Modifier.size(40.dp),
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Icon(icon, null, tint = BrandGreenLight, modifier = Modifier.size(20.dp))
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.size(22.dp),
+                    )
                 }
             }
             Spacer(Modifier.height(12.dp))

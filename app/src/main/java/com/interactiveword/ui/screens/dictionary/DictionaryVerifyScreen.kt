@@ -53,6 +53,7 @@ import com.interactiveword.ui.navigation.Screen
 import com.interactiveword.ui.theme.BrandGreenLight
 import com.interactiveword.ui.theme.DarkMutedText
 import com.interactiveword.ui.theme.DarkOutline
+import com.interactiveword.ui.theme.ErrorRed
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -239,7 +240,7 @@ fun DictionaryVerifyScreen(
                         modifier = Modifier.fillMaxWidth(),
                         shape = CircleShape,
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = BrandGreenLight,
+                            containerColor = if (uiState.isRecording) ErrorRed else BrandGreenLight,
                         ),
                     ) {
                         Icon(

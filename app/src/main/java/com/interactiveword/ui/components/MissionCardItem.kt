@@ -31,6 +31,7 @@ fun MissionCardItem(
                              else MaterialTheme.colorScheme.surface,
         ),
         border   = androidx.compose.foundation.BorderStroke(1.dp, DarkOutline),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -40,14 +41,14 @@ fun MissionCardItem(
             if (icon != null) {
                 Surface(
                     shape  = MaterialTheme.shapes.medium,
-                    color  = BrandGreenLight.copy(alpha = 0.15f),
+                    color  = BrandGreenLight,
                     modifier = Modifier.size(40.dp),
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             icon,
                             contentDescription = null,
-                            tint = BrandGreenLight,
+                            tint = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.size(20.dp),
                         )
                     }

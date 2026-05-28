@@ -1,19 +1,18 @@
 package com.interactiveword.ui.theme
 
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-// 앱은 항상 다크 테마 사용 (v0 디자인 기준)
-private val AppColorScheme = darkColorScheme(
+private val AppColorScheme = lightColorScheme(
     primary             = BrandGreenLight,       // 버튼, 액티브 상태, XP바
-    onPrimary           = Color(0xFF00391C),
+    onPrimary           = Color.White,
     primaryContainer    = BrandGreenDim,
     onPrimaryContainer  = OnBrandGreenDim,
 
     secondary           = BrandAmberLight,       // 별점, 강조 배지
-    onSecondary         = BrandAmberDim,
+    onSecondary         = DarkOnBackground,
     secondaryContainer  = BrandAmberDim,
     onSecondaryContainer = OnBrandAmberDim,
 
@@ -23,10 +22,10 @@ private val AppColorScheme = darkColorScheme(
     surface             = DarkSurface,           // 카드 배경
     onSurface           = DarkOnBackground,
     surfaceVariant      = DarkSurfaceVariant,    // 입력 필드, 뮤트 카드
-    onSurfaceVariant    = DarkMutedText,
+    onSurfaceVariant    = GameTextMid,
 
     outline             = DarkOutline,           // 카드 테두리
-    outlineVariant      = Color(0xFF2A2A2A),
+    outlineVariant      = DarkOutline,
 
     error               = ErrorRed,
     onError             = OnErrorRed,

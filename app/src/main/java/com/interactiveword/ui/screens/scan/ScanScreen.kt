@@ -34,6 +34,7 @@ import com.interactiveword.ui.theme.BrandAmberLight
 import com.interactiveword.ui.theme.BrandGreenLight
 import com.interactiveword.ui.theme.DarkMutedText
 import com.interactiveword.ui.theme.DarkOutline
+import com.interactiveword.ui.theme.ErrorRed
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -313,6 +314,7 @@ private fun ScanTypeButton(
         shape   = MaterialTheme.shapes.extraLarge,
         colors  = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         border  = androidx.compose.foundation.BorderStroke(1.dp, DarkOutline),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
     ) {
         Column(
             modifier = Modifier.padding(24.dp),
@@ -321,11 +323,16 @@ private fun ScanTypeButton(
         ) {
             Surface(
                 shape    = CircleShape,
-                color    = color.copy(alpha = 0.15f),
+                color    = color,
                 modifier = Modifier.size(64.dp),
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Icon(icon, null, tint = color, modifier = Modifier.size(32.dp))
+                    Icon(
+                        icon,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.size(32.dp),
+                    )
                 }
             }
             Text(label, style = MaterialTheme.typography.titleMedium)
@@ -347,20 +354,20 @@ private fun RecordingView(isMic: Boolean, elapsedSeconds: Int, onStop: () -> Uni
     Spacer(Modifier.height(48.dp))
     Surface(
         shape    = CircleShape,
-        color    = BrandGreenLight.copy(alpha = 0.2f),
+        color    = ErrorRed.copy(alpha = 0.2f),
         modifier = Modifier.size(128.dp).scale(scale),
     ) {
         Box(contentAlignment = Alignment.Center) {
             Surface(
                 shape    = CircleShape,
-                color    = BrandGreenLight.copy(alpha = 0.3f),
+                color    = ErrorRed.copy(alpha = 0.3f),
                 modifier = Modifier.size(96.dp),
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         if (isMic) Icons.Filled.Mic else Icons.Filled.OndemandVideo,
                         contentDescription = "녹음 중",
-                        tint     = BrandGreenLight,
+                        tint     = ErrorRed,
                         modifier = Modifier.size(40.dp),
                     )
                 }

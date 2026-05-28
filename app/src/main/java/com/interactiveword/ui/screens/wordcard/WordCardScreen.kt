@@ -28,6 +28,7 @@ import com.interactiveword.ui.components.wordCardEffectStyle
 import com.interactiveword.ui.theme.BrandGreenLight
 import com.interactiveword.ui.theme.DarkMutedText
 import com.interactiveword.ui.theme.DarkOutline
+import com.interactiveword.ui.theme.ErrorRed
 import java.io.File
 import java.io.IOException
 
@@ -458,7 +459,7 @@ fun WordCardScreen(
                     .height(52.dp),
                 shape = MaterialTheme.shapes.extraLarge,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isRecording) Color.Red else BrandGreenLight
+                    containerColor = if (isRecording) ErrorRed else BrandGreenLight
                 ),
             ) {
                 Icon(

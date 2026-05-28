@@ -135,6 +135,7 @@ private fun StatusMessageCard(
             containerColor = MaterialTheme.colorScheme.surface,
         ),
         border = androidx.compose.foundation.BorderStroke(1.dp, DarkOutline),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -206,6 +207,7 @@ private fun MissionProfileDashboard(
             containerColor = MaterialTheme.colorScheme.surface,
         ),
         border = androidx.compose.foundation.BorderStroke(1.dp, DarkOutline),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -295,6 +297,7 @@ private fun DashboardStatCard(
             containerColor = MaterialTheme.colorScheme.background,
         ),
         border = androidx.compose.foundation.BorderStroke(1.dp, DarkOutline),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
     ) {
         Column(
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 14.dp),
@@ -302,14 +305,14 @@ private fun DashboardStatCard(
         ) {
             Surface(
                 shape = MaterialTheme.shapes.medium,
-                color = BrandGreenLight.copy(alpha = 0.15f),
+                color = BrandGreenLight,
                 modifier = Modifier.size(36.dp),
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         imageVector = icon,
                         contentDescription = null,
-                        tint = BrandGreenLight,
+                        tint = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.size(18.dp),
                     )
                 }
@@ -338,6 +341,7 @@ private fun PosQuizEntryCard(
             containerColor = MaterialTheme.colorScheme.surface,
         ),
         border = androidx.compose.foundation.BorderStroke(1.dp, DarkOutline),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -349,14 +353,14 @@ private fun PosQuizEntryCard(
             ) {
                 Surface(
                     shape = MaterialTheme.shapes.medium,
-                    color = BrandGreenLight.copy(alpha = 0.15f),
+                    color = BrandGreenLight,
                     modifier = Modifier.size(44.dp),
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             imageVector = Icons.Filled.AutoStories,
                             contentDescription = null,
-                            tint = BrandGreenLight,
+                            tint = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.size(22.dp),
                         )
                     }
@@ -396,6 +400,7 @@ private fun VocabQuizEntryCard(
             containerColor = MaterialTheme.colorScheme.surface,
         ),
         border = androidx.compose.foundation.BorderStroke(1.dp, DarkOutline),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -407,14 +412,14 @@ private fun VocabQuizEntryCard(
             ) {
                 Surface(
                     shape = MaterialTheme.shapes.medium,
-                    color = BrandGreenLight.copy(alpha = 0.15f),
+                    color = BrandGreenLight,
                     modifier = Modifier.size(44.dp),
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             imageVector = Icons.Filled.MenuBook,
                             contentDescription = null,
-                            tint = BrandGreenLight,
+                            tint = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.size(22.dp),
                         )
                     }
