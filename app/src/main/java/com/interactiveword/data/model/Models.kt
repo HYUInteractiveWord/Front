@@ -168,4 +168,22 @@ data class PronunciationResponse(
     @SerializedName("is_new_best") val isNewBest: Boolean,
     @SerializedName("xp_gained") val xpGained: Int,
     @SerializedName("word_card_level") val wordCardLevel: Int,
+    val graphs: Map<String, String>? = null,
+    val details: PronunciationDetails? = null,
+    @SerializedName("raw_graph_data") val rawGraphData: RawGraphData? = null,
+)
+
+data class PronunciationDetails(
+    val pronunciation: Float,
+    val formant: Float,
+    val pitch: Float,
+    val timing: Float,
+    @SerializedName("is_intensity_good") val isIntensityGood: Boolean,
+)
+
+data class RawGraphData(
+    @SerializedName("tts_time") val ttsTime: List<Float> = emptyList(),
+    @SerializedName("tts_pitch") val ttsPitch: List<Float> = emptyList(),
+    @SerializedName("user_time") val userTime: List<Float> = emptyList(),
+    @SerializedName("user_pitch") val userPitch: List<Float> = emptyList(),
 )

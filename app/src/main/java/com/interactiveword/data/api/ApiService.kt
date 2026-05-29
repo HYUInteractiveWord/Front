@@ -78,8 +78,14 @@ interface ApiService {
     suspend fun processScan(@Body body: ScanProcessRequest): Map<String, Any>
 
     // ── Pronunciation ──────────────────────────────────────────────────────
+    @Multipart
     @POST("api/pronunciation/submit")
-    suspend fun submitPronunciation(@Body body: PronunciationSubmitRequest): PronunciationResponse
+    suspend fun submitPronunciation(
+        @Part("word_card_id") wordCardId: RequestBody,
+        @Part("korean_word") koreanWord: RequestBody,
+        @Part("tts_audio_path") ttsAudioPath: RequestBody,
+        @Part file: MultipartBody.Part,
+    ): PronunciationResponse
 
     @GET("api/pronunciation/{wordCardId}/history")
     suspend fun getPronunciationHistory(@Path("wordCardId") wordCardId: Int): List<Map<String, Any>>

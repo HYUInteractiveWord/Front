@@ -1,7 +1,12 @@
 package com.interactiveword.ui.screens.wordcard
 
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -15,9 +20,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import com.interactiveword.ui.components.WordCardEffectBadge
 import com.interactiveword.ui.components.wordCardEffectStyle
@@ -34,9 +44,17 @@ fun WordCardScreen(
 ) {
     val uiState by vm.uiState.collectAsState()
     val card = uiState.card
+    val context = LocalContext.current
+    val micPermLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+    ) { granted ->
+        if (granted) {
+            vm.togglePronunciationPractice(context)
+        }
+    }
 
     LaunchedEffect(wordId) {
-        vm.loadCard(wordId)
+        vm.loadCard(wordId, context)
     }
 
     Scaffold(
@@ -340,34 +358,126 @@ fun WordCardScreen(
                 }
             }
 
-            Spacer(Modifier.height(16.dp))
+            if (uiState.pronunciationResult == null) {
+                uiState.savedPronunciationResult?.let { saved ->
+                    Spacer(Modifier.height(12.dp))
+                    Card(
+                        shape = MaterialTheme.shapes.large,
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        ),
+                        border = BorderStroke(1.dp, BrandGreenLight),
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(
+                                text = "발음 평가 결과",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = BrandGreenLight,
+                            )
+                            Spacer(Modifier.height(8.dp))
+                            Text(
+                                text = "점수: ${saved.score.toInt()}점",
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                            Text(
+                                text = "획득 XP: +${saved.xpGained}",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = DarkMutedText,
+                            )
+                            if (!saved.recordedAt.isNullOrBlank()) {
+                                Text(
+                                    text = "저장 시각: ${saved.recordedAt}",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = DarkMutedText,
+                                )
+                            }
 
-            Card(
-                shape = MaterialTheme.shapes.large,
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                ),
-                border = BorderStroke(1.dp, DarkOutline),
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = "발음 평가",
-                        style = MaterialTheme.typography.titleMedium,
-                    )
-                    Spacer(Modifier.height(8.dp))
-                    Text(
-                        text = "아직 발음 평가 기록이 없습니다.\n발음 연습을 시작하면 점수와 그래프가 표시됩니다.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = DarkMutedText,
-                    )
+                            Spacer(Modifier.height(12.dp))
+                            PronunciationScoreChart(
+                                pronunciation = saved.pronunciation,
+                                formant = saved.formant,
+                                pitch = saved.pitch,
+                                timing = saved.timing,
+                                total = saved.score,
+                            )
+                            Spacer(Modifier.height(8.dp))
+                            Text(
+                                text = if (saved.isIntensityGood) {
+                                    "음량 상태: 적절함"
+                                } else {
+                                    "음량 상태: 작게 녹음됨. 조금 더 크게 말해보세요."
+                                },
+                                style = MaterialTheme.typography.bodySmall,
+                                color = DarkMutedText,
+                            )
+                        }
+                    }
+                }
+            }
+
+            uiState.pronunciationResult?.let { result ->
+                Spacer(Modifier.height(12.dp))
+                Card(
+                    shape = MaterialTheme.shapes.large,
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    ),
+                    border = BorderStroke(1.dp, BrandGreenLight),
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            text = "발음 평가 결과",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = BrandGreenLight,
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            text = "점수: ${result.score.toInt()}점",
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                        Text(
+                            text = "획득 XP: +${result.xpGained}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = DarkMutedText,
+                        )
+                        result.details?.let { details ->
+                            Spacer(Modifier.height(12.dp))
+                            PronunciationScoreChart(
+                                pronunciation = details.pronunciation,
+                                formant = details.formant,
+                                pitch = details.pitch,
+                                timing = details.timing,
+                                total = result.score,
+                            )
+                            Spacer(Modifier.height(8.dp))
+                            Text(
+                                text = if (details.isIntensityGood) {
+                                    "음량 상태: 적절함"
+                                } else {
+                                    "음량 상태: 작게 녹음됨. 조금 더 크게 말해보세요."
+                                },
+                                style = MaterialTheme.typography.bodySmall,
+                                color = DarkMutedText,
+                            )
+                        }
+                    }
                 }
             }
 
             Spacer(Modifier.height(16.dp))
 
             Button(
-                onClick = { vm.startPronunciationPractice() },
+                onClick = {
+                    if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) ==
+                        PackageManager.PERMISSION_GRANTED
+                    ) {
+                        vm.togglePronunciationPractice(context)
+                    } else {
+                        micPermLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp),
@@ -376,10 +486,39 @@ fun WordCardScreen(
             ) {
                 Icon(Icons.Filled.Mic, null, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.width(8.dp))
-                Text("발음 연습 시작", style = MaterialTheme.typography.titleMedium)
+                Text(
+                    when {
+                        uiState.isSubmittingPronunciation -> "평가 중..."
+                        uiState.isRecording -> "녹음 종료 및 평가 시작"
+                        else -> "발음 연습 시작"
+                    },
+                    style = MaterialTheme.typography.titleMedium,
+                )
             }
         }
     }
+}
+
+
+private fun historyFloat(history: Map<String, Any>?, vararg keys: String): Float? {
+    if (history == null) return null
+    for (key in keys) {
+        val value = history[key]
+        when (value) {
+            is Number -> return value.toFloat()
+            is String -> value.toFloatOrNull()?.let { return it }
+        }
+    }
+    return null
+}
+
+private fun historyString(history: Map<String, Any>?, vararg keys: String): String? {
+    if (history == null) return null
+    for (key in keys) {
+        val value = history[key]?.toString()
+        if (!value.isNullOrBlank()) return value
+    }
+    return null
 }
 
 private fun exampleKorean(example: Any): String {
@@ -410,4 +549,72 @@ private fun exampleTtsPath(example: Any): String? {
         }
     }
     return null
+}
+
+
+@Composable
+private fun PronunciationScoreChart(
+    pronunciation: Float,
+    formant: Float,
+    pitch: Float,
+    timing: Float,
+    total: Float,
+) {
+    val items = listOf(
+        "발음" to pronunciation,
+        "포먼트" to formant,
+        "억양" to pitch,
+        "속도" to timing,
+        "총점" to total,
+    )
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = "시각화 분석 결과",
+            style = MaterialTheme.typography.titleSmall,
+            color = BrandGreenLight,
+        )
+        Spacer(Modifier.height(8.dp))
+
+        items.forEach { (label, score) ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = DarkMutedText,
+                    modifier = Modifier.width(52.dp),
+                )
+
+                val clamped = score.coerceIn(0f, 100f)
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(18.dp)
+                        .background(DarkOutline, shape = MaterialTheme.shapes.small),
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .fillMaxWidth(clamped / 100f)
+                            .background(BrandGreenLight, shape = MaterialTheme.shapes.small),
+                    )
+                }
+
+                Spacer(Modifier.width(8.dp))
+
+                Text(
+                    text = String.format("%.1f", score),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    textAlign = TextAlign.End,
+                    modifier = Modifier.width(44.dp),
+                )
+            }
+        }
+    }
 }
