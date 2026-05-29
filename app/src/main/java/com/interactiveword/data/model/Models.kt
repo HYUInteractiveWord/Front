@@ -117,7 +117,6 @@ data class DictionaryPreviewRequest(
     val word: String,
     val definition: String,
     val pos: String,
-    @SerializedName("target_language") val targetLanguage: String = "en",
 )
 
 data class DictionaryPreviewResponse(
@@ -153,7 +152,14 @@ data class YouTubeScanRequest(
 data class ScanProcessRequest(
     @SerializedName("extracted_words") val extractedWords: Map<String, Map<String, String>>,
     @SerializedName("scan_source") val scanSource: String = "mic",
-    @SerializedName("target_language") val targetLanguage: String = "en",
+)
+
+data class PronunciationSubmitRequest(
+    @SerializedName("word_card_id") val wordCardId: Int,
+    val score: Float,
+    @SerializedName("user_pitch_data") val userPitchData: List<Float>,
+    @SerializedName("reference_pitch_data") val referencePitchData: List<Float>,
+    @SerializedName("dtw_distance") val dtwDistance: Float?,
 )
 
 data class PronunciationResponse(
@@ -162,5 +168,22 @@ data class PronunciationResponse(
     @SerializedName("is_new_best") val isNewBest: Boolean,
     @SerializedName("xp_gained") val xpGained: Int,
     @SerializedName("word_card_level") val wordCardLevel: Int,
-    val graphs: Map<String, String>? = null, // 백엔드에서 반환하는 그래프 이미지 상대 경로 매핑
+    val graphs: Map<String, String>? = null,
+    val details: PronunciationDetails? = null,
+    @SerializedName("raw_graph_data") val rawGraphData: RawGraphData? = null,
+)
+
+data class PronunciationDetails(
+    val pronunciation: Float,
+    val formant: Float,
+    val pitch: Float,
+    val timing: Float,
+    @SerializedName("is_intensity_good") val isIntensityGood: Boolean,
+)
+
+data class RawGraphData(
+    @SerializedName("tts_time") val ttsTime: List<Float> = emptyList(),
+    @SerializedName("tts_pitch") val ttsPitch: List<Float> = emptyList(),
+    @SerializedName("user_time") val userTime: List<Float> = emptyList(),
+    @SerializedName("user_pitch") val userPitch: List<Float> = emptyList(),
 )

@@ -67,7 +67,6 @@ interface ApiService {
     // ── Scan ───────────────────────────────────────────────────────────────
     @POST("api/scan/youtube")
     suspend fun scanYouTube(@Body body: com.interactiveword.data.model.YouTubeScanRequest): com.interactiveword.data.model.ScanUploadResponse
-
     @Multipart
     @POST("api/scan/upload")
     suspend fun uploadAudio(
@@ -85,7 +84,7 @@ interface ApiService {
         @Part("word_card_id") wordCardId: RequestBody,
         @Part("korean_word") koreanWord: RequestBody,
         @Part("tts_audio_path") ttsAudioPath: RequestBody,
-        @Part file: MultipartBody.Part
+        @Part file: MultipartBody.Part,
     ): PronunciationResponse
 
     @GET("api/pronunciation/{wordCardId}/history")
