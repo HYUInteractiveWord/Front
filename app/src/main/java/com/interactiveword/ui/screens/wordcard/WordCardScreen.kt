@@ -1,5 +1,6 @@
 package com.interactiveword.ui.screens.wordcard
 
+import com.interactiveword.R
 import android.Manifest
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult

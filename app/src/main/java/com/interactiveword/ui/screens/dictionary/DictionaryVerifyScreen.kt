@@ -241,7 +241,7 @@ fun DictionaryVerifyScreen(
                                 stringResource(R.string.verify_match, spoken)
                             }
                             uiState.isMatch == false -> {
-                                val spoken = uiState.spokenCorrected ?: uiState.spokenRaw ?: "알 수 없음"
+                                val spoken = (uiState.spokenCorrected ?: uiState.spokenRaw) ?: "알 수 없음"
                                 stringResource(R.string.verify_no_match, spoken)
                             }
                             uiState.hasRecordedOnce -> stringResource(R.string.verify_complete)
@@ -258,7 +258,7 @@ fun DictionaryVerifyScreen(
                     if (!uiState.spokenRaw.isNullOrBlank()) {
                         Spacer(Modifier.height(12.dp))
                         Text(
-                            text = stringResource(R.string.verify_raw_text, uiState.spokenRaw),
+                            text = stringResource(R.string.verify_raw_text, uiState.spokenRaw ?: ""),
                             style = MaterialTheme.typography.bodySmall,
                             color = DarkMutedText,
                         )
@@ -267,7 +267,7 @@ fun DictionaryVerifyScreen(
                     if (!uiState.spokenCorrected.isNullOrBlank()) {
                         Spacer(Modifier.height(4.dp))
                         Text(
-                            text = stringResource(R.string.verify_corrected, uiState.spokenCorrected),
+                            text = stringResource(R.string.verify_corrected, uiState.spokenCorrected ?: ""),
                             style = MaterialTheme.typography.bodySmall,
                             color = DarkMutedText,
                         )
