@@ -8,7 +8,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.interactiveword.R
 import com.interactiveword.data.model.Mission
 import com.interactiveword.ui.theme.BrandGreenDim
 import com.interactiveword.ui.theme.BrandGreenLight
@@ -37,7 +39,6 @@ fun MissionCardItem(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            // 아이콘
             if (icon != null) {
                 Surface(
                     shape  = MaterialTheme.shapes.medium,
@@ -63,13 +64,13 @@ fun MissionCardItem(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text(
-                        text  = mission.missionType.toDisplayName(),
+                        text  = missionDisplayName(mission.missionType),
                         style = MaterialTheme.typography.titleMedium,
                     )
                     if (mission.isCompleted) {
                         Icon(
                             Icons.Filled.CheckCircle,
-                            contentDescription = "완료",
+                            contentDescription = null,
                             tint = BrandGreenLight,
                             modifier = Modifier.size(20.dp),
                         )
@@ -100,12 +101,11 @@ fun MissionCardItem(
     }
 }
 
-private fun String.toDisplayName(): String {
-    return when (this) {
-        "daily_pronunciation" -> "일일 발음 연습"
-        "daily_scan" -> "단어 스캔"
-        "daily_word_quiz" -> "단어 테스트"
-        "daily_collect_noun" -> "명사 단어 수집"
-        else -> this
-    }
+@Composable
+private fun missionDisplayName(missionType: String): String = when (missionType) {
+    "daily_pronunciation" -> stringResource(R.string.mission_daily_pronunciation)
+    "daily_scan"          -> stringResource(R.string.mission_daily_scan)
+    "daily_word_quiz"     -> stringResource(R.string.mission_daily_word_quiz)
+    "daily_collect_noun"  -> stringResource(R.string.mission_daily_collect_noun)
+    else -> missionType
 }

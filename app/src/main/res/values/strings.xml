@@ -6,4 +6,176 @@
     <string name="notification_text_capture">탭하여 한국어 단어를 캡처하세요</string>
     <string name="notification_action_capture">캡처 시작</string>
     <string name="notification_action_stop">종료</string>
+
+    <!-- Bottom Nav -->
+    <string name="nav_home">홈</string>
+    <string name="nav_dictionary">사전</string>
+    <string name="nav_collection">단어장</string>
+    <string name="nav_missions">미션</string>
+    <string name="nav_scan">스캔</string>
+
+    <!-- Login Screen -->
+    <string name="login_title">로그인</string>
+    <string name="register_title">회원가입</string>
+    <string name="label_username">아이디</string>
+    <string name="label_email">이메일</string>
+    <string name="label_password">비밀번호</string>
+    <string name="action_login">로그인</string>
+    <string name="action_register">회원가입</string>
+    <string name="link_to_register">계정이 없으신가요? 회원가입</string>
+    <string name="link_to_login">이미 계정이 있으신가요? 로그인</string>
+    <string name="label_language">언어 선택</string>
+
+    <!-- Rank labels -->
+    <string name="rank_bronze">브론즈</string>
+    <string name="rank_silver">실버</string>
+    <string name="rank_gold">골드</string>
+    <string name="rank_platinum">플래티넘</string>
+    <string name="rank_diamond">다이아</string>
+    <string name="rank_master">마스터</string>
+
+    <!-- Home Screen -->
+    <string name="home_today_missions">오늘의 미션</string>
+    <string name="home_recent_words">최근 단어</string>
+    <string name="home_quick_learning">빠른 학습</string>
+    <string name="home_word_scan">단어 스캔</string>
+    <string name="home_word_scan_sub">미디어에서 단어 찾기</string>
+    <string name="home_pronunciation_practice">발음 연습</string>
+    <string name="home_pronunciation_practice_sub">최근 단어로 연습</string>
+    <string name="home_view_all">전체보기</string>
+    <string name="home_top_rank">최고 등급</string>
+    <string name="home_xp_to_next_rank">다음 등급까지 %d XP</string>
+    <string name="home_stat_words">수집 단어</string>
+    <string name="home_stat_today_mission">오늘 미션</string>
+    <string name="home_stat_word_slots">단어 슬롯</string>
+    <string name="home_capture_service">알림 캡처 서비스</string>
+
+    <!-- Profile Screen -->
+    <string name="profile_title">미션 &amp; 프로필</string>
+    <string name="profile_today_missions">오늘의 미션</string>
+    <string name="profile_all_missions">전체 미션</string>
+    <string name="profile_rank_progress">랭크 진행</string>
+    <string name="profile_top_rank_reached">최고 랭크에 도달했습니다.</string>
+    <string name="profile_xp_to_next_rank">다음 랭크까지 %d XP 남음</string>
+    <string name="profile_stat_words">수집 단어</string>
+    <string name="profile_stat_current_rank">현재 랭크</string>
+    <string name="profile_stat_total_xp">총 XP</string>
+    <string name="profile_pos_quiz_title">단어 품사 테스트</string>
+    <string name="profile_pos_quiz_sub">단어의 품사 맞추기</string>
+    <string name="profile_vocab_quiz_title">단어 암기 테스트</string>
+    <string name="profile_vocab_quiz_sub">수집한 단어로 실력을 테스트해보세요</string>
+    <string name="profile_failed_to_load">프로필 정보를 불러오지 못했습니다</string>
+    <string name="profile_daily_mission_status">일일 미션 상태</string>
+    <string name="action_start_test">테스트 시작</string>
+
+    <!-- Collection Screen -->
+    <string name="collection_title">내 단어장</string>
+    <string name="collection_empty">아직 단어가 없어요.\n스캔이나 사전 검색으로 추가해보세요!</string>
+    <string name="collection_word_count">%d개의 단어</string>
+    <string name="collection_slots">슬롯: %d / %d</string>
+
+    <!-- Dictionary Screen -->
+    <string name="dictionary_title">사전</string>
+    <string name="dictionary_search_hint">한국어 단어 검색…</string>
+    <string name="action_search">검색</string>
+    <string name="dictionary_search_failed">검색 실패: %s</string>
+    <string name="dictionary_result_count">검색 결과 %d개</string>
+    <string name="dictionary_category">분류: %s</string>
+    <string name="dictionary_added">추가됨</string>
+    <string name="action_add">추가</string>
+    <string name="dictionary_enter_word">검색할 단어를 입력하세요.</string>
+    <string name="dictionary_no_results">검색 결과가 없습니다.</string>
+
+    <!-- Scan Screen -->
+    <string name="scan_title">단어 스캔</string>
+    <string name="scan_subtitle">주변 소리에서 한국어 단어를 찾아보세요</string>
+    <string name="scan_mic">마이크</string>
+    <string name="scan_mic_sub">주변 음성 녹음</string>
+    <string name="scan_media">미디어</string>
+    <string name="scan_media_sub">영상/음악 파일</string>
+    <string name="scan_loading_audio">오디오 추출 및 분석 중…</string>
+    <string name="scan_loading_youtube">YouTube 분석 중…</string>
+    <string name="scan_loading">분석 중…</string>
+    <string name="scan_youtube_hint_title">YouTube 영상 스캔하기</string>
+    <string name="scan_youtube_hint_body">YouTube 앱에서 영상 공유 → InteractiveWord 선택\n자동으로 해당 영상의 단어를 분석합니다</string>
+    <string name="scan_media_settings">미디어 스캔 설정</string>
+    <string name="scan_segment_label">스캔 구간 (처음부터)</string>
+    <string name="scan_seconds">%d초</string>
+    <string name="action_start_scan">스캔 시작</string>
+    <string name="scan_detected_words">감지된 단어 (%d개)</string>
+    <string name="scan_listening">듣는 중…</string>
+    <string name="scan_elapsed">%d초  /  최대 30초</string>
+    <string name="action_done">완료</string>
+
+    <!-- WordCard Screen -->
+    <string name="wordcard_title">단어 카드</string>
+    <string name="wordcard_listen">발음 듣기</string>
+    <string name="wordcard_category">분류: %s</string>
+    <string name="wordcard_meaning">뜻: %s</string>
+    <string name="wordcard_no_meaning">뜻 정보가 없습니다.</string>
+    <string name="wordcard_points">단어 포인트</string>
+    <string name="wordcard_best_score">최고 발음 정확도</string>
+    <string name="wordcard_practice_count">스피킹 연습 %d회 · 스캔 %d회</string>
+    <string name="wordcard_eval_title">발음 평가 결과</string>
+    <string name="wordcard_evaluating">정밀 분석 중…</string>
+    <string name="wordcard_score">점수: %d점</string>
+    <string name="wordcard_new_best">🎉 최고 점수 경신!</string>
+    <string name="wordcard_clear_record">기록 지우기</string>
+    <string name="wordcard_no_eval">아직 발음 평가 기록이 없습니다.\n아래 녹음 버튼을 눌러 평가를 시작하세요.</string>
+    <string name="wordcard_master_title">MASTER 달성</string>
+    <string name="wordcard_master_desc">이 단어는 최고 숙련도에 도달했습니다.</string>
+    <string name="wordcard_stop_and_submit">녹음 종료 및 제출</string>
+    <string name="wordcard_start_recording">녹음 시작</string>
+
+    <!-- DictionaryVerify Screen -->
+    <string name="verify_title">발음 확인</string>
+    <string name="verify_back">뒤로</string>
+    <string name="verify_pronunciation_check">1회 발음 확인</string>
+    <string name="verify_start_recording">마이크 녹음 시작</string>
+    <string name="verify_stop_recording">녹음 중지</string>
+    <string name="verify_recording">녹음 중입니다. 다시 누르면 검증을 시작합니다.</string>
+    <string name="verify_ai_checking">AI가 발음을 확인 중입니다…</string>
+    <string name="verify_match">AI가 \"%s\"(으)로 인식했습니다. 이제 단어장에 추가할 수 있습니다.</string>
+    <string name="verify_no_match">인식 결과: \"%s\". 목표 단어와 일치하지 않았지만, 원하면 지금 단어장에 추가할 수 있습니다.</string>
+    <string name="verify_complete">녹음이 완료되었습니다.</string>
+    <string name="verify_prompt">버튼을 눌러 단어를 한 번 발음해보세요.</string>
+    <string name="verify_raw_text">인식 원문: %s</string>
+    <string name="verify_corrected">보정 결과: %s</string>
+    <string name="action_skip">건너뛰기</string>
+    <string name="action_add_to_collection">단어장 추가</string>
+
+    <!-- Quiz screens (shared) -->
+    <string name="quiz_question_counter">문제 %d / %d</string>
+    <string name="quiz_correct_label">정답입니다.</string>
+    <string name="quiz_wrong_label">정답은 \'%s\' 입니다.</string>
+    <string name="quiz_next_question">다음 문제</string>
+    <string name="quiz_view_results">결과 보기</string>
+    <string name="quiz_complete">테스트 완료</string>
+    <string name="quiz_score">%d / %d 정답</string>
+    <string name="quiz_expected_xp">예상 획득 XP: +%d</string>
+    <string name="quiz_try_again">다시 풀기</string>
+    <string name="quiz_back_to_missions">미션으로 돌아가기</string>
+    <string name="quiz_go_to_dictionary">사전으로 이동</string>
+    <string name="quiz_add_words_hint">단어장에 단어를 1회 이상 추가해주세요.</string>
+
+    <!-- VocabQuiz -->
+    <string name="vocabquiz_title">단어 암기 테스트</string>
+    <string name="vocabquiz_def_to_word">뜻 → 단어 맞추기</string>
+    <string name="vocabquiz_word_to_def">단어 → 뜻 맞추기</string>
+    <string name="vocabquiz_def_prompt">이 뜻에 맞는 단어를 골라주세요.</string>
+    <string name="vocabquiz_word_prompt">이 단어에 맞는 뜻을 골라주세요.</string>
+    <string name="vocabquiz_local_note">현재 단계에서는 단어 암기 테스트 점수를 로컬로만 계산합니다.</string>
+    <string name="vocabquiz_cannot_start">단어 암기 테스트를 시작할 수 없어요</string>
+
+    <!-- PosQuiz -->
+    <string name="posquiz_title">단어 품사 테스트</string>
+    <string name="posquiz_type_label">품사 맞추기</string>
+    <string name="posquiz_local_note">현재 단계에서는 품사 테스트 점수를 로컬로만 계산합니다.</string>
+    <string name="posquiz_cannot_start">품사 테스트를 시작할 수 없어요</string>
+
+    <!-- Mission display names -->
+    <string name="mission_daily_pronunciation">일일 발음 연습</string>
+    <string name="mission_daily_scan">단어 스캔</string>
+    <string name="mission_daily_word_quiz">단어 테스트</string>
+    <string name="mission_daily_collect_noun">명사 단어 수집</string>
 </resources>

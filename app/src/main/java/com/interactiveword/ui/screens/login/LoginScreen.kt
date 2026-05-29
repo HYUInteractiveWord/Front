@@ -8,18 +8,22 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.interactiveword.R
 import com.interactiveword.ShareIntentHolder
+import com.interactiveword.data.local.LanguageManager
 import com.interactiveword.ui.navigation.Screen
 
 @Composable
 fun LoginScreen(navController: NavHostController) {
-    val app = LocalContext.current.applicationContext as Application
+    val context = LocalContext.current
+    val app = context.applicationContext as Application
     val vm: LoginViewModel = viewModel(factory = AndroidViewModelFactory.getInstance(app))
     val uiState by vm.uiState.collectAsState()
 
@@ -27,10 +31,10 @@ fun LoginScreen(navController: NavHostController) {
     var password by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var isRegisterMode by remember { mutableStateOf(false) }
+    var selectedLanguage by remember { mutableStateOf(LanguageManager.getSavedLanguage(context)) }
 
     LaunchedEffect(uiState) {
         if (uiState is LoginUiState.LoggedIn) {
-            // 공유 인텐트로 cold start된 경우 바로 스캔 화면으로
             val destination = if (ShareIntentHolder.pendingYoutubeUrl.value != null)
                 Screen.Scan.route else Screen.Home.route
             navController.navigate(destination) {
@@ -50,14 +54,14 @@ fun LoginScreen(navController: NavHostController) {
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Text(
-                text = if (isRegisterMode) "회원가입" else "로그인",
+                text = if (isRegisterMode) stringResource(R.string.register_title) else stringResource(R.string.login_title),
                 style = MaterialTheme.typography.headlineMedium,
             )
 
             OutlinedTextField(
                 value = username,
                 onValueChange = { username = it },
-                label = { Text("아이디") },
+                label = { Text(stringResource(R.string.label_username)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
             )
@@ -66,7 +70,7 @@ fun LoginScreen(navController: NavHostController) {
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
-                    label = { Text("이메일") },
+                    label = { Text(stringResource(R.string.label_email)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
@@ -76,11 +80,46 @@ fun LoginScreen(navController: NavHostController) {
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("비밀번호") },
+                label = { Text(stringResource(R.string.label_password)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
             )
+
+            if (isRegisterMode) {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        text = stringResource(R.string.label_language),
+                        style = MaterialTheme.typography.labelLarge,
+                    )
+                    Spacer(Modifier.height(4.dp))
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            RadioButton(
+                                selected = selectedLanguage == "ko",
+                                onClick = {
+                                    selectedLanguage = "ko"
+                                    LanguageManager.saveLanguage(context, "ko")
+                                },
+                            )
+                            Text("한국어")
+                        }
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            RadioButton(
+                                selected = selectedLanguage == "ru",
+                                onClick = {
+                                    selectedLanguage = "ru"
+                                    LanguageManager.saveLanguage(context, "ru")
+                                },
+                            )
+                            Text("Русский")
+                        }
+                    }
+                }
+            }
 
             if (uiState is LoginUiState.Error) {
                 Text(
@@ -91,7 +130,7 @@ fun LoginScreen(navController: NavHostController) {
 
             Button(
                 onClick = {
-                    if (isRegisterMode) vm.register(username, email, password)
+                    if (isRegisterMode) vm.register(username, email, password, selectedLanguage)
                     else vm.login(username, password)
                 },
                 enabled = uiState !is LoginUiState.Loading,
@@ -100,12 +139,12 @@ fun LoginScreen(navController: NavHostController) {
                 if (uiState is LoginUiState.Loading) {
                     CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
                 } else {
-                    Text(if (isRegisterMode) "회원가입" else "로그인")
+                    Text(if (isRegisterMode) stringResource(R.string.action_register) else stringResource(R.string.action_login))
                 }
             }
 
             TextButton(onClick = { isRegisterMode = !isRegisterMode }) {
-                Text(if (isRegisterMode) "이미 계정이 있으신가요? 로그인" else "계정이 없으신가요? 회원가입")
+                Text(if (isRegisterMode) stringResource(R.string.link_to_login) else stringResource(R.string.link_to_register))
             }
         }
     }
