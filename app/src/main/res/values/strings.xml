@@ -178,4 +178,37 @@
     <string name="mission_daily_scan">단어 스캔</string>
     <string name="mission_daily_word_quiz">단어 테스트</string>
     <string name="mission_daily_collect_noun">명사 단어 수집</string>
+
+    <!-- Profile rewards -->
+    <string name="profile_reward_title">프로필 꾸미기</string>
+    <string name="profile_reward_desc">1500 XP마다 원하는 아바타 또는 배경을 하나씩 해금할 수 있어요.</string>
+    <string name="profile_reward_remaining_tickets">남은 해금권: %1$d개</string>
+    <string name="profile_reward_avatar_section">아바타</string>
+    <string name="profile_reward_background_section">배경</string>
+    <string name="profile_reward_ticket_owned">해금권 %1$d개 보유</string>
+    <string name="profile_reward_unlock">해금</string>
+    <string name="profile_reward_locked">잠김</string>
+    <string name="profile_reward_selected">선택됨</string>
+    <string name="profile_reward_owned">보유</string>
+    <string name="profile_reward_tap_to_unlock">눌러서 해금</string>
+    <string name="profile_asset_avatar_newbie">새싹 학습자</string>
+    <string name="profile_asset_avatar_reading_bear">독서 곰</string>
+    <string name="profile_asset_avatar_crown_bear">왕관 곰</string>
+    <string name="profile_asset_avatar_writing_rabbit">글쓰기 토끼</string>
+    <string name="profile_asset_avatar_headset_cat">헤드셋 고양이</string>
+    <string name="profile_asset_avatar_parrot">말하는 앵무새</string>
+    <string name="profile_asset_avatar_explorer">탐험가</string>
+    <string name="profile_asset_avatar_ghost">유령</string>
+    <string name="profile_asset_avatar_holy_fox">성스러운 여우</string>
+    <string name="profile_asset_avatar_cyberpunk_robot">사이버 로봇</string>
+    <string name="profile_asset_bg_library">도서관</string>
+    <string name="profile_asset_bg_goldenlake">황금 호수</string>
+    <string name="profile_asset_bg_forest">숲 계곡</string>
+    <string name="profile_asset_bg_campfire">모닥불</string>
+    <string name="profile_asset_bg_cyberpunk">사이버펑크</string>
+    <string name="profile_asset_bg_halloween">할로윈</string>
+    <string name="profile_reward_unlock_hint">1500 XP마다 아바타 또는 배경 1개를 해금할 수 있습니다.</string>
+    <string name="profile_reward_stat_words">단어 수</string>
+    <string name="profile_reward_stat_rank">랭크</string>
+    <string name="profile_reward_stat_xp">총 XP</string>
 </resources>
