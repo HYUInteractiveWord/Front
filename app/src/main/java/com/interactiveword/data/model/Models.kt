@@ -9,6 +9,7 @@ data class User(
     val xp: Int,
     val rank: String,
     @SerializedName("max_word_slots") val maxWordSlots: Int,
+    @SerializedName("preferred_language") val preferredLanguage: String = "ko",
 )
 
 data class WordCard(

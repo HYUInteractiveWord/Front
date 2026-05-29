@@ -1,10 +1,12 @@
 package com.interactiveword.ui.screens.login
 
+import android.app.Activity
 import android.app.Application
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -27,14 +29,27 @@ fun LoginScreen(navController: NavHostController) {
     val vm: LoginViewModel = viewModel(factory = AndroidViewModelFactory.getInstance(app))
     val uiState by vm.uiState.collectAsState()
 
-    var username by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var isRegisterMode by remember { mutableStateOf(false) }
-    var selectedLanguage by remember { mutableStateOf(LanguageManager.getSavedLanguage(context)) }
+    var username by rememberSaveable { mutableStateOf("") }
+    var password by rememberSaveable { mutableStateOf("") }
+    var email by rememberSaveable { mutableStateOf("") }
+    var isRegisterMode by rememberSaveable { mutableStateOf(false) }
+    var selectedLanguage by rememberSaveable { mutableStateOf(LanguageManager.getSavedLanguage(context)) }
+
+    fun changeLanguage(lang: String) {
+        selectedLanguage = lang
+        LanguageManager.saveLanguage(context, lang)
+        (context as? Activity)?.recreate()
+    }
+
 
     LaunchedEffect(uiState) {
-        if (uiState is LoginUiState.LoggedIn) {
+        val loggedIn = uiState as? LoginUiState.LoggedIn
+        if (loggedIn != null) {
+            if (loggedIn.languageChanged) {
+                (context as? Activity)?.recreate()
+                return@LaunchedEffect
+            }
+
             val destination = if (ShareIntentHolder.pendingYoutubeUrl.value != null)
                 Screen.Scan.route else Screen.Home.route
             navController.navigate(destination) {
@@ -101,8 +116,7 @@ fun LoginScreen(navController: NavHostController) {
                             RadioButton(
                                 selected = selectedLanguage == "ko",
                                 onClick = {
-                                    selectedLanguage = "ko"
-                                    LanguageManager.saveLanguage(context, "ko")
+                                    changeLanguage("ko")
                                 },
                             )
                             Text("한국어")
@@ -111,8 +125,7 @@ fun LoginScreen(navController: NavHostController) {
                             RadioButton(
                                 selected = selectedLanguage == "ru",
                                 onClick = {
-                                    selectedLanguage = "ru"
-                                    LanguageManager.saveLanguage(context, "ru")
+                                    changeLanguage("ru")
                                 },
                             )
                             Text("Русский")

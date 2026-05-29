@@ -168,12 +168,12 @@ private fun BottomNavBar(
                         ) {
                             Icon(
                                 Icons.Filled.Mic,
-                                contentDescription = "스캔",
+                                contentDescription = stringResource(R.string.nav_scan),
                                 tint = Color.White,
                             )
                         }
                     },
-                    label = { Text("스캔") },
+                    label = { Text(stringResource(R.string.nav_scan)) },
                     colors = NavigationBarItemDefaults.colors(
                         indicatorColor      = Color.Transparent,
                         selectedIconColor   = com.interactiveword.ui.theme.BrandGreenLight,
