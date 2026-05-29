@@ -97,10 +97,11 @@ fun WordCardItem(
                 }
             }
 
-            if (!card.definition.isNullOrBlank()) {
+            val displayDefinition = card.definitionTranslated ?: card.definition
+            if (!displayDefinition.isNullOrBlank()) {
                 Spacer(Modifier.height(6.dp))
                 Text(
-                    text = card.definition,
+                    text = displayDefinition,
                     style = MaterialTheme.typography.bodyMedium,
                     color = DarkMutedText,
                 )

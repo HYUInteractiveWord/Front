@@ -30,11 +30,19 @@ class LoginViewModel(app: Application) : AndroidViewModel(app) {
     init {
         viewModelScope.launch {
             val token = tokenDataStore.tokenFlow.first()
-            if (token != null) {
+            if (!token.isNullOrBlank()) {
                 RetrofitClient.authToken = token
-                val languageChanged = syncLanguageFromCurrentUser()
-                _uiState.value = LoginUiState.LoggedIn(languageChanged)
+                try {
+                    val languageChanged = syncLanguageFromCurrentUser()
+                    _uiState.value = LoginUiState.LoggedIn(languageChanged)
+                } catch (_: Exception) {
+                    tokenDataStore.clearToken()
+                    RetrofitClient.authToken = null
+                    _uiState.value = LoginUiState.LoggedOut
+                }
             } else {
+                tokenDataStore.clearToken()
+                RetrofitClient.authToken = null
                 _uiState.value = LoginUiState.LoggedOut
             }
         }
@@ -42,22 +50,18 @@ class LoginViewModel(app: Application) : AndroidViewModel(app) {
 
 
     private suspend fun syncLanguageFromCurrentUser(): Boolean {
-        return try {
-            val context = getApplication<Application>()
-            val me = userRepo.getMe()
-            val serverLanguage = when {
-                me.preferredLanguage.startsWith("ru", ignoreCase = true) -> "ru"
-                else -> "ko"
-            }
+        val context = getApplication<Application>()
+        val me = userRepo.getMe()
+        val serverLanguage = when {
+            me.preferredLanguage.startsWith("ru", ignoreCase = true) -> "ru"
+            else -> "ko"
+        }
 
-            val currentLanguage = LanguageManager.getSavedLanguage(context)
-            if (currentLanguage != serverLanguage) {
-                LanguageManager.saveLanguage(context, serverLanguage)
-                true
-            } else {
-                false
-            }
-        } catch (_: Exception) {
+        val currentLanguage = LanguageManager.getSavedLanguage(context)
+        return if (currentLanguage != serverLanguage) {
+            LanguageManager.saveLanguage(context, serverLanguage)
+            true
+        } else {
             false
         }
     }

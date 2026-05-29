@@ -164,12 +164,27 @@ fun WordCardScreen(
                                 Spacer(Modifier.height(8.dp))
                             }
 
-                            Text(
-                                text = stringResource(R.string.wordcard_meaning, card.definition ?: stringResource(R.string.wordcard_no_meaning)),
-                                style = MaterialTheme.typography.bodyLarge,
-                            )
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.wordcard_meaning, card.definitionTranslated ?: card.definition ?: stringResource(R.string.wordcard_no_meaning)),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    modifier = Modifier.weight(1f),
+                                )
+                                if (!card.defTransAudioPath.isNullOrBlank()) {
+                                    IconButton(onClick = { vm.playDefinitionTts() }) {
+                                        Icon(
+                                            Icons.Filled.VolumeUp,
+                                            contentDescription = stringResource(R.string.wordcard_play_definition_tts),
+                                        )
+                                    }
+                                }
+                            }
 
-                            if (!card.definitionEnglish.isNullOrBlank()) {
+                            if (card.definitionTranslated.isNullOrBlank() && !card.definitionEnglish.isNullOrBlank()) {
                                 Spacer(Modifier.height(8.dp))
                                 Text(
                                     text = "Meaning: ${card.definitionEnglish}",
@@ -280,7 +295,7 @@ fun WordCardScreen(
 
             Spacer(Modifier.height(16.dp))
 
-            Text("Learning Examples", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.wordcard_learning_examples), style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(8.dp))
 
             if (!card.exampleSentences.isNullOrEmpty()) {
@@ -309,7 +324,7 @@ fun WordCardScreen(
                                 IconButton(onClick = { vm.playExampleTts(ttsPath) }) {
                                     Icon(
                                         Icons.Filled.VolumeUp,
-                                        contentDescription = "예문 듣기",
+                                        contentDescription = stringResource(R.string.wordcard_example_listen),
                                         tint = BrandGreenLight,
                                     )
                                 }
@@ -327,7 +342,7 @@ fun WordCardScreen(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text(
-                        text = "아직 예문 정보가 없습니다.",
+                        text = stringResource(R.string.wordcard_no_examples),
                         style = MaterialTheme.typography.bodyMedium,
                         color = DarkMutedText,
                         modifier = Modifier.padding(16.dp),
@@ -348,23 +363,23 @@ fun WordCardScreen(
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text(
-                                text = "발음 평가 결과",
+                                text = stringResource(R.string.pronunciation_result_title),
                                 style = MaterialTheme.typography.titleMedium,
                                 color = BrandGreenLight,
                             )
                             Spacer(Modifier.height(8.dp))
                             Text(
-                                text = "점수: ${saved.score.toInt()}점",
+                                text = stringResource(R.string.pronunciation_score_format, saved.score.toInt()),
                                 style = MaterialTheme.typography.bodyMedium,
                             )
                             Text(
-                                text = "획득 XP: +${saved.xpGained}",
+                                text = stringResource(R.string.pronunciation_xp_gained_format, saved.xpGained),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = DarkMutedText,
                             )
                             if (!saved.recordedAt.isNullOrBlank()) {
                                 Text(
-                                    text = "저장 시각: ${saved.recordedAt}",
+                                    text = stringResource(R.string.pronunciation_saved_at_format, saved.recordedAt),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = DarkMutedText,
                                 )
@@ -381,9 +396,9 @@ fun WordCardScreen(
                             Spacer(Modifier.height(8.dp))
                             Text(
                                 text = if (saved.isIntensityGood) {
-                                    "음량 상태: 적절함"
+                                    stringResource(R.string.pronunciation_volume_ok)
                                 } else {
-                                    "음량 상태: 작게 녹음됨. 조금 더 크게 말해보세요."
+                                    stringResource(R.string.pronunciation_volume_low)
                                 },
                                 style = MaterialTheme.typography.bodySmall,
                                 color = DarkMutedText,
@@ -405,17 +420,17 @@ fun WordCardScreen(
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
-                            text = "발음 평가 결과",
+                            text = stringResource(R.string.pronunciation_result_title),
                             style = MaterialTheme.typography.titleMedium,
                             color = BrandGreenLight,
                         )
                         Spacer(Modifier.height(8.dp))
                         Text(
-                            text = "점수: ${result.score.toInt()}점",
+                            text = stringResource(R.string.pronunciation_score_format, result.score.toInt()),
                             style = MaterialTheme.typography.bodyMedium,
                         )
                         Text(
-                            text = "획득 XP: +${result.xpGained}",
+                            text = stringResource(R.string.pronunciation_xp_gained_format, result.xpGained),
                             style = MaterialTheme.typography.bodyMedium,
                             color = DarkMutedText,
                         )
@@ -431,9 +446,9 @@ fun WordCardScreen(
                             Spacer(Modifier.height(8.dp))
                             Text(
                                 text = if (details.isIntensityGood) {
-                                    "음량 상태: 적절함"
+                                    stringResource(R.string.pronunciation_volume_ok)
                                 } else {
-                                    "음량 상태: 작게 녹음됨. 조금 더 크게 말해보세요."
+                                    stringResource(R.string.pronunciation_volume_low)
                                 },
                                 style = MaterialTheme.typography.bodySmall,
                                 color = DarkMutedText,
@@ -463,9 +478,9 @@ fun WordCardScreen(
                 Spacer(Modifier.width(8.dp))
                 Text(
                     when {
-                        uiState.isSubmittingPronunciation -> "평가 중..."
-                        uiState.isRecording -> "녹음 종료 및 평가 시작"
-                        else -> "발음 연습 시작"
+                        uiState.isSubmittingPronunciation -> stringResource(R.string.pronunciation_evaluating)
+                        uiState.isRecording -> stringResource(R.string.wordcard_stop_recording_and_evaluate)
+                        else -> stringResource(R.string.wordcard_start_pronunciation)
                     },
                     style = MaterialTheme.typography.titleMedium,
                 )
@@ -507,22 +522,43 @@ private fun exampleKorean(example: Any): String {
 }
 
 private fun exampleEnglish(example: Any): String? {
-    if (example is Map<*, *>) {
-        for (key in listOf("english", "en", "translation")) {
-            val value = example[key]?.toString()
-            if (!value.isNullOrBlank()) return value
-        }
+    val map = example as? Map<*, *> ?: return null
+    val keys = listOf(
+        "translation",
+        "russian",
+        "ru",
+        "translated",
+        "translated_text",
+        "target",
+        "target_sentence",
+        "example_translated",
+        "sentence_translated",
+        "english",
+    )
+
+    for (key in keys) {
+        val value = map[key] as? String
+        if (!value.isNullOrBlank()) return value
     }
+
     return null
 }
 
 private fun exampleTtsPath(example: Any): String? {
-    if (example is Map<*, *>) {
-        for (key in listOf("tts_audio_path", "audio_path", "ttsPath", "tts_path")) {
-            val value = example[key]?.toString()
-            if (!value.isNullOrBlank()) return value
-        }
+    val map = example as? Map<*, *> ?: return null
+    val keys = listOf(
+        "trans_audio_path",
+        "translation_audio_path",
+        "translated_audio_path",
+        "tts_audio_path",
+        "audio_path",
+    )
+
+    for (key in keys) {
+        val value = map[key] as? String
+        if (!value.isNullOrBlank()) return value
     }
+
     return null
 }
 
@@ -536,16 +572,16 @@ private fun PronunciationScoreChart(
     total: Float,
 ) {
     val items = listOf(
-        "발음" to pronunciation,
-        "포먼트" to formant,
-        "억양" to pitch,
-        "속도" to timing,
-        "총점" to total,
+        stringResource(R.string.pronunciation_label_pronunciation) to pronunciation,
+        stringResource(R.string.pronunciation_label_formants) to formant,
+        stringResource(R.string.pronunciation_label_intonation) to pitch,
+        stringResource(R.string.pronunciation_label_speed) to timing,
+        stringResource(R.string.pronunciation_label_total) to total,
     )
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
-            text = "시각화 분석 결과",
+            text = stringResource(R.string.pronunciation_visual_analysis),
             style = MaterialTheme.typography.titleSmall,
             color = BrandGreenLight,
         )

@@ -116,10 +116,10 @@
     <string name="wordcard_points">Очки слова</string>
     <string name="wordcard_best_score">Лучшая точность произношения</string>
     <string name="wordcard_practice_count">Практика %1$d раз · Сканировано %2$d раз</string>
-    <string name="wordcard_eval_title">Результаты оценки произношения</string>
+    <string name="wordcard_eval_title">Результат оценки произношения</string>
     <string name="wordcard_evaluating">Детальный анализ…</string>
-    <string name="wordcard_score">Оценка: %1$d баллов</string>
-    <string name="wordcard_new_best">🎉 Новый рекорд!</string>
+    <string name="wordcard_score">Счет: %1$d</string>
+    <string name="wordcard_new_best">Счет</string>
     <string name="wordcard_clear_record">Очистить запись</string>
     <string name="wordcard_no_eval">Записей оценки произношения пока нет.\nНажмите кнопку записи ниже, чтобы начать.</string>
     <string name="wordcard_master_title">Достижение MASTER</string>
@@ -152,7 +152,7 @@
     <string name="quiz_view_results">Смотреть результаты</string>
     <string name="quiz_complete">Тест завершён</string>
     <string name="quiz_score">%1$d / %2$d правильно</string>
-    <string name="quiz_expected_xp">Ожидаемый XP: +%1$d</string>
+    <string name="quiz_expected_xp">Получено XP: +%1$d</string>
     <string name="quiz_try_again">Попробовать снова</string>
     <string name="quiz_back_to_missions">Вернуться к миссиям</string>
     <string name="quiz_go_to_dictionary">Перейти в словарь</string>
@@ -164,13 +164,13 @@
     <string name="vocabquiz_word_to_def">Слово → Значение</string>
     <string name="vocabquiz_def_prompt">Выберите слово для этого значения.</string>
     <string name="vocabquiz_word_prompt">Выберите значение для этого слова.</string>
-    <string name="vocabquiz_local_note">Оценки теста на запоминание слов пока рассчитываются локально.</string>
+    <string name="vocabquiz_local_note">Счет</string>
     <string name="vocabquiz_cannot_start">Не удаётся начать тест на запоминание слов</string>
 
     <!-- PosQuiz -->
     <string name="posquiz_title">Тест частей речи</string>
     <string name="posquiz_type_label">Угадать часть речи</string>
-    <string name="posquiz_local_note">Оценки теста частей речи пока рассчитываются локально.</string>
+    <string name="posquiz_local_note">Счет</string>
     <string name="posquiz_cannot_start">Не удаётся начать тест частей речи</string>
 
     <!-- Mission display names -->
@@ -211,4 +211,28 @@
     <string name="profile_reward_stat_words">Собрано слов</string>
     <string name="profile_reward_stat_rank">Текущий ранг</string>
     <string name="profile_reward_stat_xp">Всего XP</string>
+    <string name="wordcard_play_definition_tts">Воспроизвести озвучку значения</string>
+    <string name="wordcard_learning_examples">Учебные примеры</string>
+    <string name="wordcard_start_pronunciation">Начать запись</string>
+    <string name="wordcard_example_listen">Прослушать пример</string>
+    <string name="wordcard_no_examples">Пока нет примеров.</string>
+    <string name="wordcard_stop_recording_and_evaluate">Оценить</string>
+    <string name="wordcard_low_volume_hint">Громкость низкая. Говорите немного громче.</string>
+    <string name="pronunciation_result_title">Результат оценки произношения</string>
+    <string name="pronunciation_score_format">Счет: %1$d</string>
+    <string name="pronunciation_xp_gained_format">Получено XP: +%1$d</string>
+    <string name="pronunciation_saved_at_format">Время сохранения: %1$s</string>
+    <string name="pronunciation_evaluating">Оценка...</string>
+    <string name="pronunciation_volume_ok">Громкость: нормально</string>
+    <string name="pronunciation_volume_low">Громкость низкая. Говорите немного громче.</string>
+    <string name="pronunciation_recording_hint">Идет запись. Произнесите слово и нажмите кнопку еще раз, чтобы начать оценку.</string>
+    <string name="pronunciation_recording_start_failed">Не удалось начать запись: %1$s</string>
+    <string name="pronunciation_evaluating_message">Запись завершена. Идет оценка произношения...</string>
+    <string name="pronunciation_record_file_missing">Файл записи не найден.</string>
+    <string name="pronunciation_visual_analysis">Визуальный анализ</string>
+    <string name="pronunciation_label_pronunciation">Произношение</string>
+    <string name="pronunciation_label_formants">Форманты</string>
+    <string name="pronunciation_label_intonation">Интонация</string>
+    <string name="pronunciation_label_speed">Скорость</string>
+    <string name="pronunciation_label_total">Итог</string>
 </resources>

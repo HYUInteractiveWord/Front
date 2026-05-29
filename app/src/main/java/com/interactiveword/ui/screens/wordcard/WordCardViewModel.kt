@@ -17,6 +17,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import java.io.File
 import org.json.JSONObject
+import com.interactiveword.R
 
 data class WordCardUiState(
     val card: WordCard? = null,
@@ -88,6 +89,12 @@ class WordCardViewModel(
         }
 
         playUrl(url, "TTS 재생 실패")
+    }
+
+    fun playDefinitionTts() {
+        val path = _uiState.value.card?.defTransAudioPath
+        val url = RetrofitClient.resolveStaticUrl(path) ?: return
+        playUrl(url, "Definition TTS playback failed")
     }
 
     fun playExampleTts(path: String?) {
@@ -164,7 +171,7 @@ class WordCardViewModel(
                 isRecording = true,
                 recordingSeconds = 0,
                 pronunciationResult = null,
-                errorMessage = "녹음 중입니다. 단어를 말한 뒤 버튼을 다시 누르면 평가가 시작됩니다.",
+                errorMessage = context.getString(R.string.pronunciation_recording_hint),
             )
         } catch (e: Exception) {
             recorder?.release()
@@ -174,7 +181,7 @@ class WordCardViewModel(
             _uiState.value = _uiState.value.copy(
                 isRecording = false,
                 recordingSeconds = 0,
-                errorMessage = "녹음을 시작하지 못했습니다: ${e.message}",
+                errorMessage = context.getString(R.string.pronunciation_recording_start_failed, e.message ?: ""),
             )
         }
     }
@@ -198,13 +205,13 @@ class WordCardViewModel(
         _uiState.value = _uiState.value.copy(
             isRecording = false,
             isSubmittingPronunciation = true,
-            errorMessage = "녹음이 종료되었습니다. 발음 평가 중입니다...",
+            errorMessage = context.getString(R.string.pronunciation_evaluating_message),
         )
 
         if (card == null || file == null || !file.exists()) {
             _uiState.value = _uiState.value.copy(
                 isSubmittingPronunciation = false,
-                errorMessage = "녹음 파일을 찾을 수 없습니다.",
+                errorMessage = context.getString(R.string.pronunciation_record_file_missing),
             )
             return
         }

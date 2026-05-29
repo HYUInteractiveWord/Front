@@ -17,9 +17,11 @@ data class WordCard(
     @SerializedName("korean_word") val koreanWord: String,
     val pos: String?,
     val definition: String?,
+    @SerializedName("definition_translated") val definitionTranslated: String? = null,
     @SerializedName("definition_english") val definitionEnglish: String? = null,
     @SerializedName("example_sentences") val exampleSentences: List<Any>?,
     @SerializedName("tts_audio_path") val ttsAudioPath: String?,
+    @SerializedName("def_trans_audio_path") val defTransAudioPath: String? = null,
     val level: Int,
     @SerializedName("best_score") val bestScore: Float,
     @SerializedName("scan_count") val scanCount: Int,
@@ -106,6 +108,7 @@ data class WordQuizResultResponse(
 data class DictionaryCandidateInfo(
     val pos: String?,
     val definition: String?,
+    @SerializedName("definition_translated") val definitionTranslated: String? = null,
 )
 
 data class DictionarySearchResponse(
@@ -132,6 +135,8 @@ data class DictionaryPreviewResponse(
     val pos: String? = null,
     val pronunciation: String? = null,
     @SerializedName("audio_path") val audioPath: String? = null,
+    @SerializedName("definition_translated") val definitionTranslated: String? = null,
+    @SerializedName("def_trans_audio_path") val defTransAudioPath: String? = null,
 )
 
 data class DictionaryVerifyResponse(
