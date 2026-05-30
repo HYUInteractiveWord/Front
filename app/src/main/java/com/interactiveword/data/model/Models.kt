@@ -19,6 +19,8 @@ data class WordCard(
     @SerializedName("definition_english") val definitionEnglish: String? = null,
     @SerializedName("example_sentences") val exampleSentences: List<Any>?,
     @SerializedName("tts_audio_path") val ttsAudioPath: String?,
+    @SerializedName("def_trans_audio_path") val defTransAudioPath: String? = null,
+
     val level: Int,
     @SerializedName("best_score") val bestScore: Float,
     @SerializedName("scan_count") val scanCount: Int,

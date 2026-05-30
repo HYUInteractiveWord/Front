@@ -97,6 +97,9 @@ fun CollectionScreen(
                 items(uiState.words, key = { it.id }) { card ->
                     WordCardItem(
                         card    = card,
+                        //재생 콜백 함수 연결
+                        onPlayTts = { vm.playTts(it.ttsAudioPath) },
+                        onPlayTransTts = { vm.playTransTts(it.defTransAudioPath) },
                         onClick = { navController.navigate(Screen.WordCard.createRoute(card.id)) },
                     )
                 }

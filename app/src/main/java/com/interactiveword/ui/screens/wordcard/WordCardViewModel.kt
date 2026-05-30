@@ -17,7 +17,6 @@ data class WordCardUiState(
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
 
-    // 💡 추가됨: 발음 평가 관련 상태
     val isEvaluating: Boolean = false,
     val evalScore: Float? = null,
     val isNewBest: Boolean = false,
@@ -48,6 +47,7 @@ class WordCardViewModel(
         }
     }
 
+    // 1. 한국어 표제어 오디오 재생
     fun playTts() {
         val path = _uiState.value.card?.ttsAudioPath
         val url = RetrofitClient.resolveStaticUrl(path)
@@ -60,6 +60,20 @@ class WordCardViewModel(
         playUrl(url, "TTS 재생 실패")
     }
 
+    // 번역된 뜻풀이(타겟 언어) 오디오 재생
+    fun playDefTransTts() {
+        val path = _uiState.value.card?.defTransAudioPath
+        val url = RetrofitClient.resolveStaticUrl(path)
+
+        if (url == null) {
+            _uiState.value = _uiState.value.copy(errorMessage = "번역 뜻 TTS 파일 경로가 없습니다.")
+            return
+        }
+
+        playUrl(url, "번역 뜻 TTS 재생 실패")
+    }
+
+    // 3. 예문 오디오 재생 (한국어 및 번역 예문 공용)
     fun playExampleTts(path: String?) {
         val url = RetrofitClient.resolveStaticUrl(path)
 
@@ -71,6 +85,7 @@ class WordCardViewModel(
         playUrl(url, "예문 TTS 재생 실패")
     }
 
+    // 공통 오디오 재생 모듈
     private fun playUrl(url: String, errorPrefix: String) {
         try {
             mediaPlayer?.release()

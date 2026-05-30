@@ -4,8 +4,8 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.TrendingUp
-import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,6 +20,8 @@ fun WordCardItem(
     card: WordCard,
     compact: Boolean = false,
     onPlayTts: (WordCard) -> Unit = {},
+    //뜻 오디오 재생 콜백
+    onPlayTransTts: (WordCard) -> Unit = {},
     onClick: (WordCard) -> Unit = {},
 ) {
     val displayPoint = if (card.wordPoint > 0) {
@@ -64,25 +66,28 @@ fun WordCardItem(
                             },
                         )
 
+                        // 발음 기호를 단어 옆, 재생 버튼 앞으로 이동
+                        if (!card.pronunciation.isNullOrBlank()) {
+                            Spacer(Modifier.width(6.dp))
+                            Text(
+                                text = "[ ${card.pronunciation} ]",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = DarkMutedText,
+                            )
+                        }
+
                         IconButton(
                             onClick = { onPlayTts(card) },
                             modifier = Modifier.size(32.dp),
                         ) {
+                            // 💡 수정됨: AutoMirrored 적용
                             Icon(
-                                Icons.Filled.VolumeUp,
-                                contentDescription = "발음 듣기",
+                                Icons.AutoMirrored.Filled.VolumeUp,
+                                contentDescription = "한국어 발음 듣기",
                                 tint = BrandGreenLight,
                                 modifier = Modifier.size(18.dp),
                             )
                         }
-                    }
-
-                    if (!card.pronunciation.isNullOrEmpty()) {
-                        Text(
-                            text = "[${card.pronunciation}]",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = DarkMutedText,
-                        )
                     }
                 }
 
@@ -97,6 +102,7 @@ fun WordCardItem(
                 }
             }
 
+            // 한국어 뜻
             if (!card.definition.isNullOrBlank()) {
                 Spacer(Modifier.height(6.dp))
                 Text(
@@ -104,6 +110,33 @@ fun WordCardItem(
                     style = MaterialTheme.typography.bodyMedium,
                     color = DarkMutedText,
                 )
+            }
+
+            // 번역된 뜻(러시아어/영어) 및 재생 버튼
+            if (!card.definitionEnglish.isNullOrBlank()) {
+                Spacer(Modifier.height(4.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = card.definitionEnglish,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = DarkMutedText,
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    if (!card.defTransAudioPath.isNullOrBlank()) {
+                        IconButton(
+                            onClick = { onPlayTransTts(card) },
+                            modifier = Modifier.size(24.dp),
+                        ) {
+                            Icon(
+                                Icons.AutoMirrored.Filled.VolumeUp,
+                                contentDescription = "번역 뜻 듣기",
+                                tint = DarkMutedText,
+                                modifier = Modifier.size(16.dp),
+                            )
+                        }
+                    }
+                }
             }
 
             if (!compact) {

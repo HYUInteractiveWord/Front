@@ -64,7 +64,6 @@ fun WordCardScreen(
                 title = { Text(card?.koreanWord ?: "단어 카드") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        // 💡 수정됨: AutoMirrored 적용
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, "뒤로")
                     }
                 },
@@ -131,19 +130,19 @@ fun WordCardScreen(
                                 Spacer(Modifier.width(8.dp))
                                 WordCardEffectBadge(effect)
                             }
+                        }
 
-                            if (!card.pronunciation.isNullOrBlank()) {
-                                Spacer(Modifier.height(4.dp))
-                                Text(
-                                    card.pronunciation,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = DarkMutedText,
-                                )
-                            }
+                        // 💡 수정됨: 발음 오디오 재생 버튼 이전에 작게 표기되도록 이동
+                        if (!card.pronunciation.isNullOrBlank()) {
+                            Text(
+                                text = "[ ${card.pronunciation} ]",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = DarkMutedText,
+                                modifier = Modifier.padding(end = 8.dp)
+                            )
                         }
 
                         IconButton(onClick = { vm.playTts() }) {
-                            // 💡 수정됨: AutoMirrored 적용
                             Icon(
                                 Icons.AutoMirrored.Filled.VolumeUp,
                                 contentDescription = "발음 듣기",
@@ -182,13 +181,30 @@ fun WordCardScreen(
                                 style = MaterialTheme.typography.bodyLarge,
                             )
 
+                            // 💡 수정됨: 번역된 뜻풀이 오디오 재생 버튼 추가
                             if (!card.definitionEnglish.isNullOrBlank()) {
                                 Spacer(Modifier.height(8.dp))
-                                Text(
-                                    text = "Meaning: ${card.definitionEnglish}",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = DarkMutedText,
-                                )
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(
+                                        text = "Meaning: ${card.definitionEnglish}",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = DarkMutedText,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                    if (!card.defTransAudioPath.isNullOrBlank()) {
+                                        IconButton(
+                                            onClick = { vm.playExampleTts(card.defTransAudioPath) },
+                                            modifier = Modifier.size(32.dp)
+                                        ) {
+                                            Icon(
+                                                Icons.AutoMirrored.Filled.VolumeUp,
+                                                contentDescription = "번역 뜻 듣기",
+                                                tint = DarkMutedText,
+                                                modifier = Modifier.size(20.dp)
+                                            )
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -308,50 +324,83 @@ fun WordCardScreen(
                         ),
                         modifier = Modifier.fillMaxWidth(),
                     ) {
-                        Row(
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
+                        Column(
+                            modifier = Modifier.padding(16.dp).fillMaxWidth()
                         ) {
-                            Column(modifier = Modifier.weight(1f)) {
+                            // 한국어 예문 영역
+                            Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
                                     text = exampleKorean(example),
                                     style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.weight(1f)
                                 )
+                                val ttsPath = exampleTtsPath(example)
+                                if (!ttsPath.isNullOrBlank()) {
+                                    IconButton(
+                                        onClick = { vm.playExampleTts(ttsPath) },
+                                        modifier = Modifier.size(32.dp)
+                                    ) {
+                                        Icon(
+                                            Icons.AutoMirrored.Filled.VolumeUp,
+                                            contentDescription = "한국어 예문 듣기",
+                                            tint = BrandGreenLight,
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                    }
+                                }
+                            }
 
-                                val english = exampleEnglish(example)
-                                if (!english.isNullOrBlank()) {
-                                    Spacer(Modifier.height(4.dp))
+                            // 💡 수정됨: 번역 예문 및 오디오 영역
+                            val english = exampleEnglish(example)
+                            if (!english.isNullOrBlank()) {
+                                Spacer(Modifier.height(8.dp))
+                                Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text(
                                         text = english,
                                         style = MaterialTheme.typography.bodyMedium,
                                         color = DarkMutedText,
+                                        modifier = Modifier.weight(1f)
                                     )
-                                }
-                            }
-
-                            val ttsPath = exampleTtsPath(example)
-                            if (!ttsPath.isNullOrBlank()) {
-                                Spacer(Modifier.width(8.dp))
-                                IconButton(onClick = { vm.playExampleTts(ttsPath) }) {
-                                    // 💡 수정됨: AutoMirrored 적용
-                                    Icon(
-                                        Icons.AutoMirrored.Filled.VolumeUp,
-                                        contentDescription = "예문 듣기",
-                                        tint = BrandGreenLight,
-                                    )
+                                    val transTtsPath = exampleTransTtsPath(example)
+                                    if (!transTtsPath.isNullOrBlank()) {
+                                        IconButton(
+                                            onClick = { vm.playExampleTts(transTtsPath) },
+                                            modifier = Modifier.size(32.dp)
+                                        ) {
+                                            Icon(
+                                                Icons.AutoMirrored.Filled.VolumeUp,
+                                                contentDescription = "번역 예문 듣기",
+                                                tint = DarkMutedText,
+                                                modifier = Modifier.size(20.dp)
+                                            )
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                     Spacer(Modifier.height(8.dp))
                 }
+            } else {
+                Card(
+                    shape = MaterialTheme.shapes.large,
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(
+                        text = "아직 예문 정보가 없습니다.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = DarkMutedText,
+                        modifier = Modifier.padding(16.dp),
+                    )
+                }
             }
 
             Spacer(Modifier.height(16.dp))
 
-            // 3. 발음 평가 결과 표시 섹션 (서버에서 받은 결과 렌더링)
+            // 3. 발음 평가 결과 표시 섹션
             Card(
                 shape = MaterialTheme.shapes.large,
                 colors = CardDefaults.cardColors(
@@ -384,7 +433,6 @@ fun WordCardScreen(
                             Text(text = "🎉 최고 점수 경신!", color = Color(0xFFFFC107))
                         }
 
-                        // 서버에서 넘어온 그래프 이미지 로딩 (Pitch 파형 비교 그래프)
                         val pitchGraph = uiState.evalGraphs?.get("pitch_graph")
                         if (!pitchGraph.isNullOrEmpty()) {
                             Spacer(Modifier.height(12.dp))
@@ -415,25 +463,21 @@ fun WordCardScreen(
             Button(
                 onClick = {
                     if (isRecording) {
-                        // 녹음 중지 및 서버 전송
                         isRecording = false
                         try {
                             mediaRecorder?.stop()
                             mediaRecorder?.release()
                             mediaRecorder = null
 
-                            // 파일이 정상 생성되었다면 뷰모델을 통해 서버로 쏜다
                             currentRecordFile?.let { vm.submitPronunciation(it) }
                         } catch (e: Exception) {
                             e.printStackTrace()
                         }
                     } else {
-                        // 임시 파일 생성 및 녹음 시작
                         try {
                             val tempFile = File.createTempFile("user_record_", ".wav", context.cacheDir)
                             currentRecordFile = tempFile
 
-                            // 💡 수정됨: 구형 안드로이드 버전 호환성을 위한 MediaRecorder 초기화 분기
                             mediaRecorder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                                 MediaRecorder(context)
                             } else {
@@ -499,6 +543,16 @@ private fun exampleEnglish(example: Any): String? {
 private fun exampleTtsPath(example: Any): String? {
     if (example is Map<*, *>) {
         for (key in listOf("tts_audio_path", "audio_path", "ttsPath", "tts_path")) {
+            val value = example[key]?.toString()
+            if (!value.isNullOrBlank()) return value
+        }
+    }
+    return null
+}
+
+private fun exampleTransTtsPath(example: Any): String? {
+    if (example is Map<*, *>) {
+        for (key in listOf("trans_audio_path", "transAudioPath")) {
             val value = example[key]?.toString()
             if (!value.isNullOrBlank()) return value
         }
