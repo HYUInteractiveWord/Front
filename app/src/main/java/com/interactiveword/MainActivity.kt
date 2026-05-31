@@ -4,10 +4,16 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MenuBook
@@ -24,7 +30,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -35,8 +44,8 @@ import com.interactiveword.data.local.LanguageManager
 import com.interactiveword.ui.navigation.AppNavHost
 import com.interactiveword.ui.navigation.Screen
 import com.interactiveword.ui.theme.DarkBackground
-import com.interactiveword.ui.theme.DarkOutline
 import com.interactiveword.ui.theme.DarkSurface
+import com.interactiveword.ui.theme.GameMintDark
 import com.interactiveword.ui.theme.InteractiveWordTheme
 
 class MainActivity : ComponentActivity() {
@@ -47,7 +56,16 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.light(
+                scrim = android.graphics.Color.TRANSPARENT,
+                darkScrim = android.graphics.Color.TRANSPARENT,
+            ),
+            navigationBarStyle = SystemBarStyle.light(
+                scrim = android.graphics.Color.WHITE,
+                darkScrim = android.graphics.Color.WHITE,
+            ),
+        )
         extractYouTubeUrl(intent)?.let { ShareIntentHolder.pendingYoutubeUrl.value = it }
         setContent {
             InteractiveWordTheme {
@@ -132,10 +150,36 @@ private fun BottomNavBar(
                             launchSingleTop = true
                         }
                     },
-                    icon  = { Icon(Icons.Filled.Mic, contentDescription = stringResource(R.string.nav_scan)) },
+                    icon  = {
+                        Box(
+                            modifier = Modifier
+                                .offset(y = (-6).dp)
+                                .size(44.dp)
+                                .background(
+                                    brush = Brush.linearGradient(
+                                        colors = listOf(
+                                            com.interactiveword.ui.theme.BrandGreenLight,
+                                            GameMintDark,
+                                        ),
+                                    ),
+                                    shape = CircleShape,
+                                ),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Icon(
+                                Icons.Filled.Mic,
+                                contentDescription = stringResource(R.string.nav_scan),
+                                tint = Color.White,
+                            )
+                        }
+                    },
                     label = { Text(stringResource(R.string.nav_scan)) },
                     colors = NavigationBarItemDefaults.colors(
-                        indicatorColor = com.interactiveword.ui.theme.BrandGreen,
+                        indicatorColor      = Color.Transparent,
+                        selectedIconColor   = com.interactiveword.ui.theme.BrandGreenLight,
+                        selectedTextColor   = com.interactiveword.ui.theme.BrandGreenLight,
+                        unselectedIconColor = com.interactiveword.ui.theme.DarkMutedText,
+                        unselectedTextColor = com.interactiveword.ui.theme.DarkMutedText,
                     ),
                 )
             }

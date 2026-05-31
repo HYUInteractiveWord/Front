@@ -55,6 +55,7 @@ import com.interactiveword.ui.navigation.Screen
 import com.interactiveword.ui.theme.BrandGreenLight
 import com.interactiveword.ui.theme.DarkMutedText
 import com.interactiveword.ui.theme.DarkOutline
+import com.interactiveword.ui.theme.ErrorRed
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -217,7 +218,9 @@ fun DictionaryVerifyScreen(
                         onClick = { onMicClick() },
                         modifier = Modifier.fillMaxWidth(),
                         shape = CircleShape,
-                        colors = ButtonDefaults.buttonColors(containerColor = BrandGreenLight),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (uiState.isRecording) ErrorRed else BrandGreenLight,
+                        ),
                     ) {
                         Icon(
                             imageVector = if (uiState.isRecording) Icons.Filled.Stop else Icons.Filled.Mic,

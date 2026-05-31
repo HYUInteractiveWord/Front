@@ -30,6 +30,7 @@ import com.interactiveword.ui.components.wordCardEffectStyle
 import com.interactiveword.ui.theme.BrandGreenLight
 import com.interactiveword.ui.theme.DarkMutedText
 import com.interactiveword.ui.theme.DarkOutline
+import com.interactiveword.ui.theme.ErrorRed
 import java.io.File
 import java.io.IOException
 
@@ -464,7 +465,7 @@ fun WordCardScreen(
                 modifier = Modifier.fillMaxWidth().height(52.dp),
                 shape = MaterialTheme.shapes.extraLarge,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isRecording) Color.Red else BrandGreenLight
+                    containerColor = if (isRecording) ErrorRed else BrandGreenLight
                 ),
             ) {
                 Icon(if (isRecording) Icons.Filled.Stop else Icons.Filled.Mic, null, modifier = Modifier.size(20.dp))
