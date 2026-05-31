@@ -1,5 +1,6 @@
 package com.interactiveword
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -25,10 +26,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.interactiveword.data.local.LanguageManager
 import com.interactiveword.ui.navigation.AppNavHost
 import com.interactiveword.ui.navigation.Screen
 import com.interactiveword.ui.theme.DarkBackground
@@ -37,6 +40,10 @@ import com.interactiveword.ui.theme.DarkSurface
 import com.interactiveword.ui.theme.InteractiveWordTheme
 
 class MainActivity : ComponentActivity() {
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LanguageManager.applyLocale(newBase))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,15 +72,15 @@ class MainActivity : ComponentActivity() {
 
 private data class NavItem(
     val screen: Screen,
-    val label: String,
+    val labelRes: Int,
     val icon: ImageVector,
 )
 
 private val navItems = listOf(
-    NavItem(Screen.Home,       "홈",    Icons.Filled.Home),
-    NavItem(Screen.Dictionary, "사전",  Icons.Filled.Search),
-    NavItem(Screen.Collection, "단어장", Icons.Filled.MenuBook),
-    NavItem(Screen.Profile,    "미션",  Icons.Filled.Person),
+    NavItem(Screen.Home,       R.string.nav_home,       Icons.Filled.Home),
+    NavItem(Screen.Dictionary, R.string.nav_dictionary, Icons.Filled.Search),
+    NavItem(Screen.Collection, R.string.nav_collection, Icons.Filled.MenuBook),
+    NavItem(Screen.Profile,    R.string.nav_missions,   Icons.Filled.Person),
 )
 
 @Composable
@@ -81,16 +88,12 @@ private fun MainApp() {
     val navController = rememberNavController()
     val pendingUrl by ShareIntentHolder.pendingYoutubeUrl.collectAsState()
 
-    // Share intent 도착 시 스캔 화면으로 이동
-    // singleTask: 앱이 이미 실행 중이면 onNewIntent → 이 LaunchedEffect가 처리
-    // cold start: Login 화면에서 아직 이동 전이면 LoginScreen이 처리
     LaunchedEffect(pendingUrl) {
         val url = pendingUrl ?: return@LaunchedEffect
         val currentRoute = navController.currentDestination?.route
         if (currentRoute != null && currentRoute != Screen.Login.route) {
             navController.navigate(Screen.Scan.route) { launchSingleTop = true }
         }
-        // currentRoute == null 또는 login이면 LoginScreen의 LaunchedEffect가 처리
     }
 
     val navBackStack by navController.currentBackStackEntryAsState()
@@ -129,8 +132,8 @@ private fun BottomNavBar(
                             launchSingleTop = true
                         }
                     },
-                    icon  = { Icon(Icons.Filled.Mic, contentDescription = "스캔") },
-                    label = { Text("스캔") },
+                    icon  = { Icon(Icons.Filled.Mic, contentDescription = stringResource(R.string.nav_scan)) },
+                    label = { Text(stringResource(R.string.nav_scan)) },
                     colors = NavigationBarItemDefaults.colors(
                         indicatorColor = com.interactiveword.ui.theme.BrandGreen,
                     ),
@@ -151,8 +154,8 @@ private fun BottomNavBar(
                         }
                     }
                 },
-                icon  = { Icon(item.icon, contentDescription = item.label) },
-                label = { Text(item.label) },
+                icon  = { Icon(item.icon, contentDescription = stringResource(item.labelRes)) },
+                label = { Text(stringResource(item.labelRes)) },
                 colors = NavigationBarItemDefaults.colors(
                     indicatorColor      = com.interactiveword.ui.theme.BrandGreenDim,
                     selectedIconColor   = com.interactiveword.ui.theme.BrandGreenLight,

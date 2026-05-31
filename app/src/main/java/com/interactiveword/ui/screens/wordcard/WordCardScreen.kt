@@ -18,10 +18,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.interactiveword.R
 import com.interactiveword.data.api.RetrofitClient
 import com.interactiveword.ui.components.WordCardEffectBadge
 import com.interactiveword.ui.components.wordCardEffectStyle
@@ -42,7 +44,6 @@ fun WordCardScreen(
     val card = uiState.card
     val context = LocalContext.current
 
-    // 녹음 관련 상태 관리
     var isRecording by remember { mutableStateOf(false) }
     var mediaRecorder by remember { mutableStateOf<MediaRecorder?>(null) }
     var currentRecordFile by remember { mutableStateOf<File?>(null) }
@@ -51,7 +52,6 @@ fun WordCardScreen(
         vm.loadCard(wordId)
     }
 
-    // 화면 이탈 시 녹음기 정리
     DisposableEffect(Unit) {
         onDispose {
             mediaRecorder?.release()
@@ -61,10 +61,10 @@ fun WordCardScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(card?.koreanWord ?: "단어 카드") },
+                title = { Text(card?.koreanWord ?: stringResource(R.string.wordcard_title)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "뒤로")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.verify_back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -76,9 +76,7 @@ fun WordCardScreen(
     ) { padding ->
         if (card == null) {
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding),
+                modifier = Modifier.fillMaxSize().padding(padding),
                 contentAlignment = Alignment.Center,
             ) {
                 CircularProgressIndicator(color = BrandGreenLight)
@@ -97,8 +95,8 @@ fun WordCardScreen(
 
         val borderWidth = when {
             displayPoint >= 100 -> 3.dp
-            displayPoint >= 76 -> 2.dp
-            displayPoint >= 26 -> 1.5.dp
+            displayPoint >= 76  -> 2.dp
+            displayPoint >= 26  -> 1.5.dp
             else -> 1.dp
         }
 
@@ -109,7 +107,6 @@ fun WordCardScreen(
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState()),
         ) {
-            // 1. 단어 메인 정보 카드
             Card(
                 shape = MaterialTheme.shapes.large,
                 colors = CardDefaults.cardColors(containerColor = containerColor),
@@ -123,16 +120,12 @@ fun WordCardScreen(
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(
-                                    card.koreanWord,
-                                    style = MaterialTheme.typography.headlineMedium,
-                                )
+                                Text(card.koreanWord, style = MaterialTheme.typography.headlineMedium)
                                 Spacer(Modifier.width(8.dp))
                                 WordCardEffectBadge(effect)
                             }
                         }
 
-                        // 💡 수정됨: 발음 오디오 재생 버튼 이전에 작게 표기되도록 이동
                         if (!card.pronunciation.isNullOrBlank()) {
                             Text(
                                 text = "[ ${card.pronunciation} ]",
@@ -145,7 +138,7 @@ fun WordCardScreen(
                         IconButton(onClick = { vm.playTts() }) {
                             Icon(
                                 Icons.AutoMirrored.Filled.VolumeUp,
-                                contentDescription = "발음 듣기",
+                                contentDescription = stringResource(R.string.wordcard_listen),
                                 tint = BrandGreenLight,
                             )
                         }
@@ -154,9 +147,7 @@ fun WordCardScreen(
                     Spacer(Modifier.height(16.dp))
 
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(IntrinsicSize.Min),
+                        modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
                     ) {
                         Box(
                             modifier = Modifier
@@ -169,7 +160,7 @@ fun WordCardScreen(
                         Column(modifier = Modifier.weight(1f)) {
                             if (!card.pos.isNullOrBlank()) {
                                 Text(
-                                    text = "분류: ${card.pos}",
+                                    text = stringResource(R.string.wordcard_category, card.pos),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = BrandGreenLight,
                                 )
@@ -177,7 +168,7 @@ fun WordCardScreen(
                             }
 
                             Text(
-                                text = "뜻: ${card.definition ?: "뜻 정보가 없습니다."}",
+                                text = stringResource(R.string.wordcard_meaning, card.definition ?: stringResource(R.string.wordcard_no_meaning)),
                                 style = MaterialTheme.typography.bodyLarge,
                             )
 
@@ -218,7 +209,7 @@ fun WordCardScreen(
                             modifier = Modifier.fillMaxWidth(),
                         ) {
                             Text(
-                                text = "단어 포인트",
+                                text = stringResource(R.string.wordcard_points),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = DarkMutedText,
                             )
@@ -233,9 +224,7 @@ fun WordCardScreen(
 
                         LinearProgressIndicator(
                             progress = { displayPoint.coerceIn(0, 100) / 100f },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(6.dp),
+                            modifier = Modifier.fillMaxWidth().height(6.dp),
                             color = effect.progressColor,
                             trackColor = DarkOutline,
                         )
@@ -244,33 +233,21 @@ fun WordCardScreen(
                             Spacer(Modifier.height(12.dp))
                             Card(
                                 shape = MaterialTheme.shapes.medium,
-                                colors = CardDefaults.cardColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                ),
-                                border = BorderStroke(
-                                    1.dp,
-                                    Color(0xFFFFC107)
-                                ),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                                border = BorderStroke(1.dp, Color(0xFFFFC107)),
                                 modifier = Modifier.fillMaxWidth(),
                             ) {
-                                Row(
-                                    modifier = Modifier.padding(12.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                ) {
-                                    Text(
-                                        text = "✦",
-                                        style = MaterialTheme.typography.titleMedium,
-                                        color = Color(0xFFFFC107),
-                                    )
+                                Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                                    Text(text = "✦", style = MaterialTheme.typography.titleMedium, color = Color(0xFFFFC107))
                                     Spacer(Modifier.width(8.dp))
                                     Column {
                                         Text(
-                                            text = "MASTER 달성",
+                                            text = stringResource(R.string.wordcard_master_title),
                                             style = MaterialTheme.typography.titleSmall,
                                             color = Color(0xFF5D3B00),
                                         )
                                         Text(
-                                            text = "이 단어는 최고 숙련도에 도달했습니다.",
+                                            text = stringResource(R.string.wordcard_master_desc),
                                             style = MaterialTheme.typography.bodySmall,
                                             color = DarkMutedText,
                                         )
@@ -287,7 +264,7 @@ fun WordCardScreen(
                             modifier = Modifier.fillMaxWidth(),
                         ) {
                             Text(
-                                text = "최고 발음 정확도",
+                                text = stringResource(R.string.wordcard_best_score),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = DarkMutedText,
                             )
@@ -301,7 +278,7 @@ fun WordCardScreen(
                         Spacer(Modifier.height(4.dp))
 
                         Text(
-                            text = "스피킹 연습 ${card.speakingCount}회 · 스캔 ${card.scanCount}회",
+                            text = stringResource(R.string.wordcard_practice_count, card.speakingCount, card.scanCount),
                             style = MaterialTheme.typography.bodySmall,
                             color = DarkMutedText,
                         )
@@ -311,7 +288,6 @@ fun WordCardScreen(
 
             Spacer(Modifier.height(16.dp))
 
-            // 2. 예문 섹션
             Text("Learning Examples", style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(8.dp))
 
@@ -319,15 +295,12 @@ fun WordCardScreen(
                 card.exampleSentences.forEach { example ->
                     Card(
                         shape = MaterialTheme.shapes.large,
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                        ),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
                         modifier = Modifier.fillMaxWidth(),
                     ) {
                         Column(
                             modifier = Modifier.padding(16.dp).fillMaxWidth()
                         ) {
-                            // 한국어 예문 영역
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
                                     text = exampleKorean(example),
@@ -342,7 +315,7 @@ fun WordCardScreen(
                                     ) {
                                         Icon(
                                             Icons.AutoMirrored.Filled.VolumeUp,
-                                            contentDescription = "한국어 예문 듣기",
+                                            contentDescription = null,
                                             tint = BrandGreenLight,
                                             modifier = Modifier.size(20.dp)
                                         )
@@ -350,7 +323,6 @@ fun WordCardScreen(
                                 }
                             }
 
-                            // 💡 수정됨: 번역 예문 및 오디오 영역
                             val english = exampleEnglish(example)
                             if (!english.isNullOrBlank()) {
                                 Spacer(Modifier.height(8.dp))
@@ -369,7 +341,7 @@ fun WordCardScreen(
                                         ) {
                                             Icon(
                                                 Icons.AutoMirrored.Filled.VolumeUp,
-                                                contentDescription = "번역 예문 듣기",
+                                                contentDescription = null,
                                                 tint = DarkMutedText,
                                                 modifier = Modifier.size(20.dp)
                                             )
@@ -400,37 +372,31 @@ fun WordCardScreen(
 
             Spacer(Modifier.height(16.dp))
 
-            // 3. 발음 평가 결과 표시 섹션
             Card(
                 shape = MaterialTheme.shapes.large,
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                ),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
                 border = BorderStroke(1.dp, DarkOutline),
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = "발음 평가 결과",
-                        style = MaterialTheme.typography.titleMedium,
-                    )
+                    Text(text = stringResource(R.string.wordcard_eval_title), style = MaterialTheme.typography.titleMedium)
                     Spacer(Modifier.height(8.dp))
 
                     if (uiState.isEvaluating) {
                         CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                         Text(
-                            "정밀 분석 중...",
+                            stringResource(R.string.wordcard_evaluating),
                             color = DarkMutedText,
                             modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 8.dp)
                         )
                     } else if (uiState.evalScore != null) {
                         Text(
-                            text = "점수: ${uiState.evalScore?.toInt()}점",
+                            text = stringResource(R.string.wordcard_score, uiState.evalScore?.toInt() ?: 0),
                             style = MaterialTheme.typography.headlineSmall,
                             color = BrandGreenLight
                         )
                         if (uiState.isNewBest) {
-                            Text(text = "🎉 최고 점수 경신!", color = Color(0xFFFFC107))
+                            Text(text = stringResource(R.string.wordcard_new_best), color = Color(0xFFFFC107))
                         }
 
                         val pitchGraph = uiState.evalGraphs?.get("pitch_graph")
@@ -439,17 +405,17 @@ fun WordCardScreen(
                             val graphUrl = RetrofitClient.resolveStaticUrl(pitchGraph)
                             AsyncImage(
                                 model = graphUrl,
-                                contentDescription = "음정 그래프",
+                                contentDescription = null,
                                 modifier = Modifier.fillMaxWidth().height(200.dp)
                             )
                         }
 
                         TextButton(onClick = { vm.clearEvaluation() }) {
-                            Text("기록 지우기", color = DarkMutedText)
+                            Text(stringResource(R.string.wordcard_clear_record), color = DarkMutedText)
                         }
                     } else {
                         Text(
-                            text = "아직 발음 평가 기록이 없습니다.\n아래 녹음 버튼을 눌러 평가를 시작하세요.",
+                            text = stringResource(R.string.wordcard_no_eval),
                             style = MaterialTheme.typography.bodyMedium,
                             color = DarkMutedText,
                         )
@@ -459,7 +425,6 @@ fun WordCardScreen(
 
             Spacer(Modifier.height(24.dp))
 
-            // 4. 녹음 및 서버 전송 버튼
             Button(
                 onClick = {
                     if (isRecording) {
@@ -468,7 +433,6 @@ fun WordCardScreen(
                             mediaRecorder?.stop()
                             mediaRecorder?.release()
                             mediaRecorder = null
-
                             currentRecordFile?.let { vm.submitPronunciation(it) }
                         } catch (e: Exception) {
                             e.printStackTrace()
@@ -497,22 +461,16 @@ fun WordCardScreen(
                         }
                     }
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp),
+                modifier = Modifier.fillMaxWidth().height(52.dp),
                 shape = MaterialTheme.shapes.extraLarge,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = if (isRecording) Color.Red else BrandGreenLight
                 ),
             ) {
-                Icon(
-                    if (isRecording) Icons.Filled.Stop else Icons.Filled.Mic,
-                    null,
-                    modifier = Modifier.size(20.dp)
-                )
+                Icon(if (isRecording) Icons.Filled.Stop else Icons.Filled.Mic, null, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    if (isRecording) "녹음 종료 및 제출" else "녹음 시작",
+                    if (isRecording) stringResource(R.string.wordcard_stop_and_submit) else stringResource(R.string.wordcard_start_recording),
                     style = MaterialTheme.typography.titleMedium
                 )
             }

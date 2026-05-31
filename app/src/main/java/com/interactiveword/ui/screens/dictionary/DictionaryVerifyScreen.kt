@@ -45,10 +45,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.interactiveword.R
 import com.interactiveword.ui.navigation.Screen
 import com.interactiveword.ui.theme.BrandGreenLight
 import com.interactiveword.ui.theme.DarkMutedText
@@ -118,10 +120,10 @@ fun DictionaryVerifyScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("발음 확인") },
+                title = { Text(stringResource(R.string.verify_title)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "뒤로")
+                        Icon(Icons.Filled.ArrowBack, contentDescription = stringResource(R.string.verify_back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -133,9 +135,7 @@ fun DictionaryVerifyScreen(
     ) { padding ->
         if (uiState.isLoadingPreview) {
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding),
+                modifier = Modifier.fillMaxSize().padding(padding),
                 contentAlignment = Alignment.Center,
             ) {
                 CircularProgressIndicator(color = BrandGreenLight)
@@ -152,9 +152,7 @@ fun DictionaryVerifyScreen(
         ) {
             Card(
                 shape = MaterialTheme.shapes.large,
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                ),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 border = BorderStroke(1.dp, DarkOutline),
                 modifier = Modifier.fillMaxWidth(),
             ) {
@@ -165,15 +163,12 @@ fun DictionaryVerifyScreen(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = uiState.word,
-                                style = MaterialTheme.typography.headlineMedium,
-                            )
+                            Text(text = uiState.word, style = MaterialTheme.typography.headlineMedium)
 
                             if (uiState.pos.isNotBlank()) {
                                 Spacer(Modifier.height(6.dp))
                                 Text(
-                                    text = "분류: ${uiState.pos}",
+                                    text = stringResource(R.string.dictionary_category, uiState.pos),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = BrandGreenLight,
                                 )
@@ -183,7 +178,7 @@ fun DictionaryVerifyScreen(
                         IconButton(onClick = { vm.playPreviewAudio() }) {
                             Icon(
                                 Icons.Filled.VolumeUp,
-                                contentDescription = "발음 듣기",
+                                contentDescription = stringResource(R.string.wordcard_listen),
                                 tint = BrandGreenLight,
                             )
                         }
@@ -191,27 +186,16 @@ fun DictionaryVerifyScreen(
 
                     Spacer(Modifier.height(16.dp))
 
-                    Text(
-                        text = uiState.definition,
-                        style = MaterialTheme.typography.bodyLarge,
-                    )
+                    Text(text = uiState.definition, style = MaterialTheme.typography.bodyLarge)
 
                     if (!definitionEnglish.isNullOrBlank()) {
                         Spacer(Modifier.height(10.dp))
-                        Text(
-                            text = definitionEnglish,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = DarkMutedText,
-                        )
+                        Text(text = definitionEnglish, style = MaterialTheme.typography.bodyMedium, color = DarkMutedText)
                     }
 
                     if (!pronunciation.isNullOrBlank()) {
                         Spacer(Modifier.height(12.dp))
-                        Text(
-                            text = "[$pronunciation]",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = DarkMutedText,
-                        )
+                        Text(text = "[$pronunciation]", style = MaterialTheme.typography.bodyMedium, color = DarkMutedText)
                     }
                 }
             }
@@ -220,17 +204,12 @@ fun DictionaryVerifyScreen(
 
             Card(
                 shape = MaterialTheme.shapes.large,
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                ),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 border = BorderStroke(1.dp, DarkOutline),
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Column(modifier = Modifier.padding(20.dp)) {
-                    Text(
-                        text = "1회 발음 확인",
-                        style = MaterialTheme.typography.titleMedium,
-                    )
+                    Text(text = stringResource(R.string.verify_pronunciation_check), style = MaterialTheme.typography.titleMedium)
 
                     Spacer(Modifier.height(12.dp))
 
@@ -238,38 +217,32 @@ fun DictionaryVerifyScreen(
                         onClick = { onMicClick() },
                         modifier = Modifier.fillMaxWidth(),
                         shape = CircleShape,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = BrandGreenLight,
-                        ),
+                        colors = ButtonDefaults.buttonColors(containerColor = BrandGreenLight),
                     ) {
                         Icon(
-                            imageVector = if (uiState.isRecording) {
-                                Icons.Filled.Stop
-                            } else {
-                                Icons.Filled.Mic
-                            },
+                            imageVector = if (uiState.isRecording) Icons.Filled.Stop else Icons.Filled.Mic,
                             contentDescription = null,
                         )
                         Spacer(Modifier.width(8.dp))
-                        Text(if (uiState.isRecording) "녹음 중지" else "마이크 녹음 시작")
+                        Text(if (uiState.isRecording) stringResource(R.string.verify_stop_recording) else stringResource(R.string.verify_start_recording))
                     }
 
                     Spacer(Modifier.height(16.dp))
 
                     Text(
                         text = when {
-                            uiState.isRecording -> "녹음 중입니다. 다시 누르면 검증을 시작합니다."
-                            uiState.isVerifying -> "AI가 발음을 확인 중입니다..."
+                            uiState.isRecording -> stringResource(R.string.verify_recording)
+                            uiState.isVerifying -> stringResource(R.string.verify_ai_checking)
                             uiState.isMatch == true -> {
                                 val spoken = uiState.spokenCorrected ?: uiState.word
-                                "AI가 \"$spoken\"(으)로 인식했습니다. 이제 단어장에 추가할 수 있습니다."
+                                stringResource(R.string.verify_match, spoken)
                             }
                             uiState.isMatch == false -> {
                                 val spoken = uiState.spokenCorrected ?: uiState.spokenRaw ?: "알 수 없음"
-                                "인식 결과: \"$spoken\". 목표 단어와 일치하지 않았지만, 원하면 지금 단어장에 추가할 수 있습니다."
+                                stringResource(R.string.verify_no_match, spoken)
                             }
-                            uiState.hasRecordedOnce -> "녹음이 완료되었습니다."
-                            else -> "버튼을 눌러 단어를 한 번 발음해보세요."
+                            uiState.hasRecordedOnce -> stringResource(R.string.verify_complete)
+                            else -> stringResource(R.string.verify_prompt)
                         },
                         style = MaterialTheme.typography.bodyMedium,
                         color = if (uiState.isMatch == false) {
@@ -282,7 +255,7 @@ fun DictionaryVerifyScreen(
                     if (!uiState.spokenRaw.isNullOrBlank()) {
                         Spacer(Modifier.height(12.dp))
                         Text(
-                            text = "인식 원문: ${uiState.spokenRaw}",
+                            text = stringResource(R.string.verify_raw_text, uiState.spokenRaw),
                             style = MaterialTheme.typography.bodySmall,
                             color = DarkMutedText,
                         )
@@ -291,7 +264,7 @@ fun DictionaryVerifyScreen(
                     if (!uiState.spokenCorrected.isNullOrBlank()) {
                         Spacer(Modifier.height(4.dp))
                         Text(
-                            text = "보정 결과: ${uiState.spokenCorrected}",
+                            text = stringResource(R.string.verify_corrected, uiState.spokenCorrected),
                             style = MaterialTheme.typography.bodySmall,
                             color = DarkMutedText,
                         )
@@ -301,11 +274,7 @@ fun DictionaryVerifyScreen(
 
             uiState.errorMessage?.let { error ->
                 Spacer(Modifier.height(16.dp))
-                Text(
-                    text = error,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.error,
-                )
+                Text(text = error, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.error)
             }
 
             Spacer(Modifier.height(24.dp))
@@ -319,7 +288,7 @@ fun DictionaryVerifyScreen(
                     modifier = Modifier.weight(1f),
                     shape = MaterialTheme.shapes.large,
                 ) {
-                    Text("건너뛰기")
+                    Text(stringResource(R.string.action_skip))
                 }
 
                 Button(
@@ -327,9 +296,7 @@ fun DictionaryVerifyScreen(
                     enabled = uiState.hasVerifiedOnce && !uiState.isSaving,
                     modifier = Modifier.weight(1f),
                     shape = MaterialTheme.shapes.large,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = BrandGreenLight,
-                    ),
+                    colors = ButtonDefaults.buttonColors(containerColor = BrandGreenLight),
                 ) {
                     if (uiState.isSaving) {
                         CircularProgressIndicator(
@@ -338,7 +305,7 @@ fun DictionaryVerifyScreen(
                             strokeWidth = 2.dp,
                         )
                     } else {
-                        Text("단어장 추가")
+                        Text(stringResource(R.string.action_add_to_collection))
                     }
                 }
             }

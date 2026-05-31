@@ -8,8 +8,8 @@ import com.interactiveword.data.model.User
 class UserRepository {
     private val api = RetrofitClient.api
 
-    suspend fun register(username: String, email: String, password: String): User =
-        api.register(RegisterRequest(username, email, password))
+    suspend fun register(username: String, email: String, password: String, preferredLanguage: String = "ko"): User =
+        api.register(RegisterRequest(username, email, password, preferredLanguage))
 
     suspend fun login(username: String, password: String): String {
         val response = api.login(LoginRequest(username, password))

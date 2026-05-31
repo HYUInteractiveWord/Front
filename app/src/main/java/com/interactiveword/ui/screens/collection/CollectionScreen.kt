@@ -12,9 +12,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.interactiveword.R
 import com.interactiveword.ui.components.WordCardItem
 import com.interactiveword.ui.navigation.Screen
 import com.interactiveword.ui.theme.BrandGreenLight
@@ -45,7 +47,7 @@ fun CollectionScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("내 단어장") },
+                title = { Text(stringResource(R.string.collection_title)) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
                 ),
@@ -61,7 +63,7 @@ fun CollectionScreen(
                 contentAlignment = androidx.compose.ui.Alignment.Center,
             ) {
                 Text(
-                    "아직 단어가 없어요.\n스캔이나 사전 검색으로 추가해보세요!",
+                    stringResource(R.string.collection_empty),
                     style = MaterialTheme.typography.bodyMedium,
                     color = DarkMutedText,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
@@ -83,12 +85,12 @@ fun CollectionScreen(
                         modifier = Modifier.fillMaxWidth(),
                     ) {
                         Text(
-                            "${uiState.words.size}개의 단어",
+                            stringResource(R.string.collection_word_count, uiState.words.size),
                             style = MaterialTheme.typography.bodyMedium,
                             color = DarkMutedText,
                         )
                         Text(
-                            "슬롯: ${uiState.words.size} / ${uiState.maxSlots}",
+                            stringResource(R.string.collection_slots, uiState.words.size, uiState.maxSlots),
                             style = MaterialTheme.typography.bodySmall,
                             color = BrandGreenLight,
                         )

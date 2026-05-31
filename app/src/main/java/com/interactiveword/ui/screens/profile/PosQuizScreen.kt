@@ -34,11 +34,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MenuBook
+import com.interactiveword.R
 import com.interactiveword.ui.navigation.Screen
 import com.interactiveword.ui.theme.BrandGreenLight
 import com.interactiveword.ui.theme.DarkOutline
@@ -55,7 +57,7 @@ fun PosQuizScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("단어 품사 테스트") },
+                title = { Text(stringResource(R.string.posquiz_title)) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
                 ),
@@ -65,12 +67,7 @@ fun PosQuizScreen(
     ) { padding ->
         when {
             uiState.isLoading -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(padding),
-                    contentAlignment = Alignment.Center,
-                ) {
+                Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
             }
@@ -131,9 +128,7 @@ private fun QuizQuestionState(
     val progress = if (totalQuestions > 0) (currentIndex + 1) / totalQuestions.toFloat() else 0f
 
     LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(padding),
+        modifier = Modifier.fillMaxSize().padding(padding),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
@@ -144,20 +139,18 @@ private fun QuizQuestionState(
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Text(
-                        text = "문제 ${currentIndex + 1} / $totalQuestions",
+                        text = stringResource(R.string.quiz_question_counter, currentIndex + 1, totalQuestions),
                         style = MaterialTheme.typography.titleMedium,
                     )
                     Text(
-                        text = "품사 맞추기",
+                        text = stringResource(R.string.posquiz_type_label),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
                 LinearProgressIndicator(
                     progress = { progress.coerceIn(0f, 1f) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(6.dp),
+                    modifier = Modifier.fillMaxWidth().height(6.dp),
                     color = BrandGreenLight,
                     trackColor = DarkOutline,
                 )
@@ -168,24 +161,12 @@ private fun QuizQuestionState(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.large,
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                ),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 border = BorderStroke(1.dp, DarkOutline),
             ) {
-                Column(
-                    modifier = Modifier.padding(20.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
-                ) {
-                    Text(
-                        text = word,
-                        style = MaterialTheme.typography.headlineMedium,
-                    )
-                    Text(
-                        text = definition,
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+                Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text(text = word, style = MaterialTheme.typography.headlineMedium)
+                    Text(text = definition, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         }
@@ -212,11 +193,7 @@ private fun QuizQuestionState(
                 ),
                 contentPadding = PaddingValues(vertical = 16.dp, horizontal = 18.dp),
             ) {
-                Text(
-                    text = option,
-                    modifier = Modifier.fillMaxWidth(),
-                    style = MaterialTheme.typography.titleMedium,
-                )
+                Text(text = option, modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.titleMedium)
             }
         }
 
@@ -224,20 +201,17 @@ private fun QuizQuestionState(
             item {
                 Text(
                     text = if (selectedAnswer == correctPos) {
-                        "정답입니다."
+                        stringResource(R.string.quiz_correct_label)
                     } else {
-                        "정답은 '$correctPos' 입니다."
+                        stringResource(R.string.quiz_wrong_label, correctPos)
                     },
                     style = MaterialTheme.typography.bodyLarge,
                     color = if (selectedAnswer == correctPos) BrandGreenLight else ErrorRed,
                 )
             }
             item {
-                Button(
-                    onClick = onNextClick,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(if (currentIndex + 1 == totalQuestions) "결과 보기" else "다음 문제")
+                Button(onClick = onNextClick, modifier = Modifier.fillMaxWidth()) {
+                    Text(if (currentIndex + 1 == totalQuestions) stringResource(R.string.quiz_view_results) else stringResource(R.string.quiz_next_question))
                 }
             }
         }
@@ -254,54 +228,30 @@ private fun QuizResultState(
     onBackClick: () -> Unit,
 ) {
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(padding)
-            .padding(16.dp),
+        modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp),
         contentAlignment = Alignment.Center,
     ) {
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.large,
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface,
-            ),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             border = BorderStroke(1.dp, DarkOutline),
         ) {
-            Column(
-                modifier = Modifier.padding(20.dp),
-                verticalArrangement = Arrangement.spacedBy(14.dp),
-            ) {
+            Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                Text(text = stringResource(R.string.quiz_complete), style = MaterialTheme.typography.headlineSmall)
+                Text(text = stringResource(R.string.quiz_score, correctCount, totalQuestions), style = MaterialTheme.typography.titleLarge)
+                Text(text = stringResource(R.string.quiz_expected_xp, xp), style = MaterialTheme.typography.bodyLarge, color = BrandGreenLight)
                 Text(
-                    text = "테스트 완료",
-                    style = MaterialTheme.typography.headlineSmall,
-                )
-                Text(
-                    text = "$correctCount / $totalQuestions 정답",
-                    style = MaterialTheme.typography.titleLarge,
-                )
-                Text(
-                    text = "예상 획득 XP: +$xp",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = BrandGreenLight,
-                )
-                Text(
-                    text = "현재 단계에서는 품사 테스트 점수를 로컬로만 계산합니다.",
+                    text = stringResource(R.string.posquiz_local_note),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Spacer(Modifier.height(4.dp))
-                Button(
-                    onClick = onRestartClick,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text("다시 풀기")
+                Button(onClick = onRestartClick, modifier = Modifier.fillMaxWidth()) {
+                    Text(stringResource(R.string.quiz_try_again))
                 }
-                OutlinedButton(
-                    onClick = onBackClick,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text("미션으로 돌아가기")
+                OutlinedButton(onClick = onBackClick, modifier = Modifier.fillMaxWidth()) {
+                    Text(stringResource(R.string.quiz_back_to_missions))
                 }
             }
         }
@@ -317,24 +267,16 @@ private fun EmptyQuizState(
     onMoveToDictionary: () -> Unit,
 ) {
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(padding)
-            .padding(16.dp),
+        modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp),
         contentAlignment = Alignment.Center,
     ) {
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.large,
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface,
-            ),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             border = BorderStroke(1.dp, DarkOutline),
         ) {
-            Column(
-                modifier = Modifier.padding(20.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
+            Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 if (emptyReason == PosQuizEmptyReason.NO_WORDS) {
                     Surface(
                         color = BrandGreenLight.copy(alpha = 0.12f),
@@ -346,41 +288,24 @@ private fun EmptyQuizState(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(10.dp),
                         ) {
-                            Icon(
-                                imageVector = Icons.Filled.MenuBook,
-                                contentDescription = null,
-                                tint = BrandGreenLight,
-                            )
+                            Icon(imageVector = Icons.Filled.MenuBook, contentDescription = null, tint = BrandGreenLight)
                             Text(
-                                text = "단어장에 단어를 1회 이상 추가해주세요.",
+                                text = stringResource(R.string.quiz_add_words_hint),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = BrandGreenLight,
                             )
                         }
                     }
                 }
-                Text(
-                    text = "품사 테스트를 시작할 수 없어요",
-                    style = MaterialTheme.typography.titleLarge,
-                )
-                Text(
-                    text = message,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+                Text(text = stringResource(R.string.posquiz_cannot_start), style = MaterialTheme.typography.titleLarge)
+                Text(text = message, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 if (emptyReason == PosQuizEmptyReason.NO_WORDS) {
-                    Button(
-                        onClick = onMoveToDictionary,
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Text("사전으로 이동")
+                    Button(onClick = onMoveToDictionary, modifier = Modifier.fillMaxWidth()) {
+                        Text(stringResource(R.string.quiz_go_to_dictionary))
                     }
                 }
-                OutlinedButton(
-                    onClick = onBackClick,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text("미션으로 돌아가기")
+                OutlinedButton(onClick = onBackClick, modifier = Modifier.fillMaxWidth()) {
+                    Text(stringResource(R.string.quiz_back_to_missions))
                 }
             }
         }
@@ -414,13 +339,11 @@ private fun optionCardColors(
             border = BrandGreenLight,
             content = BrandGreenLight,
         )
-
         option == selectedAnswer -> AnswerOptionColors(
             background = ErrorRed.copy(alpha = 0.14f),
             border = ErrorRed,
             content = ErrorRed,
         )
-
         else -> AnswerOptionColors(
             background = MaterialTheme.colorScheme.surface,
             border = DarkOutline,

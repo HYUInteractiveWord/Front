@@ -23,11 +23,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.interactiveword.R
 import com.interactiveword.ShareIntentHolder
 import com.interactiveword.ui.navigation.Screen
 import com.interactiveword.ui.theme.BrandAmberLight
@@ -45,15 +47,13 @@ fun ScanScreen(
     val uiState by vm.uiState.collectAsState()
     val context = LocalContext.current
 
-    // Share Intent로 전달된 YouTube URL 자동 처리
     val pendingUrl by ShareIntentHolder.pendingYoutubeUrl.collectAsState()
     LaunchedEffect(pendingUrl) {
         val url = pendingUrl ?: return@LaunchedEffect
-        ShareIntentHolder.pendingYoutubeUrl.value = null  // 소비
+        ShareIntentHolder.pendingYoutubeUrl.value = null
         vm.startYoutubeScan(url)
     }
 
-    // ── 마이크 권한 런처 ─────────────────────────────────────────────────────
     val micPermLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted -> if (granted) vm.startMicRecording() }
@@ -65,12 +65,10 @@ fun ScanScreen(
         else micPermLauncher.launch(Manifest.permission.RECORD_AUDIO)
     }
 
-    // 화면 벗어날 때 녹음 정리
     DisposableEffect(Unit) {
         onDispose { vm.stopRecording() }
     }
 
-    // ── 미디어 파일 피커 ──────────────────────────────────────────────────────
     val mediaPickerLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocument()
     ) { uri ->
@@ -87,7 +85,7 @@ fun ScanScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("단어 스캔") },
+                title = { Text(stringResource(R.string.scan_title)) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
                 ),
@@ -109,9 +107,9 @@ fun ScanScreen(
                     Spacer(Modifier.height(16.dp))
                     Text(
                         when (uiState.scanType) {
-                            ScanType.MEDIA   -> "오디오 추출 및 분석 중..."
-                            ScanType.YOUTUBE -> "YouTube 분석 중..."
-                            else             -> "분석 중..."
+                            ScanType.MEDIA   -> stringResource(R.string.scan_loading_audio)
+                            ScanType.YOUTUBE -> stringResource(R.string.scan_loading_youtube)
+                            else             -> stringResource(R.string.scan_loading)
                         },
                         style = MaterialTheme.typography.bodyMedium,
                         color = DarkMutedText,
@@ -128,10 +126,10 @@ fun ScanScreen(
 
                 else -> {
                     Spacer(Modifier.height(48.dp))
-                    Text("단어 스캔", style = MaterialTheme.typography.headlineMedium)
+                    Text(stringResource(R.string.scan_title), style = MaterialTheme.typography.headlineMedium)
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        "주변 소리에서 한국어 단어를 찾아보세요",
+                        stringResource(R.string.scan_subtitle),
                         style = MaterialTheme.typography.bodyMedium,
                         color = DarkMutedText,
                     )
@@ -139,15 +137,15 @@ fun ScanScreen(
 
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                         ScanTypeButton(
-                            label    = "마이크",
-                            subLabel = "주변 음성 녹음",
+                            label    = stringResource(R.string.scan_mic),
+                            subLabel = stringResource(R.string.scan_mic_sub),
                             icon     = Icons.Filled.Mic,
                             color    = BrandGreenLight,
                             onClick  = { onMicClick() },
                         )
                         ScanTypeButton(
-                            label    = "미디어",
-                            subLabel = "영상/음악 파일",
+                            label    = stringResource(R.string.scan_media),
+                            subLabel = stringResource(R.string.scan_media_sub),
                             icon     = Icons.Filled.OndemandVideo,
                             color    = BrandAmberLight,
                             onClick  = { mediaPickerLauncher.launch(arrayOf("audio/*", "video/*")) },
@@ -161,17 +159,13 @@ fun ScanScreen(
 
             uiState.error?.let { err ->
                 Spacer(Modifier.height(16.dp))
-                Text(
-                    err,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.error,
-                )
+                Text(err, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
             }
 
             if (uiState.detectedWords.isNotEmpty()) {
                 Spacer(Modifier.height(32.dp))
                 Text(
-                    "감지된 단어 (${uiState.detectedWords.size}개)",
+                    stringResource(R.string.scan_detected_words, uiState.detectedWords.size),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.align(Alignment.Start),
                 )
@@ -202,7 +196,6 @@ fun ScanScreen(
         }
     }
 
-    // ── 미디어 스캔 설정 바텀시트 ────────────────────────────────────────────
     if (uiState.showMediaSheet) {
         val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
         val maxSec = (uiState.mediaTotalMs / 1000L).toInt().coerceAtLeast(10)
@@ -219,7 +212,7 @@ fun ScanScreen(
                     .padding(horizontal = 24.dp)
                     .padding(bottom = 32.dp),
             ) {
-                Text("미디어 스캔 설정", style = MaterialTheme.typography.titleLarge)
+                Text(stringResource(R.string.scan_media_settings), style = MaterialTheme.typography.titleLarge)
                 Spacer(Modifier.height(4.dp))
                 Text(
                     uiState.selectedFileName ?: "",
@@ -236,9 +229,9 @@ fun ScanScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text("스캔 구간 (처음부터)", style = MaterialTheme.typography.labelLarge)
+                    Text(stringResource(R.string.scan_segment_label), style = MaterialTheme.typography.labelLarge)
                     Text(
-                        "${uiState.mediaScanDurationSec}초",
+                        stringResource(R.string.scan_seconds, uiState.mediaScanDurationSec),
                         style = MaterialTheme.typography.titleMedium,
                         color = BrandAmberLight,
                     )
@@ -257,8 +250,8 @@ fun ScanScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
-                    Text("10초", style = MaterialTheme.typography.labelSmall, color = DarkMutedText)
-                    Text("${sliderMax.toInt()}초", style = MaterialTheme.typography.labelSmall, color = DarkMutedText)
+                    Text(stringResource(R.string.scan_seconds, 10), style = MaterialTheme.typography.labelSmall, color = DarkMutedText)
+                    Text(stringResource(R.string.scan_seconds, sliderMax.toInt()), style = MaterialTheme.typography.labelSmall, color = DarkMutedText)
                 }
 
                 Spacer(Modifier.height(24.dp))
@@ -269,14 +262,12 @@ fun ScanScreen(
                     shape    = MaterialTheme.shapes.extraLarge,
                     colors   = ButtonDefaults.buttonColors(containerColor = BrandAmberLight),
                 ) {
-                    Text("스캔 시작")
+                    Text(stringResource(R.string.action_start_scan))
                 }
             }
         }
     }
 }
-
-// ── 공통 컴포저블 ──────────────────────────────────────────────────────────────
 
 @Composable
 private fun YouTubeShareHint() {
@@ -290,9 +281,9 @@ private fun YouTubeShareHint() {
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            Text("YouTube 영상 스캔하기", style = MaterialTheme.typography.titleSmall)
+            Text(stringResource(R.string.scan_youtube_hint_title), style = MaterialTheme.typography.titleSmall)
             Text(
-                "YouTube 앱에서 영상 공유 → InteractiveWord 선택\n자동으로 해당 영상의 단어를 분석합니다",
+                stringResource(R.string.scan_youtube_hint_body),
                 style = MaterialTheme.typography.bodySmall,
                 color = DarkMutedText,
             )
@@ -359,7 +350,7 @@ private fun RecordingView(isMic: Boolean, elapsedSeconds: Int, onStop: () -> Uni
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         if (isMic) Icons.Filled.Mic else Icons.Filled.OndemandVideo,
-                        contentDescription = "녹음 중",
+                        contentDescription = null,
                         tint     = BrandGreenLight,
                         modifier = Modifier.size(40.dp),
                     )
@@ -368,15 +359,15 @@ private fun RecordingView(isMic: Boolean, elapsedSeconds: Int, onStop: () -> Uni
         }
     }
     Spacer(Modifier.height(24.dp))
-    Text("듣는 중...", style = MaterialTheme.typography.titleMedium)
+    Text(stringResource(R.string.scan_listening), style = MaterialTheme.typography.titleMedium)
     Spacer(Modifier.height(4.dp))
     Text(
-        "${elapsedSeconds}초  /  최대 30초",
+        stringResource(R.string.scan_elapsed, elapsedSeconds),
         style = MaterialTheme.typography.bodyMedium,
         color = DarkMutedText,
     )
     Spacer(Modifier.height(24.dp))
-    OutlinedButton(onClick = onStop, shape = CircleShape) { Text("완료") }
+    OutlinedButton(onClick = onStop, shape = CircleShape) { Text(stringResource(R.string.action_done)) }
 }
 
 @Composable
