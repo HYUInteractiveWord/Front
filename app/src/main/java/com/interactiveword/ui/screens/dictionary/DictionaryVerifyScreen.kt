@@ -252,19 +252,21 @@ fun DictionaryVerifyScreen(
                         },
                     )
 
-                    if (!uiState.spokenRaw.isNullOrBlank()) {
+                    val spokenRaw = uiState.spokenRaw
+                    if (!spokenRaw.isNullOrBlank()) {
                         Spacer(Modifier.height(12.dp))
                         Text(
-                            text = stringResource(R.string.verify_raw_text, uiState.spokenRaw),
+                            text = stringResource(R.string.verify_raw_text, spokenRaw),
                             style = MaterialTheme.typography.bodySmall,
                             color = DarkMutedText,
                         )
                     }
 
-                    if (!uiState.spokenCorrected.isNullOrBlank()) {
+                    val spokenCorrected = uiState.spokenCorrected
+                    if (!spokenCorrected.isNullOrBlank()) {
                         Spacer(Modifier.height(4.dp))
                         Text(
-                            text = stringResource(R.string.verify_corrected, uiState.spokenCorrected),
+                            text = stringResource(R.string.verify_corrected, spokenCorrected),
                             style = MaterialTheme.typography.bodySmall,
                             color = DarkMutedText,
                         )

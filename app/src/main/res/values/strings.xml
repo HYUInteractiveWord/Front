@@ -49,6 +49,10 @@
     <string name="home_stat_today_mission">오늘 미션</string>
     <string name="home_stat_word_slots">단어 슬롯</string>
     <string name="home_capture_service">알림 캡처 서비스</string>
+    <string name="home_logout">로그아웃</string>
+    <string name="home_logout_confirm_title">로그아웃 하시겠습니까?</string>
+    <string name="home_logout_confirm_yes">예</string>
+    <string name="home_logout_confirm_no">아니오</string>
 
     <!-- Profile Screen -->
     <string name="profile_title">미션 &amp; 프로필</string>

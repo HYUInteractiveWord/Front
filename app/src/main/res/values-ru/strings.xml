@@ -49,6 +49,10 @@
     <string name="home_stat_today_mission">Задания дня</string>
     <string name="home_stat_word_slots">Слоты слов</string>
     <string name="home_capture_service">Служба захвата</string>
+    <string name="home_logout">Выйти</string>
+    <string name="home_logout_confirm_title">Вы уверены, что хотите выйти?</string>
+    <string name="home_logout_confirm_yes">Да</string>
+    <string name="home_logout_confirm_no">Нет</string>
 
     <!-- Profile Screen -->
     <string name="profile_title">Миссии &amp; Профиль</string>

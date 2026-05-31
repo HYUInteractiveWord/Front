@@ -1,5 +1,6 @@
 package com.interactiveword.ui.screens.login
 
+import android.app.Activity
 import android.app.Application
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
@@ -35,10 +36,16 @@ fun LoginScreen(navController: NavHostController) {
 
     LaunchedEffect(uiState) {
         if (uiState is LoginUiState.LoggedIn) {
-            val destination = if (ShareIntentHolder.pendingYoutubeUrl.value != null)
-                Screen.Scan.route else Screen.Home.route
-            navController.navigate(destination) {
-                popUpTo(Screen.Login.route) { inclusive = true }
+            val savedLang = LanguageManager.getSavedLanguage(context)
+            val currentLang = context.resources.configuration.locales[0].language
+            if (savedLang != currentLang) {
+                (context as? Activity)?.recreate()
+            } else {
+                val destination = if (ShareIntentHolder.pendingYoutubeUrl.value != null)
+                    Screen.Scan.route else Screen.Home.route
+                navController.navigate(destination) {
+                    popUpTo(Screen.Login.route) { inclusive = true }
+                }
             }
         }
     }

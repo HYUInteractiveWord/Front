@@ -5,9 +5,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.TrackChanges
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Bolt
@@ -16,8 +16,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -29,6 +34,8 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.interactiveword.R
+import com.interactiveword.data.api.RetrofitClient
+import com.interactiveword.data.local.TokenDataStore
 import com.interactiveword.data.model.Mission
 import com.interactiveword.data.model.User
 import com.interactiveword.ui.components.MissionCardItem
@@ -37,6 +44,7 @@ import com.interactiveword.ui.navigation.Screen
 import com.interactiveword.ui.theme.BrandGreenLight
 import com.interactiveword.ui.theme.DarkMutedText
 import com.interactiveword.ui.theme.DarkOutline
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,6 +54,9 @@ fun HomeScreen(
 ) {
     val uiState by vm.uiState.collectAsState()
     val lifecycleOwner = LocalLifecycleOwner.current
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var showLogoutDialog by remember { mutableStateOf(false) }
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -87,11 +98,11 @@ fun HomeScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { vm.toggleCaptureService() }) {
+                    IconButton(onClick = { showLogoutDialog = true }) {
                         Icon(
-                            Icons.Filled.Notifications,
-                            contentDescription = stringResource(R.string.home_capture_service),
-                            tint = if (uiState.isCaptureServiceRunning) BrandGreenLight else DarkMutedText,
+                            Icons.AutoMirrored.Filled.ExitToApp,
+                            contentDescription = stringResource(R.string.home_logout),
+                            tint = DarkMutedText,
                         )
                     }
                 },
@@ -102,6 +113,33 @@ fun HomeScreen(
         },
         containerColor = MaterialTheme.colorScheme.background,
     ) { padding ->
+
+        if (showLogoutDialog) {
+            AlertDialog(
+                onDismissRequest = { showLogoutDialog = false },
+                title = { Text(stringResource(R.string.home_logout_confirm_title)) },
+                confirmButton = {
+                    TextButton(onClick = {
+                        showLogoutDialog = false
+                        scope.launch {
+                            TokenDataStore(context).clearToken()
+                            RetrofitClient.authToken = null
+                            navController.navigate(Screen.Login.route) {
+                                popUpTo(0) { inclusive = true }
+                            }
+                        }
+                    }) {
+                        Text(stringResource(R.string.home_logout_confirm_yes), color = MaterialTheme.colorScheme.error)
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showLogoutDialog = false }) {
+                        Text(stringResource(R.string.home_logout_confirm_no))
+                    }
+                },
+            )
+        }
+
         LazyColumn(
             contentPadding = PaddingValues(
                 start = 16.dp,

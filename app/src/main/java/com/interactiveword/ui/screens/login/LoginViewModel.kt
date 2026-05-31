@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.interactiveword.data.api.RetrofitClient
+import com.interactiveword.data.local.LanguageManager
 import com.interactiveword.data.local.TokenDataStore
 import com.interactiveword.data.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,6 +32,10 @@ class LoginViewModel(app: Application) : AndroidViewModel(app) {
             val token = tokenDataStore.tokenFlow.first()
             if (token != null) {
                 RetrofitClient.authToken = token
+                runCatching {
+                    val user = userRepo.getMe()
+                    LanguageManager.saveLanguage(getApplication(), user.preferredLanguage)
+                }
                 _uiState.value = LoginUiState.LoggedIn
             } else {
                 _uiState.value = LoginUiState.LoggedOut
@@ -44,6 +49,8 @@ class LoginViewModel(app: Application) : AndroidViewModel(app) {
             try {
                 val token = userRepo.login(username, password)
                 tokenDataStore.saveToken(token)
+                val user = userRepo.getMe()
+                LanguageManager.saveLanguage(getApplication(), user.preferredLanguage)
                 _uiState.value = LoginUiState.LoggedIn
             } catch (e: Exception) {
                 _uiState.value = LoginUiState.Error(e.message ?: "로그인 실패")
