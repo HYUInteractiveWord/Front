@@ -19,6 +19,8 @@ import androidx.compose.material.icons.filled.OndemandVideo
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -47,6 +49,8 @@ fun ScanScreen(
 ) {
     val uiState by vm.uiState.collectAsState()
     val context = LocalContext.current
+    var showYoutubeDialog by remember { mutableStateOf(false) }
+    var youtubeUrlInput by remember { mutableStateOf("") }
 
     val pendingUrl by ShareIntentHolder.pendingYoutubeUrl.collectAsState()
     LaunchedEffect(pendingUrl) {
@@ -154,7 +158,7 @@ fun ScanScreen(
                     }
 
                     Spacer(Modifier.height(24.dp))
-                    YouTubeShareHint()
+                    YouTubeShareHint(onClick = { showYoutubeDialog = true })
                 }
             }
 
@@ -195,6 +199,47 @@ fun ScanScreen(
                 }
             }
         }
+    }
+
+    if (showYoutubeDialog) {
+        AlertDialog(
+            onDismissRequest = { showYoutubeDialog = false; youtubeUrlInput = "" },
+            title = { Text(stringResource(R.string.scan_youtube_dialog_title)) },
+            text = {
+                OutlinedTextField(
+                    value = youtubeUrlInput,
+                    onValueChange = { youtubeUrlInput = it },
+                    placeholder = { Text(stringResource(R.string.scan_youtube_dialog_hint), color = DarkMutedText) },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = BrandGreenLight,
+                        unfocusedBorderColor = DarkOutline,
+                    ),
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        val url = youtubeUrlInput.trim()
+                        if (url.isNotBlank()) {
+                            showYoutubeDialog = false
+                            youtubeUrlInput = ""
+                            vm.startYoutubeScan(url)
+                        }
+                    },
+                    enabled = youtubeUrlInput.isNotBlank(),
+                ) {
+                    Text(stringResource(R.string.scan_youtube_dialog_confirm), color = BrandGreenLight)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showYoutubeDialog = false; youtubeUrlInput = "" }) {
+                    Text(stringResource(R.string.scan_youtube_dialog_cancel))
+                }
+            },
+        )
     }
 
     if (uiState.showMediaSheet) {
@@ -271,23 +316,41 @@ fun ScanScreen(
 }
 
 @Composable
-private fun YouTubeShareHint() {
-    Surface(
+private fun YouTubeShareHint(onClick: () -> Unit) {
+    Card(
+        onClick = onClick,
         shape  = MaterialTheme.shapes.extraLarge,
-        color  = MaterialTheme.colorScheme.surface,
-        border = androidx.compose.foundation.BorderStroke(1.dp, DarkOutline),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = androidx.compose.foundation.BorderStroke(1.dp, BrandGreenLight.copy(alpha = 0.5f)),
         modifier = Modifier.fillMaxWidth(),
     ) {
-        Column(
+        Row(
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Text(stringResource(R.string.scan_youtube_hint_title), style = MaterialTheme.typography.titleSmall)
-            Text(
-                stringResource(R.string.scan_youtube_hint_body),
-                style = MaterialTheme.typography.bodySmall,
-                color = DarkMutedText,
-            )
+            Surface(
+                shape = MaterialTheme.shapes.medium,
+                color = BrandGreenLight.copy(alpha = 0.15f),
+                modifier = Modifier.size(40.dp),
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        Icons.Filled.OndemandVideo,
+                        contentDescription = null,
+                        tint = BrandGreenLight,
+                        modifier = Modifier.size(22.dp),
+                    )
+                }
+            }
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(stringResource(R.string.scan_youtube_hint_title), style = MaterialTheme.typography.titleSmall)
+                Text(
+                    stringResource(R.string.scan_youtube_hint_body),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = DarkMutedText,
+                )
+            }
         }
     }
 }

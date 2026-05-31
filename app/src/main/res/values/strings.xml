@@ -101,7 +101,11 @@
     <string name="scan_loading_youtube">YouTube 분석 중…</string>
     <string name="scan_loading">분석 중…</string>
     <string name="scan_youtube_hint_title">YouTube 영상 스캔하기</string>
-    <string name="scan_youtube_hint_body">YouTube 앱에서 영상 공유 → InteractiveWord 선택\n자동으로 해당 영상의 단어를 분석합니다</string>
+    <string name="scan_youtube_hint_body">URL을 직접 붙여넣거나, YouTube 앱에서 공유 → InteractiveWord 선택</string>
+    <string name="scan_youtube_dialog_title">YouTube URL 입력</string>
+    <string name="scan_youtube_dialog_hint">https://youtu.be/...</string>
+    <string name="scan_youtube_dialog_confirm">스캔 시작</string>
+    <string name="scan_youtube_dialog_cancel">취소</string>
     <string name="scan_media_settings">미디어 스캔 설정</string>
     <string name="scan_segment_label">스캔 구간 (처음부터)</string>
     <string name="scan_seconds">%d초</string>

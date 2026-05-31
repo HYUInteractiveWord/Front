@@ -101,7 +101,11 @@
     <string name="scan_loading_youtube">Анализ YouTube…</string>
     <string name="scan_loading">Анализ…</string>
     <string name="scan_youtube_hint_title">Сканировать видео YouTube</string>
-    <string name="scan_youtube_hint_body">Поделитесь видео в YouTube → Выберите InteractiveWord\nАвтоматически анализирует слова в видео</string>
+    <string name="scan_youtube_hint_body">Вставьте URL или поделитесь из YouTube → выберите InteractiveWord</string>
+    <string name="scan_youtube_dialog_title">Введите URL YouTube</string>
+    <string name="scan_youtube_dialog_hint">https://youtu.be/...</string>
+    <string name="scan_youtube_dialog_confirm">Начать сканирование</string>
+    <string name="scan_youtube_dialog_cancel">Отмена</string>
     <string name="scan_media_settings">Настройки сканирования</string>
     <string name="scan_segment_label">Сегмент сканирования (с начала)</string>
     <string name="scan_seconds">%dс</string>
