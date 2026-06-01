@@ -57,13 +57,19 @@ fun ScanScreen(
 
     val micPermLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ) { granted -> if (granted) vm.startMicRecording() }
+    ) { granted ->
+        if (granted) vm.startMicRecording()
+    }
 
     fun onMicClick() {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO)
+        if (
+            ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO)
             == PackageManager.PERMISSION_GRANTED
-        ) vm.startMicRecording()
-        else micPermLauncher.launch(Manifest.permission.RECORD_AUDIO)
+        ) {
+            vm.startMicRecording()
+        } else {
+            micPermLauncher.launch(Manifest.permission.RECORD_AUDIO)
+        }
     }
 
     DisposableEffect(Unit) {
@@ -76,7 +82,8 @@ fun ScanScreen(
         uri?.let {
             runCatching {
                 context.contentResolver.takePersistableUriPermission(
-                    it, Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    it,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION,
                 )
             }
             vm.onMediaSelected(it)
@@ -108,9 +115,9 @@ fun ScanScreen(
                     Spacer(Modifier.height(16.dp))
                     Text(
                         when (uiState.scanType) {
-                            ScanType.MEDIA   -> stringResource(R.string.scan_loading_audio)
+                            ScanType.MEDIA -> stringResource(R.string.scan_loading_audio)
                             ScanType.YOUTUBE -> stringResource(R.string.scan_loading_youtube)
-                            else             -> stringResource(R.string.scan_loading)
+                            else -> stringResource(R.string.scan_loading)
                         },
                         style = MaterialTheme.typography.bodyMedium,
                         color = DarkMutedText,
@@ -119,67 +126,121 @@ fun ScanScreen(
 
                 uiState.isRecording -> {
                     RecordingView(
-                        isMic          = uiState.scanType == ScanType.MIC,
+                        isMic = uiState.scanType == ScanType.MIC,
                         elapsedSeconds = uiState.elapsedSeconds,
-                        onStop         = { vm.stopRecording() },
+                        onStop = { vm.stopRecording() },
                     )
                 }
 
                 else -> {
-                    Spacer(Modifier.height(48.dp))
-                    Text(stringResource(R.string.scan_title), style = MaterialTheme.typography.headlineMedium)
-                    Spacer(Modifier.height(8.dp))
+                    val hasResults = uiState.detectedWords.isNotEmpty()
+
+                    Spacer(Modifier.height(if (hasResults) 8.dp else 48.dp))
+
                     Text(
-                        stringResource(R.string.scan_subtitle),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = DarkMutedText,
+                        stringResource(R.string.scan_title),
+                        style = if (hasResults) {
+                            MaterialTheme.typography.titleLarge
+                        } else {
+                            MaterialTheme.typography.headlineMedium
+                        },
                     )
-                    Spacer(Modifier.height(48.dp))
 
-                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                        ScanTypeButton(
-                            label    = stringResource(R.string.scan_mic),
-                            subLabel = stringResource(R.string.scan_mic_sub),
-                            icon     = Icons.Filled.Mic,
-                            color    = BrandGreenLight,
-                            onClick  = { onMicClick() },
+                    if (!hasResults) {
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            stringResource(R.string.scan_subtitle),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = DarkMutedText,
                         )
-                        ScanTypeButton(
-                            label    = stringResource(R.string.scan_media),
-                            subLabel = stringResource(R.string.scan_media_sub),
-                            icon     = Icons.Filled.OndemandVideo,
-                            color    = BrandAmberLight,
-                            onClick  = { mediaPickerLauncher.launch(arrayOf("audio/*", "video/*")) },
-                        )
+
+                        Spacer(Modifier.height(48.dp))
+
+                        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                            ScanTypeButton(
+                                label = stringResource(R.string.scan_mic),
+                                subLabel = stringResource(R.string.scan_mic_sub),
+                                icon = Icons.Filled.Mic,
+                                color = BrandGreenLight,
+                                onClick = { onMicClick() },
+                            )
+
+                            ScanTypeButton(
+                                label = stringResource(R.string.scan_media),
+                                subLabel = stringResource(R.string.scan_media_sub),
+                                icon = Icons.Filled.OndemandVideo,
+                                color = BrandAmberLight,
+                                onClick = {
+                                    mediaPickerLauncher.launch(arrayOf("audio/*", "video/*"))
+                                },
+                            )
+                        }
+
+                        Spacer(Modifier.height(24.dp))
+                        YouTubeShareHint()
+                    } else {
+                        Spacer(Modifier.height(8.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            OutlinedButton(
+                                onClick = { onMicClick() },
+                                modifier = Modifier.weight(1f),
+                                shape = MaterialTheme.shapes.extraLarge,
+                            ) {
+                                Icon(Icons.Filled.Mic, contentDescription = null)
+                                Spacer(Modifier.width(6.dp))
+                                Text(stringResource(R.string.scan_mic))
+                            }
+
+                            OutlinedButton(
+                                onClick = {
+                                    mediaPickerLauncher.launch(arrayOf("audio/*", "video/*"))
+                                },
+                                modifier = Modifier.weight(1f),
+                                shape = MaterialTheme.shapes.extraLarge,
+                            ) {
+                                Icon(Icons.Filled.OndemandVideo, contentDescription = null)
+                                Spacer(Modifier.width(6.dp))
+                                Text(stringResource(R.string.scan_media))
+                            }
+                        }
                     }
-
-                    Spacer(Modifier.height(24.dp))
-                    YouTubeShareHint()
                 }
             }
 
             uiState.error?.let { err ->
                 Spacer(Modifier.height(16.dp))
-                Text(err, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                Text(
+                    err,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                )
             }
 
             if (uiState.detectedWords.isNotEmpty()) {
-                Spacer(Modifier.height(32.dp))
+                Spacer(Modifier.height(16.dp))
                 Text(
                     stringResource(R.string.scan_detected_words, uiState.detectedWords.size),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.align(Alignment.Start),
                 )
                 Spacer(Modifier.height(8.dp))
+
                 LazyColumn(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(bottom = 24.dp),
                 ) {
                     items(uiState.detectedWords, key = { it.word }) { result ->
                         DetectedWordItem(
-                            result    = result,
-                            added     = result.word in uiState.addedWords,
-                            onAdd     = {
+                            result = result,
+                            added = result.word in uiState.addedWords,
+                            onAdd = {
                                 navController.navigate(
                                     Screen.DictionaryVerify.createRoute(
                                         word = result.word,
@@ -204,8 +265,8 @@ fun ScanScreen(
 
         ModalBottomSheet(
             onDismissRequest = { vm.dismissMediaSheet() },
-            sheetState       = sheetState,
-            containerColor   = MaterialTheme.colorScheme.surface,
+            sheetState = sheetState,
+            containerColor = MaterialTheme.colorScheme.surface,
         ) {
             Column(
                 modifier = Modifier
@@ -213,12 +274,15 @@ fun ScanScreen(
                     .padding(horizontal = 24.dp)
                     .padding(bottom = 32.dp),
             ) {
-                Text(stringResource(R.string.scan_media_settings), style = MaterialTheme.typography.titleLarge)
+                Text(
+                    stringResource(R.string.scan_media_settings),
+                    style = MaterialTheme.typography.titleLarge,
+                )
                 Spacer(Modifier.height(4.dp))
                 Text(
                     uiState.selectedFileName ?: "",
-                    style    = MaterialTheme.typography.bodySmall,
-                    color    = DarkMutedText,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = DarkMutedText,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
@@ -230,38 +294,52 @@ fun ScanScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text(stringResource(R.string.scan_segment_label), style = MaterialTheme.typography.labelLarge)
+                    Text(
+                        stringResource(R.string.scan_segment_label),
+                        style = MaterialTheme.typography.labelLarge,
+                    )
                     Text(
                         stringResource(R.string.scan_seconds, uiState.mediaScanDurationSec),
                         style = MaterialTheme.typography.titleMedium,
                         color = BrandAmberLight,
                     )
                 }
+
                 Spacer(Modifier.height(4.dp))
+
                 Slider(
-                    value         = uiState.mediaScanDurationSec.toFloat(),
+                    value = uiState.mediaScanDurationSec.toFloat(),
                     onValueChange = { vm.updateMediaScanDuration(it.roundToInt()) },
-                    valueRange    = 10f..sliderMax,
-                    colors        = SliderDefaults.colors(
-                        thumbColor       = BrandAmberLight,
+                    valueRange = 10f..sliderMax,
+                    colors = SliderDefaults.colors(
+                        thumbColor = BrandAmberLight,
                         activeTrackColor = BrandAmberLight,
                     ),
                 )
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
-                    Text(stringResource(R.string.scan_seconds, 10), style = MaterialTheme.typography.labelSmall, color = DarkMutedText)
-                    Text(stringResource(R.string.scan_seconds, sliderMax.toInt()), style = MaterialTheme.typography.labelSmall, color = DarkMutedText)
+                    Text(
+                        stringResource(R.string.scan_seconds, 10),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = DarkMutedText,
+                    )
+                    Text(
+                        stringResource(R.string.scan_seconds, sliderMax.toInt()),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = DarkMutedText,
+                    )
                 }
 
                 Spacer(Modifier.height(24.dp))
 
                 Button(
-                    onClick  = { vm.startMediaScan() },
+                    onClick = { vm.startMediaScan() },
                     modifier = Modifier.fillMaxWidth(),
-                    shape    = MaterialTheme.shapes.extraLarge,
-                    colors   = ButtonDefaults.buttonColors(containerColor = BrandAmberLight),
+                    shape = MaterialTheme.shapes.extraLarge,
+                    colors = ButtonDefaults.buttonColors(containerColor = BrandAmberLight),
                 ) {
                     Text(stringResource(R.string.action_start_scan))
                 }
@@ -273,8 +351,8 @@ fun ScanScreen(
 @Composable
 private fun YouTubeShareHint() {
     Surface(
-        shape  = MaterialTheme.shapes.extraLarge,
-        color  = MaterialTheme.colorScheme.surface,
+        shape = MaterialTheme.shapes.extraLarge,
+        color = MaterialTheme.colorScheme.surface,
         border = androidx.compose.foundation.BorderStroke(1.dp, DarkOutline),
         modifier = Modifier.fillMaxWidth(),
     ) {
@@ -282,7 +360,10 @@ private fun YouTubeShareHint() {
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            Text(stringResource(R.string.scan_youtube_hint_title), style = MaterialTheme.typography.titleSmall)
+            Text(
+                stringResource(R.string.scan_youtube_hint_title),
+                style = MaterialTheme.typography.titleSmall,
+            )
             Text(
                 stringResource(R.string.scan_youtube_hint_body),
                 style = MaterialTheme.typography.bodySmall,
@@ -302,9 +383,9 @@ private fun ScanTypeButton(
 ) {
     Card(
         onClick = onClick,
-        shape   = MaterialTheme.shapes.extraLarge,
-        colors  = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        border  = androidx.compose.foundation.BorderStroke(1.dp, DarkOutline),
+        shape = MaterialTheme.shapes.extraLarge,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = androidx.compose.foundation.BorderStroke(1.dp, DarkOutline),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
     ) {
         Column(
@@ -313,8 +394,8 @@ private fun ScanTypeButton(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Surface(
-                shape    = CircleShape,
-                color    = color,
+                shape = CircleShape,
+                color = color,
                 modifier = Modifier.size(64.dp),
             ) {
                 Box(contentAlignment = Alignment.Center) {
@@ -326,47 +407,63 @@ private fun ScanTypeButton(
                     )
                 }
             }
+
             Text(label, style = MaterialTheme.typography.titleMedium)
-            Text(subLabel, style = MaterialTheme.typography.bodySmall, color = DarkMutedText)
+            Text(
+                subLabel,
+                style = MaterialTheme.typography.bodySmall,
+                color = DarkMutedText,
+            )
         }
     }
 }
 
 @Composable
-private fun RecordingView(isMic: Boolean, elapsedSeconds: Int, onStop: () -> Unit) {
+private fun RecordingView(
+    isMic: Boolean,
+    elapsedSeconds: Int,
+    onStop: () -> Unit,
+) {
     val pulse = rememberInfiniteTransition(label = "pulse")
     val scale by pulse.animateFloat(
-        initialValue  = 1f,
-        targetValue   = 1.15f,
+        initialValue = 1f,
+        targetValue = 1.15f,
         animationSpec = infiniteRepeatable(tween(600), RepeatMode.Reverse),
-        label         = "scale",
+        label = "scale",
     )
 
     Spacer(Modifier.height(48.dp))
+
     Surface(
-        shape    = CircleShape,
-        color    = ErrorRed.copy(alpha = 0.2f),
-        modifier = Modifier.size(128.dp).scale(scale),
+        shape = CircleShape,
+        color = ErrorRed.copy(alpha = 0.2f),
+        modifier = Modifier
+            .size(128.dp)
+            .scale(scale),
     ) {
         Box(contentAlignment = Alignment.Center) {
             Surface(
-                shape    = CircleShape,
-                color    = ErrorRed.copy(alpha = 0.3f),
+                shape = CircleShape,
+                color = ErrorRed.copy(alpha = 0.3f),
                 modifier = Modifier.size(96.dp),
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         if (isMic) Icons.Filled.Mic else Icons.Filled.OndemandVideo,
                         contentDescription = "녹음 중",
-                        tint     = ErrorRed,
+                        tint = ErrorRed,
                         modifier = Modifier.size(40.dp),
                     )
                 }
             }
         }
     }
+
     Spacer(Modifier.height(24.dp))
-    Text(stringResource(R.string.scan_listening), style = MaterialTheme.typography.titleMedium)
+    Text(
+        stringResource(R.string.scan_listening),
+        style = MaterialTheme.typography.titleMedium,
+    )
     Spacer(Modifier.height(4.dp))
     Text(
         stringResource(R.string.scan_elapsed, elapsedSeconds),
@@ -374,7 +471,13 @@ private fun RecordingView(isMic: Boolean, elapsedSeconds: Int, onStop: () -> Uni
         color = DarkMutedText,
     )
     Spacer(Modifier.height(24.dp))
-    OutlinedButton(onClick = onStop, shape = CircleShape) { Text(stringResource(R.string.action_done)) }
+
+    OutlinedButton(
+        onClick = onStop,
+        shape = CircleShape,
+    ) {
+        Text(stringResource(R.string.action_done))
+    }
 }
 
 @Composable
@@ -385,23 +488,27 @@ private fun DetectedWordItem(
     onDismiss: () -> Unit,
 ) {
     Card(
-        shape  = MaterialTheme.shapes.large,
+        shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         border = androidx.compose.foundation.BorderStroke(1.dp, DarkOutline),
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(12.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             IconButton(onClick = {}) {
                 Icon(Icons.Filled.VolumeUp, null, tint = BrandGreenLight)
             }
+
             Column(modifier = Modifier.weight(1f)) {
                 Row(
-                    verticalAlignment     = Alignment.CenterVertically,
+                    verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
                     Text(result.word, style = MaterialTheme.typography.titleMedium)
+
                     result.pos?.let {
                         Surface(
                             shape = MaterialTheme.shapes.small,
@@ -410,29 +517,35 @@ private fun DetectedWordItem(
                             Text(
                                 it,
                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-                                style    = MaterialTheme.typography.labelSmall,
-                                color    = BrandGreenLight,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = BrandGreenLight,
                             )
                         }
                     }
                 }
+
                 result.definition?.let {
                     Text(
                         it,
-                        style    = MaterialTheme.typography.bodySmall,
-                        color    = DarkMutedText,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = DarkMutedText,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
             }
-            IconButton(onClick = { if (!added) onAdd() }, enabled = !added) {
+
+            IconButton(
+                onClick = { if (!added) onAdd() },
+                enabled = !added,
+            ) {
                 Icon(
                     if (added) Icons.Filled.Check else Icons.Filled.Add,
                     null,
                     tint = if (added) DarkMutedText else BrandGreenLight,
                 )
             }
+
             IconButton(onClick = onDismiss) {
                 Icon(Icons.Filled.Close, null, tint = DarkMutedText)
             }
