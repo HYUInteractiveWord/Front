@@ -20,8 +20,8 @@ class ScanRepository {
         return api.uploadAudio(body, source)
     }
 
-    suspend fun scanYouTube(url: String, endSec: Double, durationSec: Double = 10.0): ScanUploadResponse =
-        api.scanYouTube(YouTubeScanRequest(url = url, endSec = endSec, durationSec = durationSec))
+    suspend fun scanYouTube(transcriptText: String): ScanUploadResponse =
+        api.scanYouTube(YouTubeScanRequest(transcriptText = transcriptText))
 
     suspend fun processScan(
         candidates: Map<String, Map<String, String>>,

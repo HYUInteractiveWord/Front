@@ -153,9 +153,7 @@ data class ScanUploadResponse(
 )
 
 data class YouTubeScanRequest(
-    val url: String,
-    @SerializedName("end_sec") val endSec: Double,
-    @SerializedName("duration_sec") val durationSec: Double = 10.0,
+    @SerializedName("transcript_text") val transcriptText: String,
 )
 
 data class ScanProcessRequest(

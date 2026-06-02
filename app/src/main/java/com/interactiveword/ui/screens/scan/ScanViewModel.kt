@@ -305,8 +305,6 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
     // ── [3] YouTube 공유 스캔 ─────────────────────────────────────────────────
 
     fun startYoutubeScan(url: String) {
-        val endSec = extractTimestampSec(url)
-
         _uiState.value = _uiState.value.copy(
             scanType      = ScanType.YOUTUBE,
             detectedWords = emptyList(),
@@ -317,7 +315,9 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
 
         viewModelScope.launch {
             try {
-                val response = scanRepo.scanYouTube(url, endSec)
+                // WebView(Chrome 엔진)로 자막 fetch → YouTube 브라우저 세션 필요 문제 우회
+                val transcriptText = com.interactiveword.util.YouTubeWebViewFetcher(getApplication()).fetchTranscript(url)
+                val response = scanRepo.scanYouTube(transcriptText)
                 val words = response.candidates.map { (word, info) ->
                     ScanWordResult(word = word, pos = info["pos"], definition = info["definition"])
                 }
@@ -329,10 +329,6 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
             }
         }
     }
-
-    // URL 내 ?t=123 파라미터를 endSec으로 변환 (없으면 0 → 처음 10초 스캔)
-    private fun extractTimestampSec(url: String): Double =
-        Regex("[?&]t=(\\d+)").find(url)?.groupValues?.getOrNull(1)?.toDoubleOrNull() ?: 0.0
 
     // ── 공통 ────────────────────────────────────────────────────────────────
 
