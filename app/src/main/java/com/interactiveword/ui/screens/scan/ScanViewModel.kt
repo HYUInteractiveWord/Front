@@ -1,6 +1,7 @@
 package com.interactiveword.ui.screens.scan
 
 import android.app.Application
+import android.content.Intent
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaCodec
@@ -9,11 +10,12 @@ import android.media.MediaFormat
 import android.media.MediaMetadataRetriever
 import android.media.MediaRecorder
 import android.net.Uri
-import android.provider.OpenableColumns
+import android.os.Build
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.interactiveword.data.repository.ScanRepository
 import com.interactiveword.data.repository.WordRepository
+import com.interactiveword.service.AudioCaptureService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,12 +40,6 @@ data class ScanUiState(
     val isRecording: Boolean = false,
     val scanType: ScanType = ScanType.MIC,
     val elapsedSeconds: Int = 0,
-    // 미디어 스캔 설정 시트
-    val showMediaSheet: Boolean = false,
-    val selectedFileName: String? = null,
-    val mediaTotalMs: Long = 0L,
-    val mediaScanDurationSec: Int = 30,
-    // 결과
     val detectedWords: List<ScanWordResult> = emptyList(),
     val addedWords: Set<String> = emptySet(),
     val isLoading: Boolean = false,
@@ -59,7 +55,6 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
     val uiState: StateFlow<ScanUiState> = _uiState.asStateFlow()
 
     @Volatile private var recordingActive = false
-    private var pendingMediaUri: Uri? = null
 
     companion object {
         private const val SAMPLE_RATE = 16000
@@ -142,61 +137,34 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
         return output.toByteArray()
     }
 
-    // ── [2] 미디어 스캔 ─────────────────────────────────────────────────────
+    // ── [2] 미디어 캡처 ─────────────────────────────────────────────────────
 
-    fun onMediaSelected(uri: Uri) {
-        pendingMediaUri = uri
+    fun startCaptureService() {
         val ctx = getApplication<Application>()
-        val retriever = MediaMetadataRetriever()
-        try {
-            retriever.setDataSource(ctx, uri)
-            val totalMs = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-                ?.toLong() ?: 0L
-            val name = ctx.contentResolver.query(uri, null, null, null, null)?.use { c ->
-                val col = c.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-                if (c.moveToFirst() && col >= 0) c.getString(col) else null
-            } ?: uri.lastPathSegment ?: "선택된 파일"
-
-            _uiState.value = _uiState.value.copy(
-                showMediaSheet       = true,
-                selectedFileName     = name,
-                mediaTotalMs         = totalMs,
-                mediaScanDurationSec = minOf(30, (totalMs / 1000).toInt().coerceAtLeast(10)),
-            )
-        } catch (e: Exception) {
-            _uiState.value = _uiState.value.copy(error = "파일 읽기 실패: ${e.message}")
-        } finally {
-            retriever.release()
+        val intent = Intent(ctx, AudioCaptureService::class.java).apply {
+            action = AudioCaptureService.ACTION_START_SERVICE
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            ctx.startForegroundService(intent)
+        } else {
+            ctx.startService(intent)
         }
     }
 
-    fun updateMediaScanDuration(sec: Int) {
-        _uiState.value = _uiState.value.copy(mediaScanDurationSec = sec)
-    }
-
-    fun dismissMediaSheet() {
-        _uiState.value = _uiState.value.copy(showMediaSheet = false)
-        pendingMediaUri = null
-    }
-
-    fun startMediaScan() {
-        val uri = pendingMediaUri ?: return
-        val durationMs = _uiState.value.mediaScanDurationSec * 1000L
-
+    fun startDirectCapture(uri: Uri, startMs: Long, endMs: Long) {
+        val durationMs = endMs - startMs
         _uiState.value = _uiState.value.copy(
-            showMediaSheet = false,
-            scanType       = ScanType.MEDIA,
-            detectedWords  = emptyList(),
-            addedWords     = emptySet(),
-            error          = null,
-            isLoading      = true,
+            scanType      = ScanType.MEDIA,
+            detectedWords = emptyList(),
+            addedWords    = emptySet(),
+            error         = null,
+            isLoading     = true,
         )
-
         viewModelScope.launch {
             try {
                 val ctx = getApplication<Application>()
                 val pcm = withContext(Dispatchers.IO) {
-                    extractAndResampleAudio(ctx, uri, durationMs)
+                    extractAndResampleAudio(ctx, uri, durationMs, startMs)
                 }
                 val wav = withContext(Dispatchers.IO) { writePcmToWav(pcm) }
                 uploadAndProcess(wav, "media")
@@ -213,6 +181,7 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
         ctx: android.content.Context,
         uri: Uri,
         durationMs: Long,
+        startMs: Long = 0L,
     ): ByteArray {
         val extractor = MediaExtractor()
         extractor.setDataSource(ctx, uri, null)
@@ -230,9 +199,12 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
         val srcRate     = srcFormat!!.getInteger(MediaFormat.KEY_SAMPLE_RATE)
         val srcChannels = srcFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT)
         val mime        = srcFormat.getString(MediaFormat.KEY_MIME)!!
-        val endUs       = durationMs * 1000L
+        val endUs       = (startMs + durationMs) * 1000L
 
         extractor.selectTrack(trackIdx)
+        if (startMs > 0L) {
+            extractor.seekTo(startMs * 1000L, MediaExtractor.SEEK_TO_CLOSEST_SYNC)
+        }
 
         val codec = MediaCodec.createDecoderByType(mime)
         codec.configure(srcFormat, null, null, 0)

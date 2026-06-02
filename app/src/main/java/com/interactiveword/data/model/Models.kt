@@ -9,7 +9,7 @@ data class User(
     val xp: Int,
     val rank: String,
     @SerializedName("max_word_slots") val maxWordSlots: Int,
-    @SerializedName("preferred_language") val preferredLanguage: String = "ko",
+    @SerializedName("preferred_language") val preferredLanguage: String = "en",
 )
 
 data class WordCard(
@@ -58,7 +58,7 @@ data class RegisterRequest(
     val username: String,
     val email: String,
     val password: String,
-    @SerializedName("preferred_language") val preferredLanguage: String = "ko",
+    @SerializedName("preferred_language") val preferredLanguage: String = "en",
 )
 data class TokenResponse(@SerializedName("access_token") val accessToken: String)
 

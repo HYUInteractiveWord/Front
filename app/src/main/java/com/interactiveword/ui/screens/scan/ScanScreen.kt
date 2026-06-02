@@ -19,8 +19,6 @@ import androidx.compose.material.icons.filled.OndemandVideo
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -31,15 +29,14 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.interactiveword.CaptureIntentHolder
 import com.interactiveword.R
-import com.interactiveword.ShareIntentHolder
 import com.interactiveword.ui.navigation.Screen
 import com.interactiveword.ui.theme.BrandAmberLight
 import com.interactiveword.ui.theme.BrandGreenLight
 import com.interactiveword.ui.theme.DarkMutedText
 import com.interactiveword.ui.theme.DarkOutline
 import com.interactiveword.ui.theme.ErrorRed
-import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,15 +46,8 @@ fun ScanScreen(
 ) {
     val uiState by vm.uiState.collectAsState()
     val context = LocalContext.current
-    var showYoutubeDialog by remember { mutableStateOf(false) }
-    var youtubeUrlInput by remember { mutableStateOf("") }
 
-    val pendingUrl by ShareIntentHolder.pendingYoutubeUrl.collectAsState()
-    LaunchedEffect(pendingUrl) {
-        val url = pendingUrl ?: return@LaunchedEffect
-        ShareIntentHolder.pendingYoutubeUrl.value = null
-        vm.startYoutubeScan(url)
-    }
+    var pendingCaptureRequest by remember { mutableStateOf<CaptureIntentHolder.CaptureRequest?>(null) }
 
     val micPermLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -83,6 +73,8 @@ fun ScanScreen(
     val mediaPickerLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocument()
     ) { uri ->
+        val captureReq = pendingCaptureRequest ?: return@rememberLauncherForActivityResult
+        pendingCaptureRequest = null
         uri?.let {
             runCatching {
                 context.contentResolver.takePersistableUriPermission(
@@ -90,7 +82,18 @@ fun ScanScreen(
                     Intent.FLAG_GRANT_READ_URI_PERMISSION,
                 )
             }
-            vm.onMediaSelected(it)
+            vm.startDirectCapture(it, captureReq.startMs, captureReq.endMs)
+        }
+    }
+
+    val pendingCapture by CaptureIntentHolder.pendingCapture.collectAsState()
+    LaunchedEffect(pendingCapture) {
+        val request = pendingCapture ?: return@LaunchedEffect
+        CaptureIntentHolder.pendingCapture.value = null
+        if (request.uri != null) {
+            vm.startDirectCapture(request.uri, request.startMs, request.endMs)
+        } else {
+            pendingCaptureRequest = request
         }
     }
 
@@ -150,7 +153,25 @@ fun ScanScreen(
                         },
                     )
 
-                    if (!hasResults) {
+                    if (pendingCaptureRequest != null) {
+                        Spacer(Modifier.height(16.dp))
+                        Text(
+                            stringResource(R.string.scan_capture_ready),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = DarkMutedText,
+                        )
+                        Spacer(Modifier.height(24.dp))
+                        Button(
+                            onClick = { mediaPickerLauncher.launch(arrayOf("audio/*", "video/*")) },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = MaterialTheme.shapes.extraLarge,
+                            colors = ButtonDefaults.buttonColors(containerColor = BrandAmberLight),
+                        ) {
+                            Icon(Icons.Filled.OndemandVideo, contentDescription = null)
+                            Spacer(Modifier.width(8.dp))
+                            Text(stringResource(R.string.scan_select_file))
+                        }
+                    } else if (!hasResults) {
                         Spacer(Modifier.height(8.dp))
                         Text(
                             stringResource(R.string.scan_subtitle),
@@ -174,14 +195,9 @@ fun ScanScreen(
                                 subLabel = stringResource(R.string.scan_media_sub),
                                 icon = Icons.Filled.OndemandVideo,
                                 color = BrandAmberLight,
-                                onClick = {
-                                    mediaPickerLauncher.launch(arrayOf("audio/*", "video/*"))
-                                },
+                                onClick = { vm.startCaptureService() },
                             )
                         }
-
-                        Spacer(Modifier.height(24.dp))
-                        YouTubeShareHint()
                     } else {
                         Spacer(Modifier.height(8.dp))
 
@@ -200,9 +216,7 @@ fun ScanScreen(
                             }
 
                             OutlinedButton(
-                                onClick = {
-                                    mediaPickerLauncher.launch(arrayOf("audio/*", "video/*"))
-                                },
+                                onClick = { vm.startCaptureService() },
                                 modifier = Modifier.weight(1f),
                                 shape = MaterialTheme.shapes.extraLarge,
                             ) {
@@ -262,161 +276,6 @@ fun ScanScreen(
         }
     }
 
-    if (showYoutubeDialog) {
-        AlertDialog(
-            onDismissRequest = { showYoutubeDialog = false; youtubeUrlInput = "" },
-            title = { Text(stringResource(R.string.scan_youtube_dialog_title)) },
-            text = {
-                OutlinedTextField(
-                    value = youtubeUrlInput,
-                    onValueChange = { youtubeUrlInput = it },
-                    placeholder = { Text(stringResource(R.string.scan_youtube_dialog_hint), color = DarkMutedText) },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = BrandGreenLight,
-                        unfocusedBorderColor = DarkOutline,
-                    ),
-                )
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        val url = youtubeUrlInput.trim()
-                        if (url.isNotBlank()) {
-                            showYoutubeDialog = false
-                            youtubeUrlInput = ""
-                            vm.startYoutubeScan(url)
-                        }
-                    },
-                    enabled = youtubeUrlInput.isNotBlank(),
-                ) {
-                    Text(stringResource(R.string.scan_youtube_dialog_confirm), color = BrandGreenLight)
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showYoutubeDialog = false; youtubeUrlInput = "" }) {
-                    Text(stringResource(R.string.scan_youtube_dialog_cancel))
-                }
-            },
-        )
-    }
-
-    if (uiState.showMediaSheet) {
-        val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-        val maxSec = (uiState.mediaTotalMs / 1000L).toInt().coerceAtLeast(10)
-        val sliderMax = minOf(maxSec, 60).toFloat()
-
-        ModalBottomSheet(
-            onDismissRequest = { vm.dismissMediaSheet() },
-            sheetState = sheetState,
-            containerColor = MaterialTheme.colorScheme.surface,
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp)
-                    .padding(bottom = 32.dp),
-            ) {
-                Text(
-                    stringResource(R.string.scan_media_settings),
-                    style = MaterialTheme.typography.titleLarge,
-                )
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    uiState.selectedFileName ?: "",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = DarkMutedText,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-
-                Spacer(Modifier.height(28.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        stringResource(R.string.scan_segment_label),
-                        style = MaterialTheme.typography.labelLarge,
-                    )
-                    Text(
-                        stringResource(R.string.scan_seconds, uiState.mediaScanDurationSec),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = BrandAmberLight,
-                    )
-                }
-
-                Spacer(Modifier.height(4.dp))
-
-                Slider(
-                    value = uiState.mediaScanDurationSec.toFloat(),
-                    onValueChange = { vm.updateMediaScanDuration(it.roundToInt()) },
-                    valueRange = 10f..sliderMax,
-                    colors = SliderDefaults.colors(
-                        thumbColor = BrandAmberLight,
-                        activeTrackColor = BrandAmberLight,
-                    ),
-                )
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                ) {
-                    Text(
-                        stringResource(R.string.scan_seconds, 10),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = DarkMutedText,
-                    )
-                    Text(
-                        stringResource(R.string.scan_seconds, sliderMax.toInt()),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = DarkMutedText,
-                    )
-                }
-
-                Spacer(Modifier.height(24.dp))
-
-                Button(
-                    onClick = { vm.startMediaScan() },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = MaterialTheme.shapes.extraLarge,
-                    colors = ButtonDefaults.buttonColors(containerColor = BrandAmberLight),
-                ) {
-                    Text(stringResource(R.string.action_start_scan))
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun YouTubeShareHint() {
-    Surface(
-        shape = MaterialTheme.shapes.extraLarge,
-        color = MaterialTheme.colorScheme.surface,
-        border = androidx.compose.foundation.BorderStroke(1.dp, DarkOutline),
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 20.dp, vertical = 14.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            Text(
-                stringResource(R.string.scan_youtube_hint_title),
-                style = MaterialTheme.typography.titleSmall,
-            )
-            Text(
-                stringResource(R.string.scan_youtube_hint_body),
-                style = MaterialTheme.typography.bodySmall,
-                color = DarkMutedText,
-            )
-        }
-    }
 }
 
 @Composable

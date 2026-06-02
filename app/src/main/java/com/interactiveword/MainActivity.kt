@@ -1,9 +1,14 @@
 package com.interactiveword
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -40,7 +45,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import android.net.Uri
 import com.interactiveword.data.local.LanguageManager
+import com.interactiveword.service.AudioCaptureService
 import com.interactiveword.ui.navigation.AppNavHost
 import com.interactiveword.ui.navigation.Screen
 import com.interactiveword.ui.theme.DarkBackground
@@ -67,6 +74,8 @@ class MainActivity : ComponentActivity() {
             ),
         )
         extractYouTubeUrl(intent)?.let { ShareIntentHolder.pendingYoutubeUrl.value = it }
+        handleCaptureIntent(intent)
+        requestNotificationPermission()
         setContent {
             InteractiveWordTheme {
                 MainApp()
@@ -77,6 +86,48 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         extractYouTubeUrl(intent)?.let { ShareIntentHolder.pendingYoutubeUrl.value = it }
+        handleCaptureIntent(intent)
+    }
+
+    private fun handleCaptureIntent(intent: Intent?) {
+        val startMs = intent?.getLongExtra(AudioCaptureService.EXTRA_START_MS, -1L) ?: -1L
+        if (startMs < 0L) return
+        val endMs  = intent!!.getLongExtra(AudioCaptureService.EXTRA_END_MS, 0L)
+        val uriStr = intent.getStringExtra(AudioCaptureService.EXTRA_URI)
+        CaptureIntentHolder.pendingCapture.value = CaptureIntentHolder.CaptureRequest(
+            uri     = uriStr?.let { Uri.parse(it) },
+            startMs = startMs,
+            endMs   = endMs,
+        )
+        // Reset service notification back to standby
+        startService(Intent(this, AudioCaptureService::class.java).apply {
+            action = AudioCaptureService.ACTION_DISMISS
+        })
+    }
+
+    private fun requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                    0,
+                )
+            }
+        }
+    }
+
+    private fun startAudioCaptureService() {
+        val svcIntent = Intent(this, AudioCaptureService::class.java).apply {
+            action = AudioCaptureService.ACTION_START_SERVICE
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(svcIntent)
+        } else {
+            startService(svcIntent)
+        }
     }
 
     private fun extractYouTubeUrl(intent: Intent): String? {
@@ -104,10 +155,19 @@ private val navItems = listOf(
 @Composable
 private fun MainApp() {
     val navController = rememberNavController()
-    val pendingUrl by ShareIntentHolder.pendingYoutubeUrl.collectAsState()
+    val pendingUrl     by ShareIntentHolder.pendingYoutubeUrl.collectAsState()
+    val pendingCapture by CaptureIntentHolder.pendingCapture.collectAsState()
 
     LaunchedEffect(pendingUrl) {
         val url = pendingUrl ?: return@LaunchedEffect
+        val currentRoute = navController.currentDestination?.route
+        if (currentRoute != null && currentRoute != Screen.Login.route) {
+            navController.navigate(Screen.Scan.route) { launchSingleTop = true }
+        }
+    }
+
+    LaunchedEffect(pendingCapture) {
+        pendingCapture ?: return@LaunchedEffect
         val currentRoute = navController.currentDestination?.route
         if (currentRoute != null && currentRoute != Screen.Login.route) {
             navController.navigate(Screen.Scan.route) { launchSingleTop = true }

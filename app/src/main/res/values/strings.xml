@@ -6,6 +6,9 @@
     <string name="notification_text_capture">탭하여 한국어 단어를 캡처하세요</string>
     <string name="notification_action_capture">캡처 시작</string>
     <string name="notification_action_stop">종료</string>
+    <string name="notification_text_standby">탭하면 현재 재생 영상 구간을 캡처합니다</string>
+    <string name="notification_title_set_range">캡처 구간 설정</string>
+    <string name="capture_video_unknown">재생 중인 영상 없음</string>
 
     <!-- Bottom Nav -->
     <string name="nav_home">홈</string>
@@ -91,12 +94,14 @@
     <string name="dictionary_no_results">검색 결과가 없습니다.</string>
 
     <!-- Scan Screen -->
+    <string name="scan_capture_ready">캡처 구간이 설정됐어요. 영상 파일을 선택하면 바로 분석을 시작합니다.</string>
+    <string name="scan_select_file">영상 파일 선택하여 분석</string>
     <string name="scan_title">단어 스캔</string>
     <string name="scan_subtitle">주변 소리에서 한국어 단어를 찾아보세요</string>
     <string name="scan_mic">마이크</string>
     <string name="scan_mic_sub">주변 음성 녹음</string>
     <string name="scan_media">미디어</string>
-    <string name="scan_media_sub">영상/음악 파일</string>
+    <string name="scan_media_sub">영상 재생 중 구간 캡처</string>
     <string name="scan_loading_audio">오디오 추출 및 분석 중…</string>
     <string name="scan_loading_youtube">YouTube 분석 중…</string>
     <string name="scan_loading">분석 중…</string>

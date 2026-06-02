@@ -17,6 +17,9 @@
     <!-- 알림 (Android 13+) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <!-- AudioCaptureService foreground type -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+
     <application
         android:allowBackup="true"
         android:usesCleartextTraffic="true"
@@ -49,6 +52,23 @@
             android:name=".service.CaptureService"
             android:foregroundServiceType="mediaProjection"
             android:exported="false" />
+
+        <!-- 알림 컨트롤 Foreground Service (미디어 감지 + 캡처 구간 선택) -->
+        <service
+            android:name=".service.AudioCaptureService"
+            android:foregroundServiceType="dataSync"
+            android:exported="false" />
+
+        <!-- NotificationListenerService: MediaSessionManager.getActiveSessions() 접근용 -->
+        <service
+            android:name=".service.MediaWatcherService"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
 
     </application>
 

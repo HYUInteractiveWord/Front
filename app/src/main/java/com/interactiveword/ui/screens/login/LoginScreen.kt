@@ -114,12 +114,12 @@ fun LoginScreen(navController: NavHostController) {
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             RadioButton(
-                                selected = selectedLanguage == "ko",
+                                selected = selectedLanguage == "en",
                                 onClick = {
-                                    changeLanguage("ko")
+                                    changeLanguage("en")
                                 },
                             )
-                            Text("한국어")
+                            Text("English")
                         }
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             RadioButton(

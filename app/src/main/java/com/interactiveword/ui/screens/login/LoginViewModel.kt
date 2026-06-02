@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.interactiveword.data.api.RetrofitClient
 import com.interactiveword.data.local.LanguageManager
 import com.interactiveword.data.local.TokenDataStore
-import com.interactiveword.data.local.LanguageManager
 import com.interactiveword.data.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -55,7 +54,7 @@ class LoginViewModel(app: Application) : AndroidViewModel(app) {
         val me = userRepo.getMe()
         val serverLanguage = when {
             me.preferredLanguage.startsWith("ru", ignoreCase = true) -> "ru"
-            else -> "ko"
+            else -> "en"
         }
 
         val currentLanguage = LanguageManager.getSavedLanguage(context)

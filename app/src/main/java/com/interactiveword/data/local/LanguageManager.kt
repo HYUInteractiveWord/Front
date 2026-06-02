@@ -17,7 +17,7 @@ object LanguageManager {
 
     fun getSavedLanguage(context: Context): String =
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .getString(KEY_LANGUAGE, "ko") ?: "ko"
+            .getString(KEY_LANGUAGE, "en") ?: "en"
 
     fun applyLocale(base: Context): Context {
         val lang = getSavedLanguage(base)

@@ -203,7 +203,7 @@ fun WordCardScreen(
                                             modifier = Modifier.size(32.dp)
                                         ) {
                                             Icon(
-                                                Icons.AutoMirrored.Filled.VolumeUp,
+                                                Icons.Filled.VolumeUp,
                                                 contentDescription = "번역 뜻 듣기",
                                                 tint = DarkMutedText,
                                                 modifier = Modifier.size(20.dp)
@@ -341,7 +341,7 @@ fun WordCardScreen(
                                         modifier = Modifier.size(32.dp)
                                     ) {
                                         Icon(
-                                            Icons.AutoMirrored.Filled.VolumeUp,
+                                            Icons.Filled.VolumeUp,
                                             contentDescription = null,
                                             tint = BrandGreenLight,
                                             modifier = Modifier.size(20.dp)
