@@ -1,38 +1,41 @@
 package com.interactiveword.ui.screens.wordcard
 
-import android.media.MediaRecorder
-import android.os.Build
+import com.interactiveword.R
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.VolumeUp
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material.icons.filled.Stop
+import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
-import com.interactiveword.R
-import com.interactiveword.data.api.RetrofitClient
 import com.interactiveword.ui.components.WordCardEffectBadge
 import com.interactiveword.ui.components.wordCardEffectStyle
 import com.interactiveword.ui.theme.BrandGreenLight
 import com.interactiveword.ui.theme.DarkMutedText
 import com.interactiveword.ui.theme.DarkOutline
-import com.interactiveword.ui.theme.ErrorRed
-import java.io.File
-import java.io.IOException
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,19 +47,16 @@ fun WordCardScreen(
     val uiState by vm.uiState.collectAsState()
     val card = uiState.card
     val context = LocalContext.current
-
-    var isRecording by remember { mutableStateOf(false) }
-    var mediaRecorder by remember { mutableStateOf<MediaRecorder?>(null) }
-    var currentRecordFile by remember { mutableStateOf<File?>(null) }
-
-    LaunchedEffect(wordId) {
-        vm.loadCard(wordId)
+    val micPermLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+    ) { granted ->
+        if (granted) {
+            vm.togglePronunciationPractice(context)
+        }
     }
 
-    DisposableEffect(Unit) {
-        onDispose {
-            mediaRecorder?.release()
-        }
+    LaunchedEffect(wordId) {
+        vm.loadCard(wordId, context)
     }
 
     Scaffold(
@@ -65,7 +65,7 @@ fun WordCardScreen(
                 title = { Text(card?.koreanWord ?: stringResource(R.string.wordcard_title)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.verify_back))
+                        Icon(Icons.Filled.ArrowBack, "뒤로")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -138,8 +138,8 @@ fun WordCardScreen(
 
                         IconButton(onClick = { vm.playTts() }) {
                             Icon(
-                                Icons.AutoMirrored.Filled.VolumeUp,
-                                contentDescription = stringResource(R.string.wordcard_listen),
+                                Icons.Filled.VolumeUp,
+                                contentDescription = "발음 듣기",
                                 tint = BrandGreenLight,
                             )
                         }
@@ -168,13 +168,27 @@ fun WordCardScreen(
                                 Spacer(Modifier.height(8.dp))
                             }
 
-                            Text(
-                                text = stringResource(R.string.wordcard_meaning, card.definition ?: stringResource(R.string.wordcard_no_meaning)),
-                                style = MaterialTheme.typography.bodyLarge,
-                            )
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.wordcard_meaning, card.definitionTranslated ?: card.definition ?: stringResource(R.string.wordcard_no_meaning)),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    modifier = Modifier.weight(1f),
+                                )
+                                if (!card.defTransAudioPath.isNullOrBlank()) {
+                                    IconButton(onClick = { vm.playDefinitionTts() }) {
+                                        Icon(
+                                            Icons.Filled.VolumeUp,
+                                            contentDescription = stringResource(R.string.wordcard_play_definition_tts),
+                                        )
+                                    }
+                                }
+                            }
 
-                            // 💡 수정됨: 번역된 뜻풀이 오디오 재생 버튼 추가
-                            if (!card.definitionEnglish.isNullOrBlank()) {
+                            if (card.definitionTranslated.isNullOrBlank() && !card.definitionEnglish.isNullOrBlank()) {
                                 Spacer(Modifier.height(8.dp))
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text(
@@ -234,18 +248,30 @@ fun WordCardScreen(
                             Spacer(Modifier.height(12.dp))
                             Card(
                                 shape = MaterialTheme.shapes.medium,
-                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-                                border = BorderStroke(1.dp, Color(0xFFFFC107)),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                ),
+                                border = BorderStroke(
+                                    1.dp,
+                                    androidx.compose.ui.graphics.Color(0xFFFFC107)
+                                ),
                                 modifier = Modifier.fillMaxWidth(),
                             ) {
-                                Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                                    Text(text = "✦", style = MaterialTheme.typography.titleMedium, color = Color(0xFFFFC107))
+                                Row(
+                                    modifier = Modifier.padding(12.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Text(
+                                        text = "✦",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = androidx.compose.ui.graphics.Color(0xFFFFC107),
+                                    )
                                     Spacer(Modifier.width(8.dp))
                                     Column {
                                         Text(
                                             text = stringResource(R.string.wordcard_master_title),
                                             style = MaterialTheme.typography.titleSmall,
-                                            color = Color(0xFF5D3B00),
+                                            color = androidx.compose.ui.graphics.Color(0xFF5D3B00),
                                         )
                                         Text(
                                             text = stringResource(R.string.wordcard_master_desc),
@@ -289,7 +315,7 @@ fun WordCardScreen(
 
             Spacer(Modifier.height(16.dp))
 
-            Text("Learning Examples", style = MaterialTheme.typography.titleMedium)
+            Text(stringResource(R.string.wordcard_learning_examples), style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(8.dp))
 
             if (!card.exampleSentences.isNullOrEmpty()) {
@@ -324,30 +350,15 @@ fun WordCardScreen(
                                 }
                             }
 
-                            val english = exampleEnglish(example)
-                            if (!english.isNullOrBlank()) {
-                                Spacer(Modifier.height(8.dp))
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Text(
-                                        text = english,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = DarkMutedText,
-                                        modifier = Modifier.weight(1f)
+                            val ttsPath = exampleTtsPath(example)
+                            if (!ttsPath.isNullOrBlank()) {
+                                Spacer(Modifier.width(8.dp))
+                                IconButton(onClick = { vm.playExampleTts(ttsPath) }) {
+                                    Icon(
+                                        Icons.Filled.VolumeUp,
+                                        contentDescription = stringResource(R.string.wordcard_example_listen),
+                                        tint = BrandGreenLight,
                                     )
-                                    val transTtsPath = exampleTransTtsPath(example)
-                                    if (!transTtsPath.isNullOrBlank()) {
-                                        IconButton(
-                                            onClick = { vm.playExampleTts(transTtsPath) },
-                                            modifier = Modifier.size(32.dp)
-                                        ) {
-                                            Icon(
-                                                Icons.AutoMirrored.Filled.VolumeUp,
-                                                contentDescription = null,
-                                                tint = DarkMutedText,
-                                                modifier = Modifier.size(20.dp)
-                                            )
-                                        }
-                                    }
                                 }
                             }
                         }
@@ -363,7 +374,7 @@ fun WordCardScreen(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text(
-                        text = "아직 예문 정보가 없습니다.",
+                        text = stringResource(R.string.wordcard_no_examples),
                         style = MaterialTheme.typography.bodyMedium,
                         color = DarkMutedText,
                         modifier = Modifier.padding(16.dp),
@@ -371,112 +382,165 @@ fun WordCardScreen(
                 }
             }
 
-            Spacer(Modifier.height(16.dp))
+            if (uiState.pronunciationResult == null) {
+                uiState.savedPronunciationResult?.let { saved ->
+                    Spacer(Modifier.height(12.dp))
+                    Card(
+                        shape = MaterialTheme.shapes.large,
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        ),
+                        border = BorderStroke(1.dp, BrandGreenLight),
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(
+                                text = stringResource(R.string.pronunciation_result_title),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = BrandGreenLight,
+                            )
+                            Spacer(Modifier.height(8.dp))
+                            Text(
+                                text = stringResource(R.string.pronunciation_score_format, saved.score.toInt()),
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                            Text(
+                                text = stringResource(R.string.pronunciation_xp_gained_format, saved.xpGained),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = DarkMutedText,
+                            )
+                            if (!saved.recordedAt.isNullOrBlank()) {
+                                Text(
+                                    text = stringResource(R.string.pronunciation_saved_at_format, saved.recordedAt),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = DarkMutedText,
+                                )
+                            }
 
-            Card(
-                shape = MaterialTheme.shapes.large,
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-                border = BorderStroke(1.dp, DarkOutline),
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(text = stringResource(R.string.wordcard_eval_title), style = MaterialTheme.typography.titleMedium)
-                    Spacer(Modifier.height(8.dp))
-
-                    if (uiState.isEvaluating) {
-                        CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-                        Text(
-                            stringResource(R.string.wordcard_evaluating),
-                            color = DarkMutedText,
-                            modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 8.dp)
-                        )
-                    } else if (uiState.evalScore != null) {
-                        Text(
-                            text = stringResource(R.string.wordcard_score, uiState.evalScore?.toInt() ?: 0),
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = BrandGreenLight
-                        )
-                        if (uiState.isNewBest) {
-                            Text(text = stringResource(R.string.wordcard_new_best), color = Color(0xFFFFC107))
-                        }
-
-                        val pitchGraph = uiState.evalGraphs?.get("pitch_graph")
-                        if (!pitchGraph.isNullOrEmpty()) {
                             Spacer(Modifier.height(12.dp))
-                            val graphUrl = RetrofitClient.resolveStaticUrl(pitchGraph)
-                            AsyncImage(
-                                model = graphUrl,
-                                contentDescription = null,
-                                modifier = Modifier.fillMaxWidth().height(200.dp)
+                            PronunciationScoreChart(
+                                pronunciation = saved.pronunciation,
+                                formant = saved.formant,
+                                pitch = saved.pitch,
+                                timing = saved.timing,
+                                total = saved.score,
+                            )
+                            Spacer(Modifier.height(8.dp))
+                            Text(
+                                text = if (saved.isIntensityGood) {
+                                    stringResource(R.string.pronunciation_volume_ok)
+                                } else {
+                                    stringResource(R.string.pronunciation_volume_low)
+                                },
+                                style = MaterialTheme.typography.bodySmall,
+                                color = DarkMutedText,
                             )
                         }
-
-                        TextButton(onClick = { vm.clearEvaluation() }) {
-                            Text(stringResource(R.string.wordcard_clear_record), color = DarkMutedText)
-                        }
-                    } else {
-                        Text(
-                            text = stringResource(R.string.wordcard_no_eval),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = DarkMutedText,
-                        )
                     }
                 }
             }
 
-            Spacer(Modifier.height(24.dp))
+            uiState.pronunciationResult?.let { result ->
+                Spacer(Modifier.height(12.dp))
+                Card(
+                    shape = MaterialTheme.shapes.large,
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    ),
+                    border = BorderStroke(1.dp, BrandGreenLight),
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            text = stringResource(R.string.pronunciation_result_title),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = BrandGreenLight,
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            text = stringResource(R.string.pronunciation_score_format, result.score.toInt()),
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                        Text(
+                            text = stringResource(R.string.pronunciation_xp_gained_format, result.xpGained),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = DarkMutedText,
+                        )
+                        result.details?.let { details ->
+                            Spacer(Modifier.height(12.dp))
+                            PronunciationScoreChart(
+                                pronunciation = details.pronunciation,
+                                formant = details.formant,
+                                pitch = details.pitch,
+                                timing = details.timing,
+                                total = result.score,
+                            )
+                            Spacer(Modifier.height(8.dp))
+                            Text(
+                                text = if (details.isIntensityGood) {
+                                    stringResource(R.string.pronunciation_volume_ok)
+                                } else {
+                                    stringResource(R.string.pronunciation_volume_low)
+                                },
+                                style = MaterialTheme.typography.bodySmall,
+                                color = DarkMutedText,
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(16.dp))
 
             Button(
                 onClick = {
-                    if (isRecording) {
-                        isRecording = false
-                        try {
-                            mediaRecorder?.stop()
-                            mediaRecorder?.release()
-                            mediaRecorder = null
-                            currentRecordFile?.let { vm.submitPronunciation(it) }
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
+                    if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) ==
+                        PackageManager.PERMISSION_GRANTED
+                    ) {
+                        vm.togglePronunciationPractice(context)
                     } else {
-                        try {
-                            val tempFile = File.createTempFile("user_record_", ".wav", context.cacheDir)
-                            currentRecordFile = tempFile
-
-                            mediaRecorder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                                MediaRecorder(context)
-                            } else {
-                                @Suppress("DEPRECATION")
-                                MediaRecorder()
-                            }.apply {
-                                setAudioSource(MediaRecorder.AudioSource.MIC)
-                                setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
-                                setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
-                                setOutputFile(tempFile.absolutePath)
-                                prepare()
-                                start()
-                            }
-                            isRecording = true
-                        } catch (e: IOException) {
-                            e.printStackTrace()
-                        }
+                        micPermLauncher.launch(Manifest.permission.RECORD_AUDIO)
                     }
                 },
                 modifier = Modifier.fillMaxWidth().height(52.dp),
                 shape = MaterialTheme.shapes.extraLarge,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isRecording) ErrorRed else BrandGreenLight
-                ),
+                colors = ButtonDefaults.buttonColors(containerColor = BrandGreenLight),
             ) {
-                Icon(if (isRecording) Icons.Filled.Stop else Icons.Filled.Mic, null, modifier = Modifier.size(20.dp))
+                Icon(Icons.Filled.Mic, null, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    if (isRecording) stringResource(R.string.wordcard_stop_and_submit) else stringResource(R.string.wordcard_start_recording),
-                    style = MaterialTheme.typography.titleMedium
+                    when {
+                        uiState.isSubmittingPronunciation -> stringResource(R.string.pronunciation_evaluating)
+                        uiState.isRecording -> stringResource(R.string.wordcard_stop_recording_and_evaluate)
+                        else -> stringResource(R.string.wordcard_start_pronunciation)
+                    },
+                    style = MaterialTheme.typography.titleMedium,
                 )
             }
         }
     }
+}
+
+
+private fun historyFloat(history: Map<String, Any>?, vararg keys: String): Float? {
+    if (history == null) return null
+    for (key in keys) {
+        val value = history[key]
+        when (value) {
+            is Number -> return value.toFloat()
+            is String -> value.toFloatOrNull()?.let { return it }
+        }
+    }
+    return null
+}
+
+private fun historyString(history: Map<String, Any>?, vararg keys: String): String? {
+    if (history == null) return null
+    for (key in keys) {
+        val value = history[key]?.toString()
+        if (!value.isNullOrBlank()) return value
+    }
+    return null
 }
 
 private fun exampleKorean(example: Any): String {
@@ -490,31 +554,110 @@ private fun exampleKorean(example: Any): String {
 }
 
 private fun exampleEnglish(example: Any): String? {
-    if (example is Map<*, *>) {
-        for (key in listOf("english", "en", "translation")) {
-            val value = example[key]?.toString()
-            if (!value.isNullOrBlank()) return value
-        }
+    val map = example as? Map<*, *> ?: return null
+    val keys = listOf(
+        "translation",
+        "russian",
+        "ru",
+        "translated",
+        "translated_text",
+        "target",
+        "target_sentence",
+        "example_translated",
+        "sentence_translated",
+        "english",
+    )
+
+    for (key in keys) {
+        val value = map[key] as? String
+        if (!value.isNullOrBlank()) return value
     }
+
     return null
 }
 
 private fun exampleTtsPath(example: Any): String? {
-    if (example is Map<*, *>) {
-        for (key in listOf("tts_audio_path", "audio_path", "ttsPath", "tts_path")) {
-            val value = example[key]?.toString()
-            if (!value.isNullOrBlank()) return value
-        }
+    val map = example as? Map<*, *> ?: return null
+    val keys = listOf(
+        "trans_audio_path",
+        "translation_audio_path",
+        "translated_audio_path",
+        "tts_audio_path",
+        "audio_path",
+    )
+
+    for (key in keys) {
+        val value = map[key] as? String
+        if (!value.isNullOrBlank()) return value
     }
+
     return null
 }
 
-private fun exampleTransTtsPath(example: Any): String? {
-    if (example is Map<*, *>) {
-        for (key in listOf("trans_audio_path", "transAudioPath")) {
-            val value = example[key]?.toString()
-            if (!value.isNullOrBlank()) return value
+
+@Composable
+private fun PronunciationScoreChart(
+    pronunciation: Float,
+    formant: Float,
+    pitch: Float,
+    timing: Float,
+    total: Float,
+) {
+    val items = listOf(
+        stringResource(R.string.pronunciation_label_pronunciation) to pronunciation,
+        stringResource(R.string.pronunciation_label_formants) to formant,
+        stringResource(R.string.pronunciation_label_intonation) to pitch,
+        stringResource(R.string.pronunciation_label_speed) to timing,
+        stringResource(R.string.pronunciation_label_total) to total,
+    )
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = stringResource(R.string.pronunciation_visual_analysis),
+            style = MaterialTheme.typography.titleSmall,
+            color = BrandGreenLight,
+        )
+        Spacer(Modifier.height(8.dp))
+
+        items.forEach { (label, score) ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = DarkMutedText,
+                    modifier = Modifier.width(52.dp),
+                )
+
+                val clamped = score.coerceIn(0f, 100f)
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(18.dp)
+                        .background(DarkOutline, shape = MaterialTheme.shapes.small),
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .fillMaxWidth(clamped / 100f)
+                            .background(BrandGreenLight, shape = MaterialTheme.shapes.small),
+                    )
+                }
+
+                Spacer(Modifier.width(8.dp))
+
+                Text(
+                    text = String.format("%.1f", score),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    textAlign = TextAlign.End,
+                    modifier = Modifier.width(44.dp),
+                )
+            }
         }
     }
-    return null
 }

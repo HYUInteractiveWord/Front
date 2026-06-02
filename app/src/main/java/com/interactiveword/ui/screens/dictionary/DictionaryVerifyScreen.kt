@@ -241,7 +241,7 @@ fun DictionaryVerifyScreen(
                                 stringResource(R.string.verify_match, spoken)
                             }
                             uiState.isMatch == false -> {
-                                val spoken = uiState.spokenCorrected ?: uiState.spokenRaw ?: "알 수 없음"
+                                val spoken = (uiState.spokenCorrected ?: uiState.spokenRaw) ?: "알 수 없음"
                                 stringResource(R.string.verify_no_match, spoken)
                             }
                             uiState.hasRecordedOnce -> stringResource(R.string.verify_complete)

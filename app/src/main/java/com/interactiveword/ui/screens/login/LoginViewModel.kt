@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.interactiveword.data.api.RetrofitClient
 import com.interactiveword.data.local.LanguageManager
 import com.interactiveword.data.local.TokenDataStore
+import com.interactiveword.data.local.LanguageManager
 import com.interactiveword.data.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,7 +17,7 @@ import kotlinx.coroutines.launch
 sealed class LoginUiState {
     object Loading : LoginUiState()
     object LoggedOut : LoginUiState()
-    object LoggedIn : LoginUiState()
+    data class LoggedIn(val languageChanged: Boolean = false) : LoginUiState()
     data class Error(val message: String) : LoginUiState()
 }
 
@@ -30,16 +31,39 @@ class LoginViewModel(app: Application) : AndroidViewModel(app) {
     init {
         viewModelScope.launch {
             val token = tokenDataStore.tokenFlow.first()
-            if (token != null) {
+            if (!token.isNullOrBlank()) {
                 RetrofitClient.authToken = token
-                runCatching {
-                    val user = userRepo.getMe()
-                    LanguageManager.saveLanguage(getApplication(), user.preferredLanguage)
+                try {
+                    val languageChanged = syncLanguageFromCurrentUser()
+                    _uiState.value = LoginUiState.LoggedIn(languageChanged)
+                } catch (_: Exception) {
+                    tokenDataStore.clearToken()
+                    RetrofitClient.authToken = null
+                    _uiState.value = LoginUiState.LoggedOut
                 }
-                _uiState.value = LoginUiState.LoggedIn
             } else {
+                tokenDataStore.clearToken()
+                RetrofitClient.authToken = null
                 _uiState.value = LoginUiState.LoggedOut
             }
+        }
+    }
+
+
+    private suspend fun syncLanguageFromCurrentUser(): Boolean {
+        val context = getApplication<Application>()
+        val me = userRepo.getMe()
+        val serverLanguage = when {
+            me.preferredLanguage.startsWith("ru", ignoreCase = true) -> "ru"
+            else -> "ko"
+        }
+
+        val currentLanguage = LanguageManager.getSavedLanguage(context)
+        return if (currentLanguage != serverLanguage) {
+            LanguageManager.saveLanguage(context, serverLanguage)
+            true
+        } else {
+            false
         }
     }
 
@@ -49,9 +73,8 @@ class LoginViewModel(app: Application) : AndroidViewModel(app) {
             try {
                 val token = userRepo.login(username, password)
                 tokenDataStore.saveToken(token)
-                val user = userRepo.getMe()
-                LanguageManager.saveLanguage(getApplication(), user.preferredLanguage)
-                _uiState.value = LoginUiState.LoggedIn
+                val languageChanged = syncLanguageFromCurrentUser()
+                _uiState.value = LoginUiState.LoggedIn(languageChanged)
             } catch (e: Exception) {
                 _uiState.value = LoginUiState.Error(e.message ?: "로그인 실패")
             }

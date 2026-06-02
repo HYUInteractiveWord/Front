@@ -157,9 +157,10 @@ fun DictionaryScreen(
                                         }
                                     }
 
-                                    if (!result.definition.isNullOrBlank()) {
+                                    val displayDefinition = result.definitionTranslated ?: result.definition
+                                    if (!displayDefinition.isNullOrBlank()) {
                                         Spacer(Modifier.height(12.dp))
-                                        Text(text = result.definition, style = MaterialTheme.typography.bodyMedium, color = DarkMutedText)
+                                        Text(text = displayDefinition, style = MaterialTheme.typography.bodyMedium, color = DarkMutedText)
                                     }
                                 }
                             }

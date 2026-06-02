@@ -44,7 +44,7 @@
     <string name="home_pronunciation_practice_sub">Практика с последними словами</string>
     <string name="home_view_all">Все</string>
     <string name="home_top_rank">Максимальный ранг</string>
-    <string name="home_xp_to_next_rank">До следующего ранга %d XP</string>
+    <string name="home_xp_to_next_rank">До следующего ранга %1$d XP</string>
     <string name="home_stat_words">Собрано слов</string>
     <string name="home_stat_today_mission">Задания дня</string>
     <string name="home_stat_word_slots">Слоты слов</string>
@@ -60,7 +60,7 @@
     <string name="profile_all_missions">Все миссии</string>
     <string name="profile_rank_progress">Прогресс ранга</string>
     <string name="profile_top_rank_reached">Максимальный ранг достигнут.</string>
-    <string name="profile_xp_to_next_rank">До следующего ранга %d XP</string>
+    <string name="profile_xp_to_next_rank">До следующего ранга %1$d XP</string>
     <string name="profile_stat_words">Собрано слов</string>
     <string name="profile_stat_current_rank">Текущий ранг</string>
     <string name="profile_stat_total_xp">Всего XP</string>
@@ -75,16 +75,16 @@
     <!-- Collection Screen -->
     <string name="collection_title">Мой словник</string>
     <string name="collection_empty">Слов пока нет.\nДобавьте через сканер или словарь!</string>
-    <string name="collection_word_count">%d слов</string>
-    <string name="collection_slots">Слоты: %d / %d</string>
+    <string name="collection_word_count">%1$d слов</string>
+    <string name="collection_slots">Слоты: %1$d / %2$d</string>
 
     <!-- Dictionary Screen -->
     <string name="dictionary_title">Словарь</string>
     <string name="dictionary_search_hint">Поиск корейского слова…</string>
     <string name="action_search">Поиск</string>
-    <string name="dictionary_search_failed">Ошибка поиска: %s</string>
-    <string name="dictionary_result_count">Результатов: %d</string>
-    <string name="dictionary_category">Категория: %s</string>
+    <string name="dictionary_search_failed">Ошибка поиска: %1$s</string>
+    <string name="dictionary_result_count">Результатов: %1$d</string>
+    <string name="dictionary_category">Категория: %1$s</string>
     <string name="dictionary_added">Добавлено</string>
     <string name="action_add">Добавить</string>
     <string name="dictionary_enter_word">Введите слово для поиска.</string>
@@ -108,26 +108,26 @@
     <string name="scan_youtube_dialog_cancel">Отмена</string>
     <string name="scan_media_settings">Настройки сканирования</string>
     <string name="scan_segment_label">Сегмент сканирования (с начала)</string>
-    <string name="scan_seconds">%dс</string>
+    <string name="scan_seconds">%1$dс</string>
     <string name="action_start_scan">Начать сканирование</string>
-    <string name="scan_detected_words">Обнаружено слов: %d</string>
+    <string name="scan_detected_words">Обнаружено слов: %1$d</string>
     <string name="scan_listening">Слушаю…</string>
-    <string name="scan_elapsed">%dс  /  макс. 30с</string>
+    <string name="scan_elapsed">%1$dс  /  макс. 30с</string>
     <string name="action_done">Готово</string>
 
     <!-- WordCard Screen -->
     <string name="wordcard_title">Карточка слова</string>
     <string name="wordcard_listen">Слушать произношение</string>
-    <string name="wordcard_category">Категория: %s</string>
-    <string name="wordcard_meaning">Значение: %s</string>
+    <string name="wordcard_category">Категория: %1$s</string>
+    <string name="wordcard_meaning">Значение: %1$s</string>
     <string name="wordcard_no_meaning">Нет информации о значении.</string>
     <string name="wordcard_points">Очки слова</string>
     <string name="wordcard_best_score">Лучшая точность произношения</string>
-    <string name="wordcard_practice_count">Практика %d раз · Сканировано %d раз</string>
-    <string name="wordcard_eval_title">Результаты оценки произношения</string>
+    <string name="wordcard_practice_count">Практика %1$d раз · Сканировано %2$d раз</string>
+    <string name="wordcard_eval_title">Результат оценки произношения</string>
     <string name="wordcard_evaluating">Детальный анализ…</string>
-    <string name="wordcard_score">Оценка: %d баллов</string>
-    <string name="wordcard_new_best">🎉 Новый рекорд!</string>
+    <string name="wordcard_score">Счет: %1$d</string>
+    <string name="wordcard_new_best">Счет</string>
     <string name="wordcard_clear_record">Очистить запись</string>
     <string name="wordcard_no_eval">Записей оценки произношения пока нет.\nНажмите кнопку записи ниже, чтобы начать.</string>
     <string name="wordcard_master_title">Достижение MASTER</string>
@@ -143,24 +143,24 @@
     <string name="verify_stop_recording">Остановить запись</string>
     <string name="verify_recording">Запись… Нажмите ещё раз для проверки.</string>
     <string name="verify_ai_checking">ИИ проверяет произношение…</string>
-    <string name="verify_match">ИИ распознал \"%s\". Теперь можно добавить в словник.</string>
-    <string name="verify_no_match">Результат: \"%s\". Не совпало с целевым словом, но можно добавить.</string>
+    <string name="verify_match">ИИ распознал \"%1$s\". Теперь можно добавить в словник.</string>
+    <string name="verify_no_match">Результат: \"%1$s\". Не совпало с целевым словом, но можно добавить.</string>
     <string name="verify_complete">Запись завершена.</string>
     <string name="verify_prompt">Нажмите кнопку и произнесите слово.</string>
-    <string name="verify_raw_text">Оригинал распознавания: %s</string>
-    <string name="verify_corrected">Исправленный результат: %s</string>
+    <string name="verify_raw_text">Оригинал распознавания: %1$s</string>
+    <string name="verify_corrected">Исправленный результат: %1$s</string>
     <string name="action_skip">Пропустить</string>
     <string name="action_add_to_collection">Добавить в словник</string>
 
     <!-- Quiz screens (shared) -->
-    <string name="quiz_question_counter">Вопрос %d / %d</string>
+    <string name="quiz_question_counter">Вопрос %1$d / %2$d</string>
     <string name="quiz_correct_label">Правильно!</string>
-    <string name="quiz_wrong_label">Правильный ответ: \'%s\'</string>
+    <string name="quiz_wrong_label">Правильный ответ: \'%1$s\'</string>
     <string name="quiz_next_question">Следующий вопрос</string>
     <string name="quiz_view_results">Смотреть результаты</string>
     <string name="quiz_complete">Тест завершён</string>
-    <string name="quiz_score">%d / %d правильно</string>
-    <string name="quiz_expected_xp">Ожидаемый XP: +%d</string>
+    <string name="quiz_score">%1$d / %2$d правильно</string>
+    <string name="quiz_expected_xp">Получено XP: +%1$d</string>
     <string name="quiz_try_again">Попробовать снова</string>
     <string name="quiz_back_to_missions">Вернуться к миссиям</string>
     <string name="quiz_go_to_dictionary">Перейти в словарь</string>
@@ -172,13 +172,13 @@
     <string name="vocabquiz_word_to_def">Слово → Значение</string>
     <string name="vocabquiz_def_prompt">Выберите слово для этого значения.</string>
     <string name="vocabquiz_word_prompt">Выберите значение для этого слова.</string>
-    <string name="vocabquiz_local_note">Оценки теста на запоминание слов пока рассчитываются локально.</string>
+    <string name="vocabquiz_local_note">Счет</string>
     <string name="vocabquiz_cannot_start">Не удаётся начать тест на запоминание слов</string>
 
     <!-- PosQuiz -->
     <string name="posquiz_title">Тест частей речи</string>
     <string name="posquiz_type_label">Угадать часть речи</string>
-    <string name="posquiz_local_note">Оценки теста частей речи пока рассчитываются локально.</string>
+    <string name="posquiz_local_note">Счет</string>
     <string name="posquiz_cannot_start">Не удаётся начать тест частей речи</string>
 
     <!-- Mission display names -->
@@ -186,4 +186,61 @@
     <string name="mission_daily_scan">Сканирование слов</string>
     <string name="mission_daily_word_quiz">Тест слов</string>
     <string name="mission_daily_collect_noun">Сбор существительных</string>
+
+    <!-- Profile rewards -->
+    <string name="profile_reward_title">Настройка профиля</string>
+    <string name="profile_reward_desc">За каждые 1500 XP можно разблокировать один аватар или фон на выбор.</string>
+    <string name="profile_reward_remaining_tickets">Доступно разблокировок: %1$d</string>
+    <string name="profile_reward_avatar_section">Аватар</string>
+    <string name="profile_reward_background_section">Фон</string>
+    <string name="profile_reward_ticket_owned">Разблокировок: %1$d</string>
+    <string name="profile_reward_unlock">Разблокировать</string>
+    <string name="profile_reward_locked">Закрыто</string>
+    <string name="profile_reward_selected">Выбрано</string>
+    <string name="profile_reward_owned">Есть</string>
+    <string name="profile_reward_tap_to_unlock">Нажмите, чтобы открыть</string>
+    <string name="profile_asset_avatar_newbie">Новичок</string>
+    <string name="profile_asset_avatar_reading_bear">Читающий медведь</string>
+    <string name="profile_asset_avatar_crown_bear">Медведь с короной</string>
+    <string name="profile_asset_avatar_writing_rabbit">Пишущий кролик</string>
+    <string name="profile_asset_avatar_headset_cat">Кот в наушниках</string>
+    <string name="profile_asset_avatar_parrot">Говорящий попугай</string>
+    <string name="profile_asset_avatar_explorer">Исследователь</string>
+    <string name="profile_asset_avatar_ghost">Призрак</string>
+    <string name="profile_asset_avatar_holy_fox">Священная лиса</string>
+    <string name="profile_asset_avatar_cyberpunk_robot">Кибер-робот</string>
+    <string name="profile_asset_bg_library">Библиотека</string>
+    <string name="profile_asset_bg_goldenlake">Золотое озеро</string>
+    <string name="profile_asset_bg_forest">Лесная долина</string>
+    <string name="profile_asset_bg_campfire">Костёр</string>
+    <string name="profile_asset_bg_cyberpunk">Киберпанк</string>
+    <string name="profile_asset_bg_halloween">Хэллоуин</string>
+    <string name="profile_reward_unlock_hint">За каждые 1500 XP можно разблокировать один аватар или фон на выбор.</string>
+    <string name="profile_reward_stat_words">Собрано слов</string>
+    <string name="profile_reward_stat_rank">Текущий ранг</string>
+    <string name="profile_reward_stat_xp">Всего XP</string>
+    <string name="wordcard_play_definition_tts">Воспроизвести озвучку значения</string>
+    <string name="wordcard_learning_examples">Учебные примеры</string>
+    <string name="wordcard_start_pronunciation">Начать запись</string>
+    <string name="wordcard_example_listen">Прослушать пример</string>
+    <string name="wordcard_no_examples">Пока нет примеров.</string>
+    <string name="wordcard_stop_recording_and_evaluate">Оценить</string>
+    <string name="wordcard_low_volume_hint">Громкость низкая. Говорите немного громче.</string>
+    <string name="pronunciation_result_title">Результат оценки произношения</string>
+    <string name="pronunciation_score_format">Счет: %1$d</string>
+    <string name="pronunciation_xp_gained_format">Получено XP: +%1$d</string>
+    <string name="pronunciation_saved_at_format">Время сохранения: %1$s</string>
+    <string name="pronunciation_evaluating">Оценка...</string>
+    <string name="pronunciation_volume_ok">Громкость: нормально</string>
+    <string name="pronunciation_volume_low">Громкость низкая. Говорите немного громче.</string>
+    <string name="pronunciation_recording_hint">Идет запись. Произнесите слово и нажмите кнопку еще раз, чтобы начать оценку.</string>
+    <string name="pronunciation_recording_start_failed">Не удалось начать запись: %1$s</string>
+    <string name="pronunciation_evaluating_message">Запись завершена. Идет оценка произношения...</string>
+    <string name="pronunciation_record_file_missing">Файл записи не найден.</string>
+    <string name="pronunciation_visual_analysis">Визуальный анализ</string>
+    <string name="pronunciation_label_pronunciation">Произношение</string>
+    <string name="pronunciation_label_formants">Форманты</string>
+    <string name="pronunciation_label_intonation">Интонация</string>
+    <string name="pronunciation_label_speed">Скорость</string>
+    <string name="pronunciation_label_total">Итог</string>
 </resources>

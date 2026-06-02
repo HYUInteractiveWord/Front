@@ -99,8 +99,10 @@ class DictionaryVerifyViewModel(
                     definition = initialDefinition,
                     pos = initialPos,
                 )
+                val translatedDefinition = preview.definitionTranslated ?: preview.definitionEnglish
                 _uiState.value = _uiState.value.copy(
-                    definitionEnglish = preview.definitionEnglish,
+                    definition = translatedDefinition ?: _uiState.value.definition,
+                    definitionEnglish = null,
                     pronunciation = preview.pronunciation,
                     audioPath = preview.audioPath,
                     isLoadingPreview = false,
@@ -170,7 +172,7 @@ class DictionaryVerifyViewModel(
                 if (pcm.isEmpty()) {
                     _uiState.value = _uiState.value.copy(
                         isRecording = false,
-                        errorMessage = "녹음된 음성이 없습니다.",
+                        errorMessage = "Записанный звук отсутствует.",
                     )
                     return@launch
                 }
@@ -219,7 +221,7 @@ class DictionaryVerifyViewModel(
                     _uiState.value.word,
                     source = "dictionary",
                     pos = _uiState.value.pos,
-                    definition = _uiState.value.definition,
+                    definition = initialDefinition,
                 )
                 _uiState.value = _uiState.value.copy(
                     isSaving = false,

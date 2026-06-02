@@ -11,6 +11,7 @@ data class DictionaryResult(
     val word: String,
     val pos: String?,
     val definition: String?,
+    val definitionTranslated: String? = null,
 )
 
 data class DictionaryUiState(
@@ -51,6 +52,7 @@ class DictionaryViewModel(
                     word = word,
                     pos = info.pos,
                     definition = info.definition,
+                    definitionTranslated = info.definitionTranslated,
                 )
             }
 

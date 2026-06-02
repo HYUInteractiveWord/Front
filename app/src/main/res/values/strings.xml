@@ -44,7 +44,7 @@
     <string name="home_pronunciation_practice_sub">최근 단어로 연습</string>
     <string name="home_view_all">전체보기</string>
     <string name="home_top_rank">최고 등급</string>
-    <string name="home_xp_to_next_rank">다음 등급까지 %d XP</string>
+    <string name="home_xp_to_next_rank">다음 등급까지 %1$d XP</string>
     <string name="home_stat_words">수집 단어</string>
     <string name="home_stat_today_mission">오늘 미션</string>
     <string name="home_stat_word_slots">단어 슬롯</string>
@@ -60,7 +60,7 @@
     <string name="profile_all_missions">전체 미션</string>
     <string name="profile_rank_progress">랭크 진행</string>
     <string name="profile_top_rank_reached">최고 랭크에 도달했습니다.</string>
-    <string name="profile_xp_to_next_rank">다음 랭크까지 %d XP 남음</string>
+    <string name="profile_xp_to_next_rank">다음 랭크까지 %1$d XP 남음</string>
     <string name="profile_stat_words">수집 단어</string>
     <string name="profile_stat_current_rank">현재 랭크</string>
     <string name="profile_stat_total_xp">총 XP</string>
@@ -75,16 +75,16 @@
     <!-- Collection Screen -->
     <string name="collection_title">내 단어장</string>
     <string name="collection_empty">아직 단어가 없어요.\n스캔이나 사전 검색으로 추가해보세요!</string>
-    <string name="collection_word_count">%d개의 단어</string>
-    <string name="collection_slots">슬롯: %d / %d</string>
+    <string name="collection_word_count">%1$d개의 단어</string>
+    <string name="collection_slots">슬롯: %1$d / %2$d</string>
 
     <!-- Dictionary Screen -->
     <string name="dictionary_title">사전</string>
     <string name="dictionary_search_hint">한국어 단어 검색…</string>
     <string name="action_search">검색</string>
-    <string name="dictionary_search_failed">검색 실패: %s</string>
-    <string name="dictionary_result_count">검색 결과 %d개</string>
-    <string name="dictionary_category">분류: %s</string>
+    <string name="dictionary_search_failed">검색 실패: %1$s</string>
+    <string name="dictionary_result_count">검색 결과 %1$d개</string>
+    <string name="dictionary_category">분류: %1$s</string>
     <string name="dictionary_added">추가됨</string>
     <string name="action_add">추가</string>
     <string name="dictionary_enter_word">검색할 단어를 입력하세요.</string>
@@ -108,25 +108,25 @@
     <string name="scan_youtube_dialog_cancel">취소</string>
     <string name="scan_media_settings">미디어 스캔 설정</string>
     <string name="scan_segment_label">스캔 구간 (처음부터)</string>
-    <string name="scan_seconds">%d초</string>
+    <string name="scan_seconds">%1$d초</string>
     <string name="action_start_scan">스캔 시작</string>
-    <string name="scan_detected_words">감지된 단어 (%d개)</string>
+    <string name="scan_detected_words">감지된 단어 (%1$d개)</string>
     <string name="scan_listening">듣는 중…</string>
-    <string name="scan_elapsed">%d초  /  최대 30초</string>
+    <string name="scan_elapsed">%1$d초  /  최대 30초</string>
     <string name="action_done">완료</string>
 
     <!-- WordCard Screen -->
     <string name="wordcard_title">단어 카드</string>
     <string name="wordcard_listen">발음 듣기</string>
-    <string name="wordcard_category">분류: %s</string>
-    <string name="wordcard_meaning">뜻: %s</string>
+    <string name="wordcard_category">분류: %1$s</string>
+    <string name="wordcard_meaning">뜻: %1$s</string>
     <string name="wordcard_no_meaning">뜻 정보가 없습니다.</string>
     <string name="wordcard_points">단어 포인트</string>
     <string name="wordcard_best_score">최고 발음 정확도</string>
-    <string name="wordcard_practice_count">스피킹 연습 %d회 · 스캔 %d회</string>
+    <string name="wordcard_practice_count">스피킹 연습 %1$d회 · 스캔 %2$d회</string>
     <string name="wordcard_eval_title">발음 평가 결과</string>
     <string name="wordcard_evaluating">정밀 분석 중…</string>
-    <string name="wordcard_score">점수: %d점</string>
+    <string name="wordcard_score">점수: %1$d점</string>
     <string name="wordcard_new_best">🎉 최고 점수 경신!</string>
     <string name="wordcard_clear_record">기록 지우기</string>
     <string name="wordcard_no_eval">아직 발음 평가 기록이 없습니다.\n아래 녹음 버튼을 눌러 평가를 시작하세요.</string>
@@ -143,24 +143,24 @@
     <string name="verify_stop_recording">녹음 중지</string>
     <string name="verify_recording">녹음 중입니다. 다시 누르면 검증을 시작합니다.</string>
     <string name="verify_ai_checking">AI가 발음을 확인 중입니다…</string>
-    <string name="verify_match">AI가 \"%s\"(으)로 인식했습니다. 이제 단어장에 추가할 수 있습니다.</string>
-    <string name="verify_no_match">인식 결과: \"%s\". 목표 단어와 일치하지 않았지만, 원하면 지금 단어장에 추가할 수 있습니다.</string>
+    <string name="verify_match">AI가 \"%1$s\"(으)로 인식했습니다. 이제 단어장에 추가할 수 있습니다.</string>
+    <string name="verify_no_match">인식 결과: \"%1$s\". 목표 단어와 일치하지 않았지만, 원하면 지금 단어장에 추가할 수 있습니다.</string>
     <string name="verify_complete">녹음이 완료되었습니다.</string>
     <string name="verify_prompt">버튼을 눌러 단어를 한 번 발음해보세요.</string>
-    <string name="verify_raw_text">인식 원문: %s</string>
-    <string name="verify_corrected">보정 결과: %s</string>
+    <string name="verify_raw_text">인식 원문: %1$s</string>
+    <string name="verify_corrected">보정 결과: %1$s</string>
     <string name="action_skip">건너뛰기</string>
     <string name="action_add_to_collection">단어장 추가</string>
 
     <!-- Quiz screens (shared) -->
-    <string name="quiz_question_counter">문제 %d / %d</string>
+    <string name="quiz_question_counter">문제 %1$d / %2$d</string>
     <string name="quiz_correct_label">정답입니다.</string>
-    <string name="quiz_wrong_label">정답은 \'%s\' 입니다.</string>
+    <string name="quiz_wrong_label">정답은 \'%1$s\' 입니다.</string>
     <string name="quiz_next_question">다음 문제</string>
     <string name="quiz_view_results">결과 보기</string>
     <string name="quiz_complete">테스트 완료</string>
-    <string name="quiz_score">%d / %d 정답</string>
-    <string name="quiz_expected_xp">예상 획득 XP: +%d</string>
+    <string name="quiz_score">%1$d / %2$d 정답</string>
+    <string name="quiz_expected_xp">예상 획득 XP: +%1$d</string>
     <string name="quiz_try_again">다시 풀기</string>
     <string name="quiz_back_to_missions">미션으로 돌아가기</string>
     <string name="quiz_go_to_dictionary">사전으로 이동</string>
@@ -186,4 +186,61 @@
     <string name="mission_daily_scan">단어 스캔</string>
     <string name="mission_daily_word_quiz">단어 테스트</string>
     <string name="mission_daily_collect_noun">명사 단어 수집</string>
+
+    <!-- Profile rewards -->
+    <string name="profile_reward_title">프로필 꾸미기</string>
+    <string name="profile_reward_desc">1500 XP마다 원하는 아바타 또는 배경을 하나씩 해금할 수 있어요.</string>
+    <string name="profile_reward_remaining_tickets">남은 해금권: %1$d개</string>
+    <string name="profile_reward_avatar_section">아바타</string>
+    <string name="profile_reward_background_section">배경</string>
+    <string name="profile_reward_ticket_owned">해금권 %1$d개 보유</string>
+    <string name="profile_reward_unlock">해금</string>
+    <string name="profile_reward_locked">잠김</string>
+    <string name="profile_reward_selected">선택됨</string>
+    <string name="profile_reward_owned">보유</string>
+    <string name="profile_reward_tap_to_unlock">눌러서 해금</string>
+    <string name="profile_asset_avatar_newbie">새싹 학습자</string>
+    <string name="profile_asset_avatar_reading_bear">독서 곰</string>
+    <string name="profile_asset_avatar_crown_bear">왕관 곰</string>
+    <string name="profile_asset_avatar_writing_rabbit">글쓰기 토끼</string>
+    <string name="profile_asset_avatar_headset_cat">헤드셋 고양이</string>
+    <string name="profile_asset_avatar_parrot">말하는 앵무새</string>
+    <string name="profile_asset_avatar_explorer">탐험가</string>
+    <string name="profile_asset_avatar_ghost">유령</string>
+    <string name="profile_asset_avatar_holy_fox">성스러운 여우</string>
+    <string name="profile_asset_avatar_cyberpunk_robot">사이버 로봇</string>
+    <string name="profile_asset_bg_library">도서관</string>
+    <string name="profile_asset_bg_goldenlake">황금 호수</string>
+    <string name="profile_asset_bg_forest">숲 계곡</string>
+    <string name="profile_asset_bg_campfire">모닥불</string>
+    <string name="profile_asset_bg_cyberpunk">사이버펑크</string>
+    <string name="profile_asset_bg_halloween">할로윈</string>
+    <string name="profile_reward_unlock_hint">1500 XP마다 아바타 또는 배경 1개를 해금할 수 있습니다.</string>
+    <string name="profile_reward_stat_words">단어 수</string>
+    <string name="profile_reward_stat_rank">랭크</string>
+    <string name="profile_reward_stat_xp">총 XP</string>
+    <string name="wordcard_play_definition_tts">뜻 음성 재생</string>
+    <string name="wordcard_learning_examples">학습 예문</string>
+    <string name="wordcard_start_pronunciation">발음 연습 시작</string>
+    <string name="wordcard_example_listen">예문 듣기</string>
+    <string name="wordcard_no_examples">아직 예문 정보가 없습니다.</string>
+    <string name="wordcard_stop_recording_and_evaluate">녹음 종료 및 평가 시작</string>
+    <string name="wordcard_low_volume_hint">음량 상태: 작게 녹음됨. 조금 더 크게 말해보세요.</string>
+    <string name="pronunciation_result_title">발음 평가 결과</string>
+    <string name="pronunciation_score_format">점수: %1$d점</string>
+    <string name="pronunciation_xp_gained_format">획득 XP: +%1$d</string>
+    <string name="pronunciation_saved_at_format">저장 시각: %1$s</string>
+    <string name="pronunciation_evaluating">평가 중...</string>
+    <string name="pronunciation_volume_ok">음량 상태: 적절함</string>
+    <string name="pronunciation_volume_low">음량 상태: 작게 녹음됨. 조금 더 크게 말해보세요.</string>
+    <string name="pronunciation_recording_hint">녹음 중입니다. 단어를 말한 뒤 버튼을 다시 누르면 평가가 시작됩니다.</string>
+    <string name="pronunciation_recording_start_failed">녹음을 시작하지 못했습니다: %1$s</string>
+    <string name="pronunciation_evaluating_message">녹음이 종료되었습니다. 발음 평가 중입니다...</string>
+    <string name="pronunciation_record_file_missing">녹음 파일을 찾을 수 없습니다.</string>
+    <string name="pronunciation_visual_analysis">시각화 분석 결과</string>
+    <string name="pronunciation_label_pronunciation">발음</string>
+    <string name="pronunciation_label_formants">포먼트</string>
+    <string name="pronunciation_label_intonation">억양</string>
+    <string name="pronunciation_label_speed">속도</string>
+    <string name="pronunciation_label_total">총점</string>
 </resources>
