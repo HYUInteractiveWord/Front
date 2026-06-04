@@ -1,5 +1,6 @@
 package com.interactiveword.ui.screens.scan
 
+import android.Manifest
 import android.app.Application
 import android.content.Intent
 import android.media.AudioFormat
@@ -11,6 +12,7 @@ import android.media.MediaMetadataRetriever
 import android.media.MediaRecorder
 import android.net.Uri
 import android.os.Build
+import androidx.annotation.RequiresPermission
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.interactiveword.data.repository.ScanRepository
@@ -107,6 +109,7 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
 
     fun stopRecording() { recordingActive = false }
 
+    @RequiresPermission(Manifest.permission.RECORD_AUDIO)
     private fun recordMicAudio(): ByteArray {
         val channelConfig = AudioFormat.CHANNEL_IN_MONO
         val audioFormat  = AudioFormat.ENCODING_PCM_16BIT

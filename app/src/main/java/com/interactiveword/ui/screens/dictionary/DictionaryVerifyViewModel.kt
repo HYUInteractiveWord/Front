@@ -1,10 +1,12 @@
 package com.interactiveword.ui.screens.dictionary
 
+import android.Manifest
 import android.app.Application
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaPlayer
 import android.media.MediaRecorder
+import androidx.annotation.RequiresPermission
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -240,6 +242,7 @@ class DictionaryVerifyViewModel(
         _uiState.value = _uiState.value.copy(saveCompleted = false)
     }
 
+    @RequiresPermission(Manifest.permission.RECORD_AUDIO)
     private fun recordMicAudio(): ByteArray {
         val channelConfig = AudioFormat.CHANNEL_IN_MONO
         val audioFormat = AudioFormat.ENCODING_PCM_16BIT

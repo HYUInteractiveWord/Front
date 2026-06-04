@@ -410,6 +410,12 @@ private fun DetectedWordItem(
     added: Boolean,
     onAdd: () -> Unit,
     onDismiss: () -> Unit,
+) @Composable
+private fun DetectedWordItem(
+    result: ScanWordResult,
+    added: Boolean,
+    onAdd: () -> Unit,
+    onDismiss: () -> Unit,
 ) {
     Card(
         shape = MaterialTheme.shapes.large,
@@ -438,8 +444,9 @@ private fun DetectedWordItem(
                             shape = MaterialTheme.shapes.small,
                             color = BrandGreenLight.copy(alpha = 0.15f),
                         ) {
+                            // 💡 수정됨: it 대신 getPosString(it)을 사용하여 다국어 품사로 변환
                             Text(
-                                it,
+                                text = getPosString(it),
                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = BrandGreenLight,
@@ -450,7 +457,7 @@ private fun DetectedWordItem(
 
                 result.definition?.let {
                     Text(
-                        it,
+                        text = it,
                         style = MaterialTheme.typography.bodySmall,
                         color = DarkMutedText,
                         maxLines = 2,
