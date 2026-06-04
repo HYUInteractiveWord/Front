@@ -1,45 +1,22 @@
 package com.interactiveword.ui.screens.profile
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material.icons.filled.VolumeUp
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MenuBook
 import com.interactiveword.R
 import com.interactiveword.ui.navigation.Screen
 import com.interactiveword.ui.theme.BrandGreenLight
@@ -58,9 +35,7 @@ fun PosQuizScreen(
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.posquiz_title)) },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                ),
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
             )
         },
         containerColor = MaterialTheme.colorScheme.background,
@@ -71,7 +46,6 @@ fun PosQuizScreen(
                     CircularProgressIndicator()
                 }
             }
-
             uiState.errorMessage != null -> {
                 EmptyQuizState(
                     padding = padding,
@@ -81,7 +55,6 @@ fun PosQuizScreen(
                     onMoveToDictionary = { navController.navigate(Screen.Dictionary.route) },
                 )
             }
-
             uiState.isFinished -> {
                 QuizResultState(
                     padding = padding,
@@ -92,7 +65,6 @@ fun PosQuizScreen(
                     onBackClick = { navController.popBackStack() },
                 )
             }
-
             else -> {
                 val question = uiState.currentQuestion ?: return@Scaffold
                 QuizQuestionState(
@@ -102,10 +74,12 @@ fun PosQuizScreen(
                     word = question.word,
                     definition = question.definition,
                     correctPos = question.correctPos,
+                    audioPath = question.wordAudioPath,
                     selectedAnswer = uiState.selectedAnswer,
                     isAnswerChecked = uiState.isAnswerChecked,
                     onAnswerClick = vm::selectAnswer,
                     onNextClick = vm::goToNextQuestion,
+                    onPlayAudio = vm::playTts
                 )
             }
         }
@@ -120,12 +94,15 @@ private fun QuizQuestionState(
     word: String,
     definition: String,
     correctPos: String,
+    audioPath: String?,
     selectedAnswer: String?,
     isAnswerChecked: Boolean,
     onAnswerClick: (String) -> Unit,
     onNextClick: () -> Unit,
+    onPlayAudio: (String?) -> Unit,
 ) {
     val progress = if (totalQuestions > 0) (currentIndex + 1) / totalQuestions.toFloat() else 0f
+    var pendingAnswer by remember(currentIndex) { mutableStateOf<String?>(null) }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize().padding(padding),
@@ -134,90 +111,65 @@ private fun QuizQuestionState(
     ) {
         item {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                ) {
-                    Text(
-                        text = stringResource(R.string.quiz_question_counter, currentIndex + 1, totalQuestions),
-                        style = MaterialTheme.typography.titleMedium,
-                    )
-                    Text(
-                        text = stringResource(R.string.posquiz_type_label),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(text = stringResource(R.string.quiz_question_counter, currentIndex + 1, totalQuestions), style = MaterialTheme.typography.titleMedium)
+                    Text(text = stringResource(R.string.posquiz_type_label), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
-                LinearProgressIndicator(
-                    progress = { progress.coerceIn(0f, 1f) },
-                    modifier = Modifier.fillMaxWidth().height(6.dp),
-                    color = BrandGreenLight,
-                    trackColor = DarkOutline,
-                )
+                LinearProgressIndicator(progress = { progress.coerceIn(0f, 1f) }, modifier = Modifier.fillMaxWidth().height(6.dp), color = BrandGreenLight, trackColor = DarkOutline)
             }
         }
 
         item {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = MaterialTheme.shapes.large,
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                border = BorderStroke(1.dp, DarkOutline),
-            ) {
+            Card(modifier = Modifier.fillMaxWidth(), shape = MaterialTheme.shapes.large, colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), border = BorderStroke(1.dp, DarkOutline)) {
                 Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Text(text = word, style = MaterialTheme.typography.headlineMedium)
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+                        Text(text = word, style = MaterialTheme.typography.headlineMedium, modifier = Modifier.weight(1f))
+                        IconButton(onClick = { onPlayAudio(audioPath) }) { Icon(Icons.Filled.VolumeUp, contentDescription = null, tint = BrandGreenLight) }
+                    }
                     Text(text = definition, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         }
 
         items(PosQuizViewModel.options) { option ->
-            val colors = optionCardColors(
-                option = option,
-                correctPos = correctPos,
-                selectedAnswer = selectedAnswer,
-                isAnswerChecked = isAnswerChecked,
-            )
-
+            val colors = optionCardColors(option, correctPos, selectedAnswer, pendingAnswer, isAnswerChecked)
             OutlinedButton(
-                onClick = { onAnswerClick(option) },
-                enabled = !isAnswerChecked,
+                onClick = { if (!isAnswerChecked) pendingAnswer = option },
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.large,
                 border = BorderStroke(1.dp, colors.border),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    containerColor = colors.background,
-                    contentColor = colors.content,
-                    disabledContainerColor = colors.background,
-                    disabledContentColor = colors.content,
-                ),
+                colors = ButtonDefaults.outlinedButtonColors(containerColor = colors.background, contentColor = colors.content),
                 contentPadding = PaddingValues(vertical = 16.dp, horizontal = 18.dp),
             ) {
-                Text(text = option, modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.titleMedium)
+                Text(text = getPosString(option), modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.titleMedium)
             }
         }
 
-        if (isAnswerChecked) {
-            item {
-                Text(
-                    text = if (selectedAnswer == correctPos) {
-                        stringResource(R.string.quiz_correct_label)
-                    } else {
-                        stringResource(R.string.quiz_wrong_label, correctPos)
-                    },
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = if (selectedAnswer == correctPos) BrandGreenLight else ErrorRed,
-                )
-            }
-            item {
-                Button(onClick = onNextClick, modifier = Modifier.fillMaxWidth()) {
-                    Text(if (currentIndex + 1 == totalQuestions) stringResource(R.string.quiz_view_results) else stringResource(R.string.quiz_next_question))
+        item {
+            if (!isAnswerChecked) {
+                Button(
+                    onClick = { pendingAnswer?.let { onAnswerClick(it) } },
+                    enabled = pendingAnswer != null,
+                    modifier = Modifier.fillMaxWidth().height(52.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = BrandGreenLight)
+                ) {
+                    Text(stringResource(R.string.action_confirm), style = MaterialTheme.typography.titleMedium)
+                }
+            } else {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        text = if (selectedAnswer == correctPos) stringResource(R.string.quiz_correct_label) else stringResource(R.string.quiz_wrong_label, getPosString(correctPos)),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = if (selectedAnswer == correctPos) BrandGreenLight else ErrorRed,
+                    )
+                    Button(onClick = onNextClick, modifier = Modifier.fillMaxWidth()) {
+                        Text(if (currentIndex + 1 == totalQuestions) stringResource(R.string.quiz_view_results) else stringResource(R.string.quiz_next_question))
+                    }
                 }
             }
         }
     }
 }
-
 @Composable
 private fun QuizResultState(
     padding: PaddingValues,
@@ -323,14 +275,23 @@ private fun optionCardColors(
     option: String,
     correctPos: String,
     selectedAnswer: String?,
+    pendingAnswer: String?,
     isAnswerChecked: Boolean,
 ): AnswerOptionColors {
     if (!isAnswerChecked) {
-        return AnswerOptionColors(
-            background = MaterialTheme.colorScheme.surface,
-            border = DarkOutline,
-            content = MaterialTheme.colorScheme.onSurface,
-        )
+        return if (option == pendingAnswer) {
+            AnswerOptionColors(
+                background = BrandGreenLight.copy(alpha = 0.14f),
+                border = BrandGreenLight,
+                content = BrandGreenLight,
+            )
+        } else {
+            AnswerOptionColors(
+                background = MaterialTheme.colorScheme.surface,
+                border = DarkOutline,
+                content = MaterialTheme.colorScheme.onSurface,
+            )
+        }
     }
 
     return when {
@@ -349,5 +310,16 @@ private fun optionCardColors(
             border = DarkOutline,
             content = MaterialTheme.colorScheme.onSurfaceVariant,
         )
+    }
+}
+@Composable
+private fun getPosString(pos: String?): String {
+    if (pos == null) return ""
+    return when {
+        pos.contains("명사") -> stringResource(R.string.pos_noun)
+        pos.contains("동사") -> stringResource(R.string.pos_verb)
+        pos.contains("형용사") -> stringResource(R.string.pos_adjective)
+        pos.contains("부사") -> stringResource(R.string.pos_adverb)
+        else -> pos
     }
 }
