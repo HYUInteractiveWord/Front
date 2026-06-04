@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.WorkspacePremium
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -53,6 +54,8 @@ fun ProfileScreen(
     vm: ProfileViewModel = viewModel(),
 ) {
     val uiState by vm.uiState.collectAsState()
+
+    LaunchedEffect(Unit) { vm.refresh() }
 
     Scaffold(
         topBar = {

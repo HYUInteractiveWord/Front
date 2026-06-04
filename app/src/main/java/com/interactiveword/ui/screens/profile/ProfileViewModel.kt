@@ -34,6 +34,8 @@ class ProfileViewModel(
 
     init { loadData() }
 
+    fun refresh() { loadData() }
+
     private fun loadData() {
         viewModelScope.launch {
             val userResult = runCatching { userRepo.getMe() }

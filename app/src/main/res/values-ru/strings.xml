@@ -6,6 +6,9 @@
     <string name="notification_text_capture">Нажмите, чтобы захватить корейские слова</string>
     <string name="notification_action_capture">Начать захват</string>
     <string name="notification_action_stop">Остановить</string>
+    <string name="notification_text_standby">Нажмите, чтобы захватить текущий сегмент видео</string>
+    <string name="notification_title_set_range">Установить диапазон захвата</string>
+    <string name="capture_video_unknown">Нет воспроизводимого видео</string>
 
     <!-- Bottom Nav -->
     <string name="nav_home">Главная</string>
@@ -91,12 +94,14 @@
     <string name="dictionary_no_results">Ничего не найдено.</string>
 
     <!-- Scan Screen -->
+    <string name="scan_capture_ready">Диапазон захвата установлен. Выберите видеофайл для начала анализа.</string>
+    <string name="scan_select_file">Выбрать видеофайл для анализа</string>
     <string name="scan_title">Сканер слов</string>
     <string name="scan_subtitle">Найдите корейские слова в окружающих звуках</string>
     <string name="scan_mic">Микрофон</string>
     <string name="scan_mic_sub">Запись окружающего звука</string>
     <string name="scan_media">Медиа</string>
-    <string name="scan_media_sub">Видео/аудио файлы</string>
+    <string name="scan_media_sub">Захват сегмента во время воспроизведения видео</string>
     <string name="scan_loading_audio">Извлечение и анализ аудио…</string>
     <string name="scan_loading_youtube">Анализ YouTube…</string>
     <string name="scan_loading">Анализ…</string>
