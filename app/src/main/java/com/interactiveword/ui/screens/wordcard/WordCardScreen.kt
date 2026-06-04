@@ -8,7 +8,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -22,15 +21,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.style.TextAlign
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.interactiveword.ui.components.WordCardEffectBadge
 import com.interactiveword.ui.components.wordCardEffectStyle
@@ -352,6 +350,7 @@ fun WordCardScreen(
                                 }
                             }
 
+                            // 2. 💡 복구된 부분: 번역 예문 및 번역 오디오 재생 버튼
                             val english = exampleEnglish(example)
                             if (!english.isNullOrBlank()) {
                                 Spacer(Modifier.height(8.dp))
@@ -370,7 +369,7 @@ fun WordCardScreen(
                                         ) {
                                             Icon(
                                                 Icons.Filled.VolumeUp,
-                                                contentDescription = stringResource(R.string.wordcard_example_listen),
+                                                contentDescription = stringResource(R.string.wordcard_translation_listen),
                                                 tint = DarkMutedText,
                                                 modifier = Modifier.size(20.dp)
                                             )
@@ -560,42 +559,39 @@ private fun historyString(history: Map<String, Any>?, vararg keys: String): Stri
     return null
 }
 
-// 신버전 파싱 로직 적용
+// 💡 널 체크(null check) 및 문자열 방어 로직 강화됨
 private fun exampleKorean(example: Any): String {
     val map = example as? Map<*, *> ?: return example.toString()
     for (key in listOf("korean", "kr", "sentence", "example")) {
         val value = map[key]?.toString()
-        if (!value.isNullOrBlank()) return value
+        if (!value.isNullOrBlank() && value != "null") return value
     }
     return example.toString()
 }
 
-// 신버전 파싱 로직 적용
 private fun exampleEnglish(example: Any): String? {
     val map = example as? Map<*, *> ?: return null
     for (key in listOf("translation", "russian", "ru", "translated", "translated_text", "english", "en")) {
         val value = map[key]?.toString()
-        if (!value.isNullOrBlank()) return value
+        if (!value.isNullOrBlank() && value != "null") return value
     }
     return null
 }
 
-// 신버전 파싱 로직 적용 (한국어 TTS 경로)
 private fun exampleTtsPath(example: Any): String? {
     val map = example as? Map<*, *> ?: return null
     for (key in listOf("audio_path", "tts_audio_path", "ttsPath")) {
         val value = map[key]?.toString()
-        if (!value.isNullOrBlank()) return value
+        if (!value.isNullOrBlank() && value != "null") return value
     }
     return null
 }
 
-// 신버전 파싱 로직 적용 (번역문 TTS 경로 복구)
 private fun exampleTransTtsPath(example: Any): String? {
     val map = example as? Map<*, *> ?: return null
     for (key in listOf("trans_audio_path", "translation_audio_path", "def_trans_audio_path")) {
         val value = map[key]?.toString()
-        if (!value.isNullOrBlank()) return value
+        if (!value.isNullOrBlank() && value != "null") return value
     }
     return null
 }
