@@ -2,6 +2,7 @@ package com.interactiveword.ui.screens.wordcard
 
 import com.interactiveword.R
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -65,7 +66,7 @@ fun WordCardScreen(
                 title = { Text(card?.koreanWord ?: stringResource(R.string.wordcard_title)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Filled.ArrowBack, "뒤로")
+                        Icon(Icons.Filled.ArrowBack, contentDescription = stringResource(R.string.wordcard_back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -139,7 +140,7 @@ fun WordCardScreen(
                         IconButton(onClick = { vm.playTts() }) {
                             Icon(
                                 Icons.Filled.VolumeUp,
-                                contentDescription = "발음 듣기",
+                                contentDescription = stringResource(R.string.wordcard_listen),
                                 tint = BrandGreenLight,
                             )
                         }
@@ -192,7 +193,7 @@ fun WordCardScreen(
                                 Spacer(Modifier.height(8.dp))
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text(
-                                        text = "Meaning: ${card.definitionEnglish}",
+                                        text = stringResource(R.string.wordcard_english_meaning_format, card.definitionEnglish),
                                         style = MaterialTheme.typography.bodyMedium,
                                         color = DarkMutedText,
                                         modifier = Modifier.weight(1f)
@@ -204,7 +205,7 @@ fun WordCardScreen(
                                         ) {
                                             Icon(
                                                 Icons.Filled.VolumeUp,
-                                                contentDescription = "번역 뜻 듣기",
+                                                contentDescription = stringResource(R.string.wordcard_translation_listen),
                                                 tint = DarkMutedText,
                                                 modifier = Modifier.size(20.dp)
                                             )
@@ -229,7 +230,7 @@ fun WordCardScreen(
                                 color = DarkMutedText,
                             )
                             Text(
-                                text = "$displayPoint / 100 pt",
+                                text = stringResource(R.string.wordcard_point_format, displayPoint),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = effect.borderColor,
                             )
@@ -296,7 +297,7 @@ fun WordCardScreen(
                                 color = DarkMutedText,
                             )
                             Text(
-                                text = "${card.bestScore.toInt()}%",
+                                text = stringResource(R.string.wordcard_percentage_format, card.bestScore.toInt()),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = BrandGreenLight,
                             )
@@ -361,7 +362,7 @@ fun WordCardScreen(
                                         color = DarkMutedText,
                                         modifier = Modifier.weight(1f)
                                     )
-                                    val transTtsPath = exampleTransTtsPath(example) // 💡 올바른 번역 음성 경로 함수 호출
+                                    val transTtsPath = exampleTransTtsPath(example)
                                     if (!transTtsPath.isNullOrBlank()) {
                                         IconButton(
                                             onClick = { vm.playExampleTts(transTtsPath) },
@@ -559,58 +560,48 @@ private fun historyString(history: Map<String, Any>?, vararg keys: String): Stri
     return null
 }
 
+// 신버전 파싱 로직 적용
 private fun exampleKorean(example: Any): String {
-    if (example is Map<*, *>) {
-        for (key in listOf("korean", "kr", "sentence", "example")) {
-            val value = example[key]?.toString()
-            if (!value.isNullOrBlank()) return value
-        }
+    val map = example as? Map<*, *> ?: return example.toString()
+    for (key in listOf("korean", "kr", "sentence", "example")) {
+        val value = map[key]?.toString()
+        if (!value.isNullOrBlank()) return value
     }
     return example.toString()
 }
 
+// 신버전 파싱 로직 적용
 private fun exampleEnglish(example: Any): String? {
     val map = example as? Map<*, *> ?: return null
-    val keys = listOf(
-        "translation",
-        "russian",
-        "ru",
-        "translated",
-        "translated_text",
-        "target",
-        "target_sentence",
-        "example_translated",
-        "sentence_translated",
-        "english",
-    )
-
-    for (key in keys) {
-        val value = map[key] as? String
+    for (key in listOf("translation", "russian", "ru", "translated", "translated_text", "english", "en")) {
+        val value = map[key]?.toString()
         if (!value.isNullOrBlank()) return value
     }
-
     return null
 }
 
+// 신버전 파싱 로직 적용 (한국어 TTS 경로)
 private fun exampleTtsPath(example: Any): String? {
     val map = example as? Map<*, *> ?: return null
-    val keys = listOf(
-        "trans_audio_path",
-        "translation_audio_path",
-        "translated_audio_path",
-        "tts_audio_path",
-        "audio_path",
-    )
-
-    for (key in keys) {
-        val value = map[key] as? String
+    for (key in listOf("audio_path", "tts_audio_path", "ttsPath")) {
+        val value = map[key]?.toString()
         if (!value.isNullOrBlank()) return value
     }
+    return null
+}
 
+// 신버전 파싱 로직 적용 (번역문 TTS 경로 복구)
+private fun exampleTransTtsPath(example: Any): String? {
+    val map = example as? Map<*, *> ?: return null
+    for (key in listOf("trans_audio_path", "translation_audio_path", "def_trans_audio_path")) {
+        val value = map[key]?.toString()
+        if (!value.isNullOrBlank()) return value
+    }
     return null
 }
 
 
+@SuppressLint("DefaultLocale")
 @Composable
 private fun PronunciationScoreChart(
     pronunciation: Float,

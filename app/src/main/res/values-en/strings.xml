@@ -122,7 +122,9 @@
 
     <!-- WordCard Screen -->
     <string name="wordcard_title">Word Card</string>
+    <string name="wordcard_back">Back</string>
     <string name="wordcard_listen">Listen to Pronunciation</string>
+    <string name="wordcard_percentage_format">%1$d%%</string>
     <string name="wordcard_category">Category: %1$s</string>
     <string name="wordcard_meaning">Meaning: %1$s</string>
     <string name="wordcard_no_meaning">No meaning information.</string>
@@ -248,4 +250,7 @@
     <string name="pronunciation_label_intonation">Intonation</string>
     <string name="pronunciation_label_speed">Speed</string>
     <string name="pronunciation_label_total">Total</string>
+    <string name="wordcard_translation_listen">Listen to translation</string>
+    <string name="wordcard_english_meaning_format">Meaning: %1$s</string>
+    <string name="wordcard_point_format">%1$d / 100 pt</string>
 </resources>

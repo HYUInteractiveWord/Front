@@ -10,14 +10,12 @@
     <string name="notification_title_set_range">캡처 구간 설정</string>
     <string name="capture_video_unknown">재생 중인 영상 없음</string>
 
-    <!-- Bottom Nav -->
     <string name="nav_home">홈</string>
     <string name="nav_dictionary">사전</string>
     <string name="nav_collection">단어장</string>
     <string name="nav_missions">미션</string>
     <string name="nav_scan">스캔</string>
 
-    <!-- Login Screen -->
     <string name="login_title">로그인</string>
     <string name="register_title">회원가입</string>
     <string name="label_username">아이디</string>
@@ -29,7 +27,6 @@
     <string name="link_to_login">이미 계정이 있으신가요? 로그인</string>
     <string name="label_language">언어 선택</string>
 
-    <!-- Rank labels -->
     <string name="rank_bronze">브론즈</string>
     <string name="rank_silver">실버</string>
     <string name="rank_gold">골드</string>
@@ -37,7 +34,6 @@
     <string name="rank_diamond">다이아</string>
     <string name="rank_master">마스터</string>
 
-    <!-- Home Screen -->
     <string name="home_today_missions">오늘의 미션</string>
     <string name="home_recent_words">최근 단어</string>
     <string name="home_quick_learning">빠른 학습</string>
@@ -57,7 +53,6 @@
     <string name="home_logout_confirm_yes">예</string>
     <string name="home_logout_confirm_no">아니오</string>
 
-    <!-- Profile Screen -->
     <string name="profile_title">미션 &amp; 프로필</string>
     <string name="profile_today_missions">오늘의 미션</string>
     <string name="profile_all_missions">전체 미션</string>
@@ -75,13 +70,11 @@
     <string name="profile_daily_mission_status">일일 미션 상태</string>
     <string name="action_start_test">테스트 시작</string>
 
-    <!-- Collection Screen -->
     <string name="collection_title">내 단어장</string>
     <string name="collection_empty">아직 단어가 없어요.\n스캔이나 사전 검색으로 추가해보세요!</string>
     <string name="collection_word_count">%1$d개의 단어</string>
     <string name="collection_slots">슬롯: %1$d / %2$d</string>
 
-    <!-- Dictionary Screen -->
     <string name="dictionary_title">사전</string>
     <string name="dictionary_search_hint">한국어 단어 검색…</string>
     <string name="action_search">검색</string>
@@ -93,7 +86,6 @@
     <string name="dictionary_enter_word">검색할 단어를 입력하세요.</string>
     <string name="dictionary_no_results">검색 결과가 없습니다.</string>
 
-    <!-- Scan Screen -->
     <string name="scan_capture_ready">캡처 구간이 설정됐어요. 영상 파일을 선택하면 바로 분석을 시작합니다.</string>
     <string name="scan_select_file">영상 파일 선택하여 분석</string>
     <string name="scan_title">단어 스캔</string>
@@ -120,10 +112,9 @@
     <string name="scan_elapsed">%1$d초  /  최대 30초</string>
     <string name="action_done">완료</string>
 
-    <!-- WordCard Screen -->
     <string name="wordcard_title">단어 카드</string>
-    <string name="wordcard_listen">발음 듣기</string>
-    <string name="wordcard_category">분류: %1$s</string>
+    <string name="wordcard_back">뒤로</string> <string name="wordcard_listen">발음 듣기</string>
+    <string name="wordcard_translation_listen">번역 뜻 듣기</string> <string name="wordcard_english_meaning_format">Meaning: %1$s</string> <string name="wordcard_point_format">%1$d / 100 pt</string> <string name="wordcard_percentage_format">%1$d%%</string> <string name="wordcard_category">분류: %1$s</string>
     <string name="wordcard_meaning">뜻: %1$s</string>
     <string name="wordcard_no_meaning">뜻 정보가 없습니다.</string>
     <string name="wordcard_points">단어 포인트</string>
@@ -139,8 +130,14 @@
     <string name="wordcard_master_desc">이 단어는 최고 숙련도에 도달했습니다.</string>
     <string name="wordcard_stop_and_submit">녹음 종료 및 제출</string>
     <string name="wordcard_start_recording">녹음 시작</string>
+    <string name="wordcard_play_definition_tts">뜻 음성 재생</string>
+    <string name="wordcard_learning_examples">학습 예문</string>
+    <string name="wordcard_start_pronunciation">발음 연습 시작</string>
+    <string name="wordcard_example_listen">예문 듣기</string>
+    <string name="wordcard_no_examples">아직 예문 정보가 없습니다.</string>
+    <string name="wordcard_stop_recording_and_evaluate">녹음 종료 및 평가 시작</string>
+    <string name="wordcard_low_volume_hint">음량 상태: 작게 녹음됨. 조금 더 크게 말해보세요.</string>
 
-    <!-- DictionaryVerify Screen -->
     <string name="verify_title">발음 확인</string>
     <string name="verify_back">뒤로</string>
     <string name="verify_pronunciation_check">1회 발음 확인</string>
@@ -157,7 +154,6 @@
     <string name="action_skip">건너뛰기</string>
     <string name="action_add_to_collection">단어장 추가</string>
 
-    <!-- Quiz screens (shared) -->
     <string name="quiz_question_counter">문제 %1$d / %2$d</string>
     <string name="quiz_correct_label">정답입니다.</string>
     <string name="quiz_wrong_label">정답은 \'%1$s\' 입니다.</string>
@@ -171,7 +167,6 @@
     <string name="quiz_go_to_dictionary">사전으로 이동</string>
     <string name="quiz_add_words_hint">단어장에 단어를 1회 이상 추가해주세요.</string>
 
-    <!-- VocabQuiz -->
     <string name="vocabquiz_title">단어 암기 테스트</string>
     <string name="vocabquiz_def_to_word">뜻 → 단어 맞추기</string>
     <string name="vocabquiz_word_to_def">단어 → 뜻 맞추기</string>
@@ -180,19 +175,16 @@
     <string name="vocabquiz_local_note">현재 단계에서는 단어 암기 테스트 점수를 로컬로만 계산합니다.</string>
     <string name="vocabquiz_cannot_start">단어 암기 테스트를 시작할 수 없어요</string>
 
-    <!-- PosQuiz -->
     <string name="posquiz_title">단어 품사 테스트</string>
     <string name="posquiz_type_label">품사 맞추기</string>
     <string name="posquiz_local_note">현재 단계에서는 품사 테스트 점수를 로컬로만 계산합니다.</string>
     <string name="posquiz_cannot_start">품사 테스트를 시작할 수 없어요</string>
 
-    <!-- Mission display names -->
     <string name="mission_daily_pronunciation">일일 발음 연습</string>
     <string name="mission_daily_scan">단어 스캔</string>
     <string name="mission_daily_word_quiz">단어 테스트</string>
     <string name="mission_daily_collect_noun">명사 단어 수집</string>
 
-    <!-- Profile rewards -->
     <string name="profile_reward_title">프로필 꾸미기</string>
     <string name="profile_reward_desc">1500 XP마다 원하는 아바타 또는 배경을 하나씩 해금할 수 있어요.</string>
     <string name="profile_reward_remaining_tickets">남은 해금권: %1$d개</string>
@@ -224,13 +216,7 @@
     <string name="profile_reward_stat_words">단어 수</string>
     <string name="profile_reward_stat_rank">랭크</string>
     <string name="profile_reward_stat_xp">총 XP</string>
-    <string name="wordcard_play_definition_tts">뜻 음성 재생</string>
-    <string name="wordcard_learning_examples">학습 예문</string>
-    <string name="wordcard_start_pronunciation">발음 연습 시작</string>
-    <string name="wordcard_example_listen">예문 듣기</string>
-    <string name="wordcard_no_examples">아직 예문 정보가 없습니다.</string>
-    <string name="wordcard_stop_recording_and_evaluate">녹음 종료 및 평가 시작</string>
-    <string name="wordcard_low_volume_hint">음량 상태: 작게 녹음됨. 조금 더 크게 말해보세요.</string>
+
     <string name="pronunciation_result_title">발음 평가 결과</string>
     <string name="pronunciation_score_format">점수: %1$d점</string>
     <string name="pronunciation_xp_gained_format">획득 XP: +%1$d</string>

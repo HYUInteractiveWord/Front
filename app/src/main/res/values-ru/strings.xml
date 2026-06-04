@@ -122,7 +122,9 @@
 
     <!-- WordCard Screen -->
     <string name="wordcard_title">Карточка слова</string>
+    <string name="wordcard_back">Назад</string>
     <string name="wordcard_listen">Слушать произношение</string>
+    <string name="wordcard_percentage_format">%1$d%%</string>
     <string name="wordcard_category">Категория: %1$s</string>
     <string name="wordcard_meaning">Значение: %1$s</string>
     <string name="wordcard_no_meaning">Нет информации о значении.</string>
@@ -248,4 +250,7 @@
     <string name="pronunciation_label_intonation">Интонация</string>
     <string name="pronunciation_label_speed">Скорость</string>
     <string name="pronunciation_label_total">Итог</string>
+    <string name="wordcard_translation_listen">Послушать перевод</string>
+    <string name="wordcard_english_meaning_format">Значение: %1$s</string>
+    <string name="wordcard_point_format">%1$d / 100 pt</string>
 </resources>
