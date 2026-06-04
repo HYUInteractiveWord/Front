@@ -234,4 +234,5 @@
     <string name="pronunciation_label_intonation">억양</string>
     <string name="pronunciation_label_speed">속도</string>
     <string name="pronunciation_label_total">총점</string>
+    <string name="action_confirm">확인</string>
 </resources>
