@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -38,8 +40,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MenuBook
 import com.interactiveword.R
 import com.interactiveword.ui.navigation.Screen
 import com.interactiveword.ui.theme.BrandGreenLight
@@ -67,7 +67,12 @@ fun PosQuizScreen(
     ) { padding ->
         when {
             uiState.isLoading -> {
-                Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding),
+                    contentAlignment = Alignment.Center,
+                ) {
                     CircularProgressIndicator()
                 }
             }
@@ -125,10 +130,18 @@ private fun QuizQuestionState(
     onAnswerClick: (String) -> Unit,
     onNextClick: () -> Unit,
 ) {
-    val progress = if (totalQuestions > 0) (currentIndex + 1) / totalQuestions.toFloat() else 0f
+    val progress = if (totalQuestions > 0) {
+        (currentIndex + 1) / totalQuestions.toFloat()
+    } else {
+        0f
+    }
+
+    val correctPosLabel = localizedPosLabel(correctPos)
 
     LazyColumn(
-        modifier = Modifier.fillMaxSize().padding(padding),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(padding),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
@@ -139,7 +152,11 @@ private fun QuizQuestionState(
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Text(
-                        text = stringResource(R.string.quiz_question_counter, currentIndex + 1, totalQuestions),
+                        text = stringResource(
+                            R.string.quiz_question_counter,
+                            currentIndex + 1,
+                            totalQuestions,
+                        ),
                         style = MaterialTheme.typography.titleMedium,
                     )
                     Text(
@@ -148,9 +165,12 @@ private fun QuizQuestionState(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
+
                 LinearProgressIndicator(
                     progress = { progress.coerceIn(0f, 1f) },
-                    modifier = Modifier.fillMaxWidth().height(6.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(6.dp),
                     color = BrandGreenLight,
                     trackColor = DarkOutline,
                 )
@@ -164,14 +184,26 @@ private fun QuizQuestionState(
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 border = BorderStroke(1.dp, DarkOutline),
             ) {
-                Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Text(text = word, style = MaterialTheme.typography.headlineMedium)
-                    Text(text = definition, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Column(
+                    modifier = Modifier.padding(20.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    Text(
+                        text = word,
+                        style = MaterialTheme.typography.headlineMedium,
+                    )
+                    Text(
+                        text = definition,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
                 }
             }
         }
 
         items(PosQuizViewModel.options) { option ->
+            val optionLabel = localizedPosLabel(option)
+
             val colors = optionCardColors(
                 option = option,
                 correctPos = correctPos,
@@ -193,7 +225,11 @@ private fun QuizQuestionState(
                 ),
                 contentPadding = PaddingValues(vertical = 16.dp, horizontal = 18.dp),
             ) {
-                Text(text = option, modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.titleMedium)
+                Text(
+                    text = optionLabel,
+                    modifier = Modifier.fillMaxWidth(),
+                    style = MaterialTheme.typography.titleMedium,
+                )
             }
         }
 
@@ -203,15 +239,25 @@ private fun QuizQuestionState(
                     text = if (selectedAnswer == correctPos) {
                         stringResource(R.string.quiz_correct_label)
                     } else {
-                        stringResource(R.string.quiz_wrong_label, correctPos)
+                        stringResource(R.string.quiz_wrong_label, correctPosLabel)
                     },
                     style = MaterialTheme.typography.bodyLarge,
                     color = if (selectedAnswer == correctPos) BrandGreenLight else ErrorRed,
                 )
             }
+
             item {
-                Button(onClick = onNextClick, modifier = Modifier.fillMaxWidth()) {
-                    Text(if (currentIndex + 1 == totalQuestions) stringResource(R.string.quiz_view_results) else stringResource(R.string.quiz_next_question))
+                Button(
+                    onClick = onNextClick,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(
+                        if (currentIndex + 1 == totalQuestions) {
+                            stringResource(R.string.quiz_view_results)
+                        } else {
+                            stringResource(R.string.quiz_next_question)
+                        }
+                    )
                 }
             }
         }
@@ -228,7 +274,10 @@ private fun QuizResultState(
     onBackClick: () -> Unit,
 ) {
     Box(
-        modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(padding)
+            .padding(16.dp),
         contentAlignment = Alignment.Center,
     ) {
         Card(
@@ -237,20 +286,42 @@ private fun QuizResultState(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             border = BorderStroke(1.dp, DarkOutline),
         ) {
-            Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                Text(text = stringResource(R.string.quiz_complete), style = MaterialTheme.typography.headlineSmall)
-                Text(text = stringResource(R.string.quiz_score, correctCount, totalQuestions), style = MaterialTheme.typography.titleLarge)
-                Text(text = stringResource(R.string.quiz_expected_xp, xp), style = MaterialTheme.typography.bodyLarge, color = BrandGreenLight)
+            Column(
+                modifier = Modifier.padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp),
+            ) {
+                Text(
+                    text = stringResource(R.string.quiz_complete),
+                    style = MaterialTheme.typography.headlineSmall,
+                )
+                Text(
+                    text = stringResource(R.string.quiz_score, correctCount, totalQuestions),
+                    style = MaterialTheme.typography.titleLarge,
+                )
+                Text(
+                    text = stringResource(R.string.quiz_expected_xp, xp),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = BrandGreenLight,
+                )
                 Text(
                     text = stringResource(R.string.posquiz_local_note),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+
                 Spacer(Modifier.height(4.dp))
-                Button(onClick = onRestartClick, modifier = Modifier.fillMaxWidth()) {
+
+                Button(
+                    onClick = onRestartClick,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
                     Text(stringResource(R.string.quiz_try_again))
                 }
-                OutlinedButton(onClick = onBackClick, modifier = Modifier.fillMaxWidth()) {
+
+                OutlinedButton(
+                    onClick = onBackClick,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
                     Text(stringResource(R.string.quiz_back_to_missions))
                 }
             }
@@ -267,7 +338,10 @@ private fun EmptyQuizState(
     onMoveToDictionary: () -> Unit,
 ) {
     Box(
-        modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(padding)
+            .padding(16.dp),
         contentAlignment = Alignment.Center,
     ) {
         Card(
@@ -276,7 +350,10 @@ private fun EmptyQuizState(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             border = BorderStroke(1.dp, DarkOutline),
         ) {
-            Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(
+                modifier = Modifier.padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
                 if (emptyReason == PosQuizEmptyReason.NO_WORDS) {
                     Surface(
                         color = BrandGreenLight.copy(alpha = 0.12f),
@@ -288,7 +365,11 @@ private fun EmptyQuizState(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(10.dp),
                         ) {
-                            Icon(imageVector = Icons.Filled.MenuBook, contentDescription = null, tint = BrandGreenLight)
+                            Icon(
+                                imageVector = Icons.Filled.MenuBook,
+                                contentDescription = null,
+                                tint = BrandGreenLight,
+                            )
                             Text(
                                 text = stringResource(R.string.quiz_add_words_hint),
                                 style = MaterialTheme.typography.bodyMedium,
@@ -297,18 +378,45 @@ private fun EmptyQuizState(
                         }
                     }
                 }
-                Text(text = stringResource(R.string.posquiz_cannot_start), style = MaterialTheme.typography.titleLarge)
-                Text(text = message, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+
+                Text(
+                    text = stringResource(R.string.posquiz_cannot_start),
+                    style = MaterialTheme.typography.titleLarge,
+                )
+                Text(
+                    text = message,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+
                 if (emptyReason == PosQuizEmptyReason.NO_WORDS) {
-                    Button(onClick = onMoveToDictionary, modifier = Modifier.fillMaxWidth()) {
+                    Button(
+                        onClick = onMoveToDictionary,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
                         Text(stringResource(R.string.quiz_go_to_dictionary))
                     }
                 }
-                OutlinedButton(onClick = onBackClick, modifier = Modifier.fillMaxWidth()) {
+
+                OutlinedButton(
+                    onClick = onBackClick,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
                     Text(stringResource(R.string.quiz_back_to_missions))
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun localizedPosLabel(pos: String): String {
+    return when (pos) {
+        "명사" -> stringResource(R.string.pos_noun)
+        "동사" -> stringResource(R.string.pos_verb)
+        "형용사" -> stringResource(R.string.pos_adjective)
+        "부사" -> stringResource(R.string.pos_adverb)
+        else -> pos
     }
 }
 

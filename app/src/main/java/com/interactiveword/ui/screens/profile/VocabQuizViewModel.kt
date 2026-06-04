@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
+import java.util.Locale
 import kotlin.math.min
 import kotlin.random.Random
 
@@ -147,6 +148,7 @@ class VocabQuizViewModel(
         val correctCount = _uiState.value.correctCount
         val total = _uiState.value.totalQuestions
         if (total == 0) return 0
+
         val baseXp = correctCount * 10
         val bonusXp = if (total >= 3 && correctCount == total) 10 else 0
         return baseXp + bonusXp
@@ -155,8 +157,10 @@ class VocabQuizViewModel(
     private fun loadQuestions() {
         viewModelScope.launch {
             _uiState.value = VocabQuizUiState(isLoading = true)
+
             try {
                 val words = wordRepo.getMyWords()
+
                 if (words.isEmpty()) {
                     _uiState.value = VocabQuizUiState(
                         isLoading = false,
@@ -167,6 +171,7 @@ class VocabQuizViewModel(
                 }
 
                 val questions = buildQuestions(words)
+
                 _uiState.value = if (questions.isEmpty()) {
                     VocabQuizUiState(
                         isLoading = false,
@@ -197,9 +202,12 @@ class VocabQuizViewModel(
     }
 
     private fun buildQuestions(words: List<WordCard>): List<VocabQuizQuestion> {
+        val language = currentLanguage()
+
         val candidates = words.mapNotNull { card ->
-            val definition = card.definition?.trim().orEmpty()
+            val definition = localizedDefinition(card, language)
             val normalizedPos = normalizePos(card.pos)
+
             if (definition.isBlank() || normalizedPos == null) return@mapNotNull null
 
             VocabCandidate(
@@ -213,12 +221,19 @@ class VocabQuizViewModel(
         return candidates
             .shuffled()
             .take(min(VOCAB_QUIZ_LIMIT, candidates.size))
-            .map { candidate -> buildQuestion(candidate, candidates) }
+            .map { candidate ->
+                buildQuestion(
+                    candidate = candidate,
+                    candidates = candidates,
+                    language = language,
+                )
+            }
     }
 
     private fun buildQuestion(
         candidate: VocabCandidate,
         candidates: List<VocabCandidate>,
+        language: String,
     ): VocabQuizQuestion {
         return if (Random.nextBoolean()) {
             VocabQuizQuestion(
@@ -227,7 +242,10 @@ class VocabQuizViewModel(
                 prompt = candidate.definition,
                 correctAnswer = candidate.word,
                 correctPos = candidate.pos,
-                options = buildWordOptions(correct = candidate, candidates = candidates),
+                options = buildWordOptions(
+                    correct = candidate,
+                    candidates = candidates,
+                ),
             )
         } else {
             VocabQuizQuestion(
@@ -236,7 +254,11 @@ class VocabQuizViewModel(
                 prompt = candidate.word,
                 correctAnswer = candidate.definition,
                 correctPos = candidate.pos,
-                options = buildDefinitionOptions(correct = candidate, candidates = candidates),
+                options = buildDefinitionOptions(
+                    correct = candidate,
+                    candidates = candidates,
+                    language = language,
+                ),
             )
         }
     }
@@ -276,6 +298,7 @@ class VocabQuizViewModel(
     private fun buildDefinitionOptions(
         correct: VocabCandidate,
         candidates: List<VocabCandidate>,
+        language: String,
     ): List<String> {
         val samePosDefinitions = candidates
             .filter { it.word != correct.word && it.pos == correct.pos }
@@ -289,10 +312,14 @@ class VocabQuizViewModel(
             .distinct()
             .shuffled()
 
-        val fallbackDefinitions = (fallbackDefinitionPool[correct.pos].orEmpty() + fallbackDefinitionPool.values.flatten())
-            .filter { it != correct.definition }
-            .distinct()
-            .shuffled()
+        val fallbackDefinitions = if (language == "ko") {
+            (fallbackDefinitionPool[correct.pos].orEmpty() + fallbackDefinitionPool.values.flatten())
+                .filter { it != correct.definition }
+                .distinct()
+                .shuffled()
+        } else {
+            emptyList()
+        }
 
         val wrongOptions = buildList {
             addDistinctItems(this, samePosDefinitions, 3)
@@ -303,6 +330,33 @@ class VocabQuizViewModel(
         return (wrongOptions + correct.definition)
             .distinct()
             .shuffled()
+    }
+
+    private fun localizedDefinition(card: WordCard, language: String): String {
+        return when (language) {
+            "ru" -> {
+                card.definitionTranslated?.trim()
+                    ?: card.definitionEnglish?.trim()
+                    ?: card.definition?.trim()
+                    ?: ""
+            }
+            "en" -> {
+                card.definitionEnglish?.trim()
+                    ?: card.definitionTranslated?.trim()
+                    ?: card.definition?.trim()
+                    ?: ""
+            }
+            else -> {
+                card.definition?.trim()
+                    ?: card.definitionTranslated?.trim()
+                    ?: card.definitionEnglish?.trim()
+                    ?: ""
+            }
+        }
+    }
+
+    private fun currentLanguage(): String {
+        return Locale.getDefault().language.lowercase(Locale.ROOT)
     }
 
     private fun addDistinctItems(
@@ -321,6 +375,7 @@ class VocabQuizViewModel(
     private fun normalizePos(raw: String?): String? {
         val pos = raw?.trim().orEmpty()
         if (pos.isBlank()) return null
+
         return when {
             "명사" in pos -> "명사"
             "동사" in pos -> "동사"

@@ -251,10 +251,10 @@ private fun BottomNavBar(
                             navController.popBackStack(Screen.Home.route, inclusive = false)
                         } else {
                             navController.navigate(item.screen.route) {
-                                popUpTo(Screen.Home.route) { saveState = true }
+                                popUpTo(Screen.Home.route) { saveState = item.screen != Screen.Dictionary }
                                 launchSingleTop = true
-                                restoreState    = true
-                            }
+                                restoreState = item.screen != Screen.Dictionary
+                           }
                         }
                     }
                 },

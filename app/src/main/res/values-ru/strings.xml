@@ -187,6 +187,10 @@
     <string name="posquiz_type_label">Угадать часть речи</string>
     <string name="posquiz_local_note">Счет</string>
     <string name="posquiz_cannot_start">Не удаётся начать тест частей речи</string>
+    <string name="pos_noun">Существительное</string>
+    <string name="pos_verb">Глагол</string>
+    <string name="pos_adjective">Прилагательное</string>
+    <string name="pos_adverb">Наречие</string>
 
     <!-- Mission display names -->
     <string name="mission_daily_pronunciation">Ежедневное произношение</string>

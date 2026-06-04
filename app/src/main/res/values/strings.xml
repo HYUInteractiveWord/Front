@@ -179,6 +179,10 @@
     <string name="posquiz_type_label">품사 맞추기</string>
     <string name="posquiz_local_note">현재 단계에서는 품사 테스트 점수를 로컬로만 계산합니다.</string>
     <string name="posquiz_cannot_start">품사 테스트를 시작할 수 없어요</string>
+    <string name="pos_noun">명사</string>
+    <string name="pos_verb">동사</string>
+    <string name="pos_adjective">형용사</string>
+    <string name="pos_adverb">부사</string>
 
     <string name="mission_daily_pronunciation">일일 발음 연습</string>
     <string name="mission_daily_scan">단어 스캔</string>

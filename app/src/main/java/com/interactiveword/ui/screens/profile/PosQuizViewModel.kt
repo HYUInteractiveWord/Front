@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
+import java.util.Locale
 import kotlin.math.min
 
 private const val POS_QUIZ_LIMIT = 5
@@ -136,6 +137,7 @@ class PosQuizViewModel(
         val correctCount = _uiState.value.correctCount
         val total = _uiState.value.totalQuestions
         if (total == 0) return 0
+
         val baseXp = correctCount * 10
         val bonusXp = if (total >= 3 && correctCount == total) 10 else 0
         return baseXp + bonusXp
@@ -144,8 +146,10 @@ class PosQuizViewModel(
     private fun loadQuestions() {
         viewModelScope.launch {
             _uiState.value = PosQuizUiState(isLoading = true)
+
             try {
                 val words = wordRepo.getMyWords()
+
                 if (words.isEmpty()) {
                     _uiState.value = PosQuizUiState(
                         isLoading = false,
@@ -154,7 +158,9 @@ class PosQuizViewModel(
                     )
                     return@launch
                 }
+
                 val questions = buildQuestions(words)
+
                 _uiState.value = if (questions.isEmpty()) {
                     PosQuizUiState(
                         isLoading = false,
@@ -185,26 +191,58 @@ class PosQuizViewModel(
     }
 
     private fun buildQuestions(words: List<WordCard>): List<PosQuizQuestion> {
-        return words
-            .mapNotNull { card ->
-                val definition = card.definition?.trim().orEmpty()
-                val normalizedPos = normalizePos(card.pos)
-                if (definition.isBlank() || normalizedPos == null) return@mapNotNull null
+        val language = currentLanguage()
 
-                PosQuizQuestion(
-                    wordId = card.id,
-                    word = card.koreanWord,
-                    definition = definition,
-                    correctPos = normalizedPos,
-                )
-            }
+        val candidates = words.mapNotNull { card ->
+            val definition = localizedDefinition(card, language)
+            val normalizedPos = normalizePos(card.pos)
+
+            if (definition.isBlank() || normalizedPos == null) return@mapNotNull null
+
+            PosQuizQuestion(
+                wordId = card.id,
+                word = card.koreanWord,
+                definition = definition,
+                correctPos = normalizedPos,
+            )
+        }
+
+        return candidates
             .shuffled()
-            .take(min(POS_QUIZ_LIMIT, words.size))
+            .take(min(POS_QUIZ_LIMIT, candidates.size))
+    }
+
+    private fun localizedDefinition(card: WordCard, language: String): String {
+        return when (language) {
+            "ru" -> {
+                card.definitionTranslated?.trim()
+                    ?: card.definitionEnglish?.trim()
+                    ?: card.definition?.trim()
+                    ?: ""
+            }
+            "en" -> {
+                card.definitionEnglish?.trim()
+                    ?: card.definitionTranslated?.trim()
+                    ?: card.definition?.trim()
+                    ?: ""
+            }
+            else -> {
+                card.definition?.trim()
+                    ?: card.definitionTranslated?.trim()
+                    ?: card.definitionEnglish?.trim()
+                    ?: ""
+            }
+        }
+    }
+
+    private fun currentLanguage(): String {
+        return Locale.getDefault().language.lowercase(Locale.ROOT)
     }
 
     private fun normalizePos(raw: String?): String? {
         val pos = raw?.trim().orEmpty()
         if (pos.isBlank()) return null
+
         return when {
             "명사" in pos -> "명사"
             "동사" in pos -> "동사"
