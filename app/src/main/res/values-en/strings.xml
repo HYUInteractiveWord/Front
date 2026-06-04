@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">말해봐</string>
+    <string name="app_name">나만의 단어장</string>
     <string name="notification_channel_capture">Audio Capture</string>
     <string name="notification_title_capture">말해봐 - Waiting for Capture</string>
     <string name="notification_text_capture">Tap to capture Korean words</string>
