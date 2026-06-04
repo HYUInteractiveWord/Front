@@ -1,5 +1,6 @@
 package com.interactiveword.ui.screens.profile
 
+import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -41,6 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -113,11 +116,13 @@ fun PosQuizScreen(
                     definition = question.definition,
                     correctPos = question.correctPos,
                     audioPath = question.wordAudioPath,
+                    defAudioPath = question.definitionAudioPath,
                     selectedAnswer = uiState.selectedAnswer,
                     isAnswerChecked = uiState.isAnswerChecked,
                     onAnswerClick = vm::selectAnswer,
                     onNextClick = vm::goToNextQuestion,
                     onPlayAudio = vm::playTts,
+                    onSpeakText = vm::speakText,
                 )
             }
         }
@@ -133,11 +138,13 @@ private fun QuizQuestionState(
     definition: String,
     correctPos: String,
     audioPath: String?,
+    defAudioPath: String?,
     selectedAnswer: String?,
     isAnswerChecked: Boolean,
     onAnswerClick: (String) -> Unit,
     onNextClick: () -> Unit,
     onPlayAudio: (String?) -> Unit,
+    onSpeakText: (Context, String) -> Unit,
 ) {
     val progress = if (totalQuestions > 0) {
         (currentIndex + 1) / totalQuestions.toFloat()
@@ -146,6 +153,7 @@ private fun QuizQuestionState(
     }
 
     var pendingAnswer by remember(currentIndex) { mutableStateOf<String?>(null) }
+    val context = LocalContext.current
 
     LazyColumn(
         modifier = Modifier
@@ -219,11 +227,36 @@ private fun QuizQuestionState(
                         }
                     }
 
-                    Text(
-                        text = definition,
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        Text(
+                            text = definition,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.weight(1f),
+                        )
+
+                        IconButton(
+                            onClick = {
+                                if (!defAudioPath.isNullOrBlank()) {
+                                    onPlayAudio(defAudioPath)
+                                } else {
+                                    onSpeakText(context, definition)
+                                }
+                            },
+                            modifier = Modifier.size(32.dp),
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.VolumeUp,
+                                contentDescription = null,
+                                tint = BrandGreenLight.copy(alpha = 0.7f),
+                                modifier = Modifier.size(20.dp),
+                            )
+                        }
+                    }
                 }
             }
         }

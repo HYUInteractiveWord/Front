@@ -258,8 +258,4 @@
     <string name="wordcard_english_meaning_format">Значение: %1$s</string>
     <string name="wordcard_point_format">%1$d / 100 pt</string>
     <string name="action_confirm">Подтвердить</string>
-    <string name="pos_noun">Существительное</string>
-    <string name="pos_verb">Глагол</string>
-    <string name="pos_adjective">Прилагательное</string>
-    <string name="pos_adverb">Наречие</string>
 </resources>

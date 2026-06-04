@@ -1,6 +1,8 @@
 package com.interactiveword.ui.screens.profile
 
+import android.content.Context
 import android.media.MediaPlayer
+import android.speech.tts.TextToSpeech
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.interactiveword.data.api.RetrofitClient
@@ -31,6 +33,7 @@ data class PosQuizQuestion(
     val definition: String,
     val correctPos: String,
     val wordAudioPath: String?,
+    val definitionAudioPath: String?,
 )
 
 data class PosQuizUiState(
@@ -65,6 +68,7 @@ class PosQuizViewModel(
     val uiState: StateFlow<PosQuizUiState> = _uiState.asStateFlow()
 
     private var mediaPlayer: MediaPlayer? = null
+    private var tts: TextToSpeech? = null
 
     init {
         loadQuestions()
@@ -179,9 +183,28 @@ class PosQuizViewModel(
         }
     }
 
+    fun speakText(context: Context, text: String) {
+        if (text.isBlank()) return
+
+        if (tts == null) {
+            tts = TextToSpeech(context) { status ->
+                if (status == TextToSpeech.SUCCESS) {
+                    tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, null)
+                }
+            }
+        } else {
+            tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, null)
+        }
+    }
+
     override fun onCleared() {
         mediaPlayer?.release()
         mediaPlayer = null
+
+        tts?.stop()
+        tts?.shutdown()
+        tts = null
+
         super.onCleared()
     }
 
@@ -247,6 +270,7 @@ class PosQuizViewModel(
                 definition = definition,
                 correctPos = normalizedPos,
                 wordAudioPath = card.ttsAudioPath,
+                definitionAudioPath = card.defTransAudioPath,
             )
         }
     }
