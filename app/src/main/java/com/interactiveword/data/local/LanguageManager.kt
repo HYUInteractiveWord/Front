@@ -3,16 +3,20 @@ package com.interactiveword.data.local
 import android.content.Context
 import android.content.res.Configuration
 import java.util.Locale
+import androidx.core.content.edit
 
 object LanguageManager {
     private const val PREFS_NAME = "language_prefs"
     private const val KEY_LANGUAGE = "language"
 
     fun saveLanguage(context: Context, language: String) {
+        val current = getSavedLanguage(context)
+        if (current == language) return
+
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .edit()
-            .putString(KEY_LANGUAGE, language)
-            .apply()
+            .edit {
+                putString(KEY_LANGUAGE, language)
+            }
     }
 
     fun getSavedLanguage(context: Context): String =

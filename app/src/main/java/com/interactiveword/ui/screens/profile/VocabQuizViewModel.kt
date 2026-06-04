@@ -1,7 +1,9 @@
 package com.interactiveword.ui.screens.profile
 
+import android.media.MediaPlayer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.interactiveword.data.api.RetrofitClient
 import com.interactiveword.data.model.WordCard
 import com.interactiveword.data.model.WordQuizItemResultRequest
 import com.interactiveword.data.repository.WordRepository
@@ -62,7 +64,10 @@ private data class VocabCandidate(
     val wordId: Int,
     val word: String,
     val definition: String,
+    val displayDefinition: String,
     val pos: String,
+    val wordAudioPath: String?,
+    val defAudioPath: String?,
 )
 
 class VocabQuizViewModel(
@@ -71,6 +76,9 @@ class VocabQuizViewModel(
 
     private val _uiState = MutableStateFlow(VocabQuizUiState())
     val uiState: StateFlow<VocabQuizUiState> = _uiState.asStateFlow()
+
+    private var mediaPlayer: MediaPlayer? = null
+    private var currentCandidatesCache: List<VocabCandidate>? = null
 
     init {
         loadQuestions()
@@ -82,6 +90,7 @@ class VocabQuizViewModel(
         if (state.isAnswerChecked) return
 
         val isCorrect = answer == currentQuestion.correctAnswer
+
         _uiState.value = state.copy(
             selectedAnswer = answer,
             isAnswerChecked = true,
@@ -102,6 +111,7 @@ class VocabQuizViewModel(
             selectedAnswer = null,
             isAnswerChecked = false,
         )
+
         _uiState.value = nextState
 
         if (nextState.isFinished) {
@@ -151,7 +161,54 @@ class VocabQuizViewModel(
 
         val baseXp = correctCount * 10
         val bonusXp = if (total >= 3 && correctCount == total) 10 else 0
+
         return baseXp + bonusXp
+    }
+
+    fun playTts(text: String) {
+        val candidates = currentCandidatesCache ?: return
+
+        val matchedCandidate = candidates.find {
+            it.word == text || it.displayDefinition == text || it.definition == text
+        } ?: return
+
+        val audioPath = if (text == matchedCandidate.word) {
+            matchedCandidate.wordAudioPath
+        } else {
+            matchedCandidate.defAudioPath
+        }
+
+        if (audioPath.isNullOrBlank()) return
+
+        val url = RetrofitClient.resolveStaticUrl(audioPath) ?: return
+
+        try {
+            mediaPlayer?.release()
+            mediaPlayer = MediaPlayer().apply {
+                setAudioAttributes(
+                    android.media.AudioAttributes.Builder()
+                        .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SPEECH)
+                        .setUsage(android.media.AudioAttributes.USAGE_MEDIA)
+                        .build()
+                )
+                setDataSource(url)
+                setOnPreparedListener { it.start() }
+                setOnErrorListener { _, _, _ -> true }
+                setOnCompletionListener {
+                    it.release()
+                    mediaPlayer = null
+                }
+                prepareAsync()
+            }
+        } catch (e: Exception) {
+            // TTS 재생 실패는 퀴즈 진행을 막지 않는다.
+        }
+    }
+
+    override fun onCleared() {
+        mediaPlayer?.release()
+        mediaPlayer = null
+        super.onCleared()
     }
 
     private fun loadQuestions() {
@@ -160,30 +217,27 @@ class VocabQuizViewModel(
 
             try {
                 val words = wordRepo.getMyWords()
+                val candidates = buildCandidates(words)
 
-                if (words.isEmpty()) {
+                if (candidates.size < 4) {
                     _uiState.value = VocabQuizUiState(
                         isLoading = false,
-                        errorMessage = "단어장에 단어를 1회 이상 추가해주세요.",
-                        emptyReason = VocabQuizEmptyReason.NO_WORDS,
+                        errorMessage = "단어 암기 테스트를 시작하려면\n최소 4개 이상의 단어가 필요해요.\n(현재 ${candidates.size}개)",
+                        emptyReason = if (words.isEmpty()) {
+                            VocabQuizEmptyReason.NO_WORDS
+                        } else {
+                            VocabQuizEmptyReason.NO_DEFINITION_DATA
+                        },
                     )
                     return@launch
                 }
 
-                val questions = buildQuestions(words)
+                currentCandidatesCache = candidates
 
-                _uiState.value = if (questions.isEmpty()) {
-                    VocabQuizUiState(
-                        isLoading = false,
-                        errorMessage = "뜻 정보가 있는 저장 단어가 아직 없어요.",
-                        emptyReason = VocabQuizEmptyReason.NO_DEFINITION_DATA,
-                    )
-                } else {
-                    VocabQuizUiState(
-                        isLoading = false,
-                        questions = questions,
-                    )
-                }
+                _uiState.value = VocabQuizUiState(
+                    isLoading = false,
+                    questions = buildQuestions(candidates),
+                )
             } catch (e: Throwable) {
                 _uiState.value = VocabQuizUiState(
                     isLoading = false,
@@ -192,6 +246,7 @@ class VocabQuizViewModel(
                             401 -> "로그인 정보가 만료되어 단어를 불러오지 못했습니다. 다시 로그인해주세요."
                             else -> "서버 응답 오류(${e.code()})로 단어 암기 테스트를 시작할 수 없어요."
                         }
+
                         is IOException -> "서버에 연결하지 못했습니다. 네트워크 또는 서버 상태를 확인해주세요."
                         else -> "단어 암기 테스트 문제를 불러오지 못했습니다."
                     },
@@ -201,23 +256,33 @@ class VocabQuizViewModel(
         }
     }
 
-    private fun buildQuestions(words: List<WordCard>): List<VocabQuizQuestion> {
+    private fun buildCandidates(words: List<WordCard>): List<VocabCandidate> {
         val language = currentLanguage()
 
-        val candidates = words.mapNotNull { card ->
-            val definition = localizedDefinition(card, language)
+        return words.mapNotNull { card ->
+            val definition = card.definition.clean()
+            val displayDefinition = localizedDefinition(card, language)
             val normalizedPos = normalizePos(card.pos)
 
-            if (definition.isBlank() || normalizedPos == null) return@mapNotNull null
+            if (definition.isBlank() || displayDefinition.isBlank() || normalizedPos == null) {
+                return@mapNotNull null
+            }
 
             VocabCandidate(
                 wordId = card.id,
                 word = card.koreanWord.trim(),
                 definition = definition,
+                displayDefinition = displayDefinition,
                 pos = normalizedPos,
+                wordAudioPath = card.ttsAudioPath,
+                defAudioPath = card.defTransAudioPath,
             )
         }
+    }
 
+    private fun buildQuestions(
+        candidates: List<VocabCandidate>,
+    ): List<VocabQuizQuestion> {
         return candidates
             .shuffled()
             .take(min(VOCAB_QUIZ_LIMIT, candidates.size))
@@ -225,7 +290,6 @@ class VocabQuizViewModel(
                 buildQuestion(
                     candidate = candidate,
                     candidates = candidates,
-                    language = language,
                 )
             }
     }
@@ -233,13 +297,12 @@ class VocabQuizViewModel(
     private fun buildQuestion(
         candidate: VocabCandidate,
         candidates: List<VocabCandidate>,
-        language: String,
     ): VocabQuizQuestion {
         return if (Random.nextBoolean()) {
             VocabQuizQuestion(
                 wordId = candidate.wordId,
                 type = VocabQuizType.DEFINITION_TO_WORD,
-                prompt = candidate.definition,
+                prompt = candidate.displayDefinition,
                 correctAnswer = candidate.word,
                 correctPos = candidate.pos,
                 options = buildWordOptions(
@@ -252,12 +315,11 @@ class VocabQuizViewModel(
                 wordId = candidate.wordId,
                 type = VocabQuizType.WORD_TO_DEFINITION,
                 prompt = candidate.word,
-                correctAnswer = candidate.definition,
+                correctAnswer = candidate.displayDefinition,
                 correctPos = candidate.pos,
                 options = buildDefinitionOptions(
                     correct = candidate,
                     candidates = candidates,
-                    language = language,
                 ),
             )
         }
@@ -273,22 +335,13 @@ class VocabQuizViewModel(
             .distinct()
             .shuffled()
 
-        val otherSavedWords = candidates
+        val otherWords = candidates
             .filter { it.word != correct.word && it.pos != correct.pos }
             .map { it.word }
             .distinct()
             .shuffled()
 
-        val fallbackWords = (fallbackWordPool[correct.pos].orEmpty() + fallbackWordPool.values.flatten())
-            .filter { it != correct.word }
-            .distinct()
-            .shuffled()
-
-        val wrongOptions = buildList {
-            addDistinctItems(this, samePosWords, 3)
-            addDistinctItems(this, otherSavedWords, 3)
-            addDistinctItems(this, fallbackWords, 3)
-        }.take(3)
+        val wrongOptions = (samePosWords + otherWords).take(3)
 
         return (wrongOptions + correct.word)
             .distinct()
@@ -298,78 +351,50 @@ class VocabQuizViewModel(
     private fun buildDefinitionOptions(
         correct: VocabCandidate,
         candidates: List<VocabCandidate>,
-        language: String,
     ): List<String> {
         val samePosDefinitions = candidates
             .filter { it.word != correct.word && it.pos == correct.pos }
-            .map { it.definition }
+            .map { it.displayDefinition }
             .distinct()
             .shuffled()
 
-        val otherSavedDefinitions = candidates
+        val otherDefinitions = candidates
             .filter { it.word != correct.word && it.pos != correct.pos }
-            .map { it.definition }
+            .map { it.displayDefinition }
             .distinct()
             .shuffled()
 
-        val fallbackDefinitions = if (language == "ko") {
-            (fallbackDefinitionPool[correct.pos].orEmpty() + fallbackDefinitionPool.values.flatten())
-                .filter { it != correct.definition }
-                .distinct()
-                .shuffled()
-        } else {
-            emptyList()
-        }
+        val wrongOptions = (samePosDefinitions + otherDefinitions).take(3)
 
-        val wrongOptions = buildList {
-            addDistinctItems(this, samePosDefinitions, 3)
-            addDistinctItems(this, otherSavedDefinitions, 3)
-            addDistinctItems(this, fallbackDefinitions, 3)
-        }.take(3)
-
-        return (wrongOptions + correct.definition)
+        return (wrongOptions + correct.displayDefinition)
             .distinct()
             .shuffled()
     }
 
     private fun localizedDefinition(card: WordCard, language: String): String {
         return when (language) {
-            "ru" -> {
-                card.definitionTranslated?.trim()
-                    ?: card.definitionEnglish?.trim()
-                    ?: card.definition?.trim()
-                    ?: ""
-            }
-            "en" -> {
-                card.definitionEnglish?.trim()
-                    ?: card.definitionTranslated?.trim()
-                    ?: card.definition?.trim()
-                    ?: ""
-            }
-            else -> {
-                card.definition?.trim()
-                    ?: card.definitionTranslated?.trim()
-                    ?: card.definitionEnglish?.trim()
-                    ?: ""
-            }
+            "ru" -> listOf(
+                card.definitionTranslated,
+                card.definitionEnglish,
+                card.definition,
+            ).firstClean()
+
+            "en" -> listOf(
+                card.definitionEnglish,
+                card.definitionTranslated,
+                card.definition,
+            ).firstClean()
+
+            else -> listOf(
+                card.definition,
+                card.definitionTranslated,
+                card.definitionEnglish,
+            ).firstClean()
         }
     }
 
     private fun currentLanguage(): String {
         return Locale.getDefault().language.lowercase(Locale.ROOT)
-    }
-
-    private fun addDistinctItems(
-        target: MutableList<String>,
-        source: List<String>,
-        limit: Int,
-    ) {
-        source.forEach { item ->
-            if (target.size >= limit) return
-            if (item !in target) {
-                target += item
-            }
-        }
     }
 
     private fun normalizePos(raw: String?): String? {
@@ -385,39 +410,11 @@ class VocabQuizViewModel(
         }
     }
 
-    private companion object {
-        val fallbackWordPool = mapOf(
-            "명사" to listOf("연필", "강아지", "도서관", "바다", "시계"),
-            "동사" to listOf("걷다", "웃다", "먹다", "배우다", "기다리다"),
-            "형용사" to listOf("조용하다", "따뜻하다", "어렵다", "행복하다", "부드럽다"),
-            "부사" to listOf("빠르게", "갑자기", "매우", "조용히", "자주"),
-        )
+    private fun String?.clean(): String {
+        return this?.trim().orEmpty()
+    }
 
-        val fallbackDefinitionPool = mapOf(
-            "명사" to listOf(
-                "글씨를 쓰거나 그림을 그릴 때 사용하는 도구.",
-                "사람이 책을 읽거나 공부하는 공간.",
-                "사람과 함께 사는 친숙한 동물.",
-                "시간을 확인하는 데 사용하는 물건.",
-            ),
-            "동사" to listOf(
-                "발을 번갈아 옮기며 앞으로 움직이다.",
-                "소리를 내며 즐거움을 나타내다.",
-                "음식을 입으로 넣어 삼키다.",
-                "새로운 지식이나 기술을 익히다.",
-            ),
-            "형용사" to listOf(
-                "소리가 거의 나지 않고 고요하다.",
-                "온도가 높아 포근한 느낌이 있다.",
-                "이해하거나 해내기 쉽지 않다.",
-                "마음이 즐겁고 만족스럽다.",
-            ),
-            "부사" to listOf(
-                "속도가 높게 움직이는 모양.",
-                "예상하지 못한 순간에 바로.",
-                "정도가 아주 큰 상태로.",
-                "소리를 거의 내지 않고 조용하게.",
-            ),
-        )
+    private fun List<String?>.firstClean(): String {
+        return firstOrNull { !it.isNullOrBlank() }?.trim().orEmpty()
     }
 }

@@ -253,4 +253,10 @@
     <string name="wordcard_translation_listen">Listen to translation</string>
     <string name="wordcard_english_meaning_format">Meaning: %1$s</string>
     <string name="wordcard_point_format">%1$d / 100 pt</string>
+    <string name="action_confirm">Confirm</string>
+    <string name="pos_noun">Noun</string>
+    <string name="pos_verb">Verb</string>
+    <string name="pos_adjective">Adjective</string>
+    <string name="pos_adverb">Adverb</string>
+
 </resources>

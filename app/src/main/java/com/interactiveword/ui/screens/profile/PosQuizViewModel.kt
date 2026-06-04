@@ -1,7 +1,9 @@
 package com.interactiveword.ui.screens.profile
 
+import android.media.MediaPlayer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.interactiveword.data.api.RetrofitClient
 import com.interactiveword.data.model.WordCard
 import com.interactiveword.data.model.WordQuizItemResultRequest
 import com.interactiveword.data.repository.WordRepository
@@ -28,6 +30,7 @@ data class PosQuizQuestion(
     val word: String,
     val definition: String,
     val correctPos: String,
+    val wordAudioPath: String?,
 )
 
 data class PosQuizUiState(
@@ -61,6 +64,8 @@ class PosQuizViewModel(
     private val _uiState = MutableStateFlow(PosQuizUiState())
     val uiState: StateFlow<PosQuizUiState> = _uiState.asStateFlow()
 
+    private var mediaPlayer: MediaPlayer? = null
+
     init {
         loadQuestions()
     }
@@ -71,6 +76,7 @@ class PosQuizViewModel(
         if (state.isAnswerChecked) return
 
         val isCorrect = answer == currentQuestion.correctPos
+
         _uiState.value = state.copy(
             selectedAnswer = answer,
             isAnswerChecked = true,
@@ -91,6 +97,7 @@ class PosQuizViewModel(
             selectedAnswer = null,
             isAnswerChecked = false,
         )
+
         _uiState.value = nextState
 
         if (nextState.isFinished) {
@@ -140,7 +147,42 @@ class PosQuizViewModel(
 
         val baseXp = correctCount * 10
         val bonusXp = if (total >= 3 && correctCount == total) 10 else 0
+
         return baseXp + bonusXp
+    }
+
+    fun playTts(audioPath: String?) {
+        if (audioPath.isNullOrBlank()) return
+
+        val url = RetrofitClient.resolveStaticUrl(audioPath) ?: return
+
+        try {
+            mediaPlayer?.release()
+            mediaPlayer = MediaPlayer().apply {
+                setAudioAttributes(
+                    android.media.AudioAttributes.Builder()
+                        .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SPEECH)
+                        .setUsage(android.media.AudioAttributes.USAGE_MEDIA)
+                        .build()
+                )
+                setDataSource(url)
+                setOnPreparedListener { it.start() }
+                setOnErrorListener { _, _, _ -> true }
+                setOnCompletionListener {
+                    it.release()
+                    mediaPlayer = null
+                }
+                prepareAsync()
+            }
+        } catch (e: Exception) {
+            // TTS 재생 실패는 퀴즈 진행을 막지 않는다.
+        }
+    }
+
+    override fun onCleared() {
+        mediaPlayer?.release()
+        mediaPlayer = null
+        super.onCleared()
     }
 
     private fun loadQuestions() {
@@ -149,30 +191,27 @@ class PosQuizViewModel(
 
             try {
                 val words = wordRepo.getMyWords()
+                val validQuestions = buildQuestions(words)
 
-                if (words.isEmpty()) {
+                if (validQuestions.size < 4) {
                     _uiState.value = PosQuizUiState(
                         isLoading = false,
-                        errorMessage = "단어장에 단어를 1회 이상 추가해주세요.",
-                        emptyReason = PosQuizEmptyReason.NO_WORDS,
+                        errorMessage = "품사 퀴즈를 시작하려면\n최소 4개 이상의 단어가 필요해요.\n(현재 ${validQuestions.size}개)",
+                        emptyReason = if (words.isEmpty()) {
+                            PosQuizEmptyReason.NO_WORDS
+                        } else {
+                            PosQuizEmptyReason.NO_POS_DATA
+                        },
                     )
                     return@launch
                 }
 
-                val questions = buildQuestions(words)
-
-                _uiState.value = if (questions.isEmpty()) {
-                    PosQuizUiState(
-                        isLoading = false,
-                        errorMessage = "품사 정보가 있는 저장 단어가 아직 없어요.",
-                        emptyReason = PosQuizEmptyReason.NO_POS_DATA,
-                    )
-                } else {
-                    PosQuizUiState(
-                        isLoading = false,
-                        questions = questions,
-                    )
-                }
+                _uiState.value = PosQuizUiState(
+                    isLoading = false,
+                    questions = validQuestions
+                        .shuffled()
+                        .take(min(POS_QUIZ_LIMIT, validQuestions.size)),
+                )
             } catch (e: Throwable) {
                 _uiState.value = PosQuizUiState(
                     isLoading = false,
@@ -181,6 +220,7 @@ class PosQuizViewModel(
                             401 -> "로그인 정보가 만료되어 단어를 불러오지 못했습니다. 다시 로그인해주세요."
                             else -> "서버 응답 오류(${e.code()})로 품사 테스트를 시작할 수 없어요."
                         }
+
                         is IOException -> "서버에 연결하지 못했습니다. 네트워크 또는 서버 상태를 확인해주세요."
                         else -> "품사 테스트 문제를 불러오지 못했습니다."
                     },
@@ -193,45 +233,43 @@ class PosQuizViewModel(
     private fun buildQuestions(words: List<WordCard>): List<PosQuizQuestion> {
         val language = currentLanguage()
 
-        val candidates = words.mapNotNull { card ->
+        return words.mapNotNull { card ->
             val definition = localizedDefinition(card, language)
             val normalizedPos = normalizePos(card.pos)
 
-            if (definition.isBlank() || normalizedPos == null) return@mapNotNull null
+            if (definition.isBlank() || normalizedPos == null) {
+                return@mapNotNull null
+            }
 
             PosQuizQuestion(
                 wordId = card.id,
                 word = card.koreanWord,
                 definition = definition,
                 correctPos = normalizedPos,
+                wordAudioPath = card.ttsAudioPath,
             )
         }
-
-        return candidates
-            .shuffled()
-            .take(min(POS_QUIZ_LIMIT, candidates.size))
     }
 
     private fun localizedDefinition(card: WordCard, language: String): String {
         return when (language) {
-            "ru" -> {
-                card.definitionTranslated?.trim()
-                    ?: card.definitionEnglish?.trim()
-                    ?: card.definition?.trim()
-                    ?: ""
-            }
-            "en" -> {
-                card.definitionEnglish?.trim()
-                    ?: card.definitionTranslated?.trim()
-                    ?: card.definition?.trim()
-                    ?: ""
-            }
-            else -> {
-                card.definition?.trim()
-                    ?: card.definitionTranslated?.trim()
-                    ?: card.definitionEnglish?.trim()
-                    ?: ""
-            }
+            "ru" -> listOf(
+                card.definitionTranslated,
+                card.definitionEnglish,
+                card.definition,
+            ).firstClean()
+
+            "en" -> listOf(
+                card.definitionEnglish,
+                card.definitionTranslated,
+                card.definition,
+            ).firstClean()
+
+            else -> listOf(
+                card.definition,
+                card.definitionTranslated,
+                card.definitionEnglish,
+            ).firstClean()
         }
     }
 
@@ -250,5 +288,9 @@ class PosQuizViewModel(
             "부사" in pos -> "부사"
             else -> null
         }
+    }
+
+    private fun List<String?>.firstClean(): String {
+        return firstOrNull { !it.isNullOrBlank() }?.trim().orEmpty()
     }
 }

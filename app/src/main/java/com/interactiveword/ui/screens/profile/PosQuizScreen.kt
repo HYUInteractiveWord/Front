@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -22,6 +23,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -33,6 +35,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -107,10 +112,12 @@ fun PosQuizScreen(
                     word = question.word,
                     definition = question.definition,
                     correctPos = question.correctPos,
+                    audioPath = question.wordAudioPath,
                     selectedAnswer = uiState.selectedAnswer,
                     isAnswerChecked = uiState.isAnswerChecked,
                     onAnswerClick = vm::selectAnswer,
                     onNextClick = vm::goToNextQuestion,
+                    onPlayAudio = vm::playTts,
                 )
             }
         }
@@ -125,10 +132,12 @@ private fun QuizQuestionState(
     word: String,
     definition: String,
     correctPos: String,
+    audioPath: String?,
     selectedAnswer: String?,
     isAnswerChecked: Boolean,
     onAnswerClick: (String) -> Unit,
     onNextClick: () -> Unit,
+    onPlayAudio: (String?) -> Unit,
 ) {
     val progress = if (totalQuestions > 0) {
         (currentIndex + 1) / totalQuestions.toFloat()
@@ -136,7 +145,7 @@ private fun QuizQuestionState(
         0f
     }
 
-    val correctPosLabel = localizedPosLabel(correctPos)
+    var pendingAnswer by remember(currentIndex) { mutableStateOf<String?>(null) }
 
     LazyColumn(
         modifier = Modifier
@@ -181,17 +190,35 @@ private fun QuizQuestionState(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.large,
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                ),
                 border = BorderStroke(1.dp, DarkOutline),
             ) {
                 Column(
                     modifier = Modifier.padding(20.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                 ) {
-                    Text(
-                        text = word,
-                        style = MaterialTheme.typography.headlineMedium,
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        Text(
+                            text = word,
+                            style = MaterialTheme.typography.headlineMedium,
+                            modifier = Modifier.weight(1f),
+                        )
+
+                        IconButton(onClick = { onPlayAudio(audioPath) }) {
+                            Icon(
+                                imageVector = Icons.Filled.VolumeUp,
+                                contentDescription = null,
+                                tint = BrandGreenLight,
+                            )
+                        }
+                    }
+
                     Text(
                         text = definition,
                         style = MaterialTheme.typography.bodyLarge,
@@ -202,18 +229,20 @@ private fun QuizQuestionState(
         }
 
         items(PosQuizViewModel.options) { option ->
-            val optionLabel = localizedPosLabel(option)
-
             val colors = optionCardColors(
                 option = option,
                 correctPos = correctPos,
                 selectedAnswer = selectedAnswer,
+                pendingAnswer = pendingAnswer,
                 isAnswerChecked = isAnswerChecked,
             )
 
             OutlinedButton(
-                onClick = { onAnswerClick(option) },
-                enabled = !isAnswerChecked,
+                onClick = {
+                    if (!isAnswerChecked) {
+                        pendingAnswer = option
+                    }
+                },
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.large,
                 border = BorderStroke(1.dp, colors.border),
@@ -226,38 +255,61 @@ private fun QuizQuestionState(
                 contentPadding = PaddingValues(vertical = 16.dp, horizontal = 18.dp),
             ) {
                 Text(
-                    text = optionLabel,
+                    text = localizedPosLabel(option),
                     modifier = Modifier.fillMaxWidth(),
                     style = MaterialTheme.typography.titleMedium,
                 )
             }
         }
 
-        if (isAnswerChecked) {
-            item {
-                Text(
-                    text = if (selectedAnswer == correctPos) {
-                        stringResource(R.string.quiz_correct_label)
-                    } else {
-                        stringResource(R.string.quiz_wrong_label, correctPosLabel)
-                    },
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = if (selectedAnswer == correctPos) BrandGreenLight else ErrorRed,
-                )
-            }
-
-            item {
+        item {
+            if (!isAnswerChecked) {
                 Button(
-                    onClick = onNextClick,
-                    modifier = Modifier.fillMaxWidth(),
+                    onClick = { pendingAnswer?.let { onAnswerClick(it) } },
+                    enabled = pendingAnswer != null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = BrandGreenLight,
+                    ),
                 ) {
                     Text(
-                        if (currentIndex + 1 == totalQuestions) {
-                            stringResource(R.string.quiz_view_results)
-                        } else {
-                            stringResource(R.string.quiz_next_question)
-                        }
+                        text = stringResource(R.string.action_confirm),
+                        style = MaterialTheme.typography.titleMedium,
                     )
+                }
+            } else {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        text = if (selectedAnswer == correctPos) {
+                            stringResource(R.string.quiz_correct_label)
+                        } else {
+                            stringResource(
+                                R.string.quiz_wrong_label,
+                                localizedPosLabel(correctPos),
+                            )
+                        },
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = if (selectedAnswer == correctPos) {
+                            BrandGreenLight
+                        } else {
+                            ErrorRed
+                        },
+                    )
+
+                    Button(
+                        onClick = onNextClick,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text(
+                            if (currentIndex + 1 == totalQuestions) {
+                                stringResource(R.string.quiz_view_results)
+                            } else {
+                                stringResource(R.string.quiz_next_question)
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -283,7 +335,9 @@ private fun QuizResultState(
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.large,
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+            ),
             border = BorderStroke(1.dp, DarkOutline),
         ) {
             Column(
@@ -295,7 +349,11 @@ private fun QuizResultState(
                     style = MaterialTheme.typography.headlineSmall,
                 )
                 Text(
-                    text = stringResource(R.string.quiz_score, correctCount, totalQuestions),
+                    text = stringResource(
+                        R.string.quiz_score,
+                        correctCount,
+                        totalQuestions,
+                    ),
                     style = MaterialTheme.typography.titleLarge,
                 )
                 Text(
@@ -347,7 +405,9 @@ private fun EmptyQuizState(
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.large,
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+            ),
             border = BorderStroke(1.dp, DarkOutline),
         ) {
             Column(
@@ -361,7 +421,10 @@ private fun EmptyQuizState(
                         modifier = Modifier.fillMaxWidth(),
                     ) {
                         Row(
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                            modifier = Modifier.padding(
+                                horizontal = 12.dp,
+                                vertical = 10.dp,
+                            ),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(10.dp),
                         ) {
@@ -410,12 +473,14 @@ private fun EmptyQuizState(
 }
 
 @Composable
-private fun localizedPosLabel(pos: String): String {
-    return when (pos) {
-        "명사" -> stringResource(R.string.pos_noun)
-        "동사" -> stringResource(R.string.pos_verb)
-        "형용사" -> stringResource(R.string.pos_adjective)
-        "부사" -> stringResource(R.string.pos_adverb)
+private fun localizedPosLabel(pos: String?): String {
+    if (pos == null) return ""
+
+    return when {
+        pos.contains("명사") -> stringResource(R.string.pos_noun)
+        pos.contains("동사") -> stringResource(R.string.pos_verb)
+        pos.contains("형용사") -> stringResource(R.string.pos_adjective)
+        pos.contains("부사") -> stringResource(R.string.pos_adverb)
         else -> pos
     }
 }
@@ -431,14 +496,23 @@ private fun optionCardColors(
     option: String,
     correctPos: String,
     selectedAnswer: String?,
+    pendingAnswer: String?,
     isAnswerChecked: Boolean,
 ): AnswerOptionColors {
     if (!isAnswerChecked) {
-        return AnswerOptionColors(
-            background = MaterialTheme.colorScheme.surface,
-            border = DarkOutline,
-            content = MaterialTheme.colorScheme.onSurface,
-        )
+        return if (option == pendingAnswer) {
+            AnswerOptionColors(
+                background = BrandGreenLight.copy(alpha = 0.14f),
+                border = BrandGreenLight,
+                content = BrandGreenLight,
+            )
+        } else {
+            AnswerOptionColors(
+                background = MaterialTheme.colorScheme.surface,
+                border = DarkOutline,
+                content = MaterialTheme.colorScheme.onSurface,
+            )
+        }
     }
 
     return when {
@@ -447,11 +521,13 @@ private fun optionCardColors(
             border = BrandGreenLight,
             content = BrandGreenLight,
         )
+
         option == selectedAnswer -> AnswerOptionColors(
             background = ErrorRed.copy(alpha = 0.14f),
             border = ErrorRed,
             content = ErrorRed,
         )
+
         else -> AnswerOptionColors(
             background = MaterialTheme.colorScheme.surface,
             border = DarkOutline,

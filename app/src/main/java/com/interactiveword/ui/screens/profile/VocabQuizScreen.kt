@@ -15,12 +15,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -32,6 +34,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -106,6 +111,7 @@ fun VocabQuizScreen(
                     isAnswerChecked = uiState.isAnswerChecked,
                     onAnswerClick = vm::selectAnswer,
                     onNextClick = vm::goToNextQuestion,
+                    onPlayAudio = vm::playTts // 💡 뷰모델의 오디오 재생 함수 연동
                 )
             }
         }
@@ -125,8 +131,12 @@ private fun VocabQuizQuestionState(
     isAnswerChecked: Boolean,
     onAnswerClick: (String) -> Unit,
     onNextClick: () -> Unit,
+    onPlayAudio: (String) -> Unit,
 ) {
     val progress = if (totalQuestions > 0) (currentIndex + 1) / totalQuestions.toFloat() else 0f
+
+    // 💡 선택지 임시 저장 상태 (확인 버튼 클릭 전까지 유지)
+    var pendingAnswer by remember(currentIndex) { mutableStateOf<String?>(null) }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize().padding(padding),
@@ -179,7 +189,26 @@ private fun VocabQuizQuestionState(
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
-                    Text(text = prompt, style = MaterialTheme.typography.headlineSmall)
+
+                    // 💡 문제 텍스트 및 스피커 아이콘 배치
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = prompt,
+                            style = MaterialTheme.typography.headlineSmall,
+                            modifier = Modifier.weight(1f)
+                        )
+                        IconButton(onClick = { onPlayAudio(prompt) }) {
+                            Icon(
+                                imageVector = Icons.Filled.VolumeUp,
+                                contentDescription = "발음 듣기",
+                                tint = BrandGreenLight
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -189,12 +218,16 @@ private fun VocabQuizQuestionState(
                 option = option,
                 correctAnswer = correctAnswer,
                 selectedAnswer = selectedAnswer,
+                pendingAnswer = pendingAnswer,
                 isAnswerChecked = isAnswerChecked,
             )
 
             OutlinedButton(
-                onClick = { onAnswerClick(option) },
-                enabled = !isAnswerChecked,
+                onClick = {
+                    if (!isAnswerChecked) {
+                        pendingAnswer = option // 💡 정답 제출 전 임시 저장
+                    }
+                },
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.large,
                 border = BorderStroke(1.dp, colors.border),
@@ -204,27 +237,72 @@ private fun VocabQuizQuestionState(
                     disabledContainerColor = colors.background,
                     disabledContentColor = colors.content,
                 ),
-                contentPadding = PaddingValues(vertical = 16.dp, horizontal = 18.dp),
+                contentPadding = PaddingValues(vertical = 12.dp, horizontal = 18.dp),
             ) {
-                Text(text = option, modifier = Modifier.fillMaxWidth(), style = MaterialTheme.typography.titleMedium)
+                // 💡 선택지 텍스트 및 스피커 아이콘 배치
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = option,
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.weight(1f)
+                    )
+                    IconButton(onClick = { onPlayAudio(option) }) {
+                        Icon(
+                            imageVector = Icons.Filled.VolumeUp,
+                            contentDescription = "발음 듣기",
+                            tint = colors.content
+                        )
+                    }
+                }
             }
         }
 
-        if (isAnswerChecked) {
-            item {
-                Text(
-                    text = if (selectedAnswer == correctAnswer) {
-                        stringResource(R.string.quiz_correct_label)
-                    } else {
-                        stringResource(R.string.quiz_wrong_label, correctAnswer)
-                    },
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = if (selectedAnswer == correctAnswer) BrandGreenLight else ErrorRed,
-                )
-            }
-            item {
-                Button(onClick = onNextClick, modifier = Modifier.fillMaxWidth()) {
-                    Text(if (currentIndex + 1 == totalQuestions) stringResource(R.string.quiz_view_results) else stringResource(R.string.quiz_next_question))
+        item {
+            Spacer(modifier = Modifier.height(8.dp))
+            if (!isAnswerChecked) {
+                Button(
+                    onClick = { pendingAnswer?.let { onAnswerClick(it) } },
+                    enabled = pendingAnswer != null,
+                    modifier = Modifier.fillMaxWidth().height(52.dp),
+                    shape = MaterialTheme.shapes.large,
+                    colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                        containerColor = BrandGreenLight
+                    )
+                ) {
+                    Text(
+                        text = stringResource(R.string.action_confirm), // 다국어 리소스로 변경
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+            } else {
+                // 💡 제출 후 상태: 결과 및 다음 문제 버튼
+                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    Text(
+                        text = if (selectedAnswer == correctAnswer) {
+                            stringResource(R.string.quiz_correct_label)
+                        } else {
+                            stringResource(R.string.quiz_wrong_label, correctAnswer)
+                        },
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = if (selectedAnswer == correctAnswer) BrandGreenLight else ErrorRed,
+                    )
+                    Button(
+                        onClick = onNextClick,
+                        modifier = Modifier.fillMaxWidth().height(52.dp),
+                        shape = MaterialTheme.shapes.large,
+                        colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                            containerColor = BrandGreenLight
+                        )
+                    ) {
+                        Text(
+                            text = if (currentIndex + 1 == totalQuestions) stringResource(R.string.quiz_view_results) else stringResource(R.string.quiz_next_question),
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
                 }
             }
         }
@@ -336,14 +414,23 @@ private fun optionCardColors(
     option: String,
     correctAnswer: String,
     selectedAnswer: String?,
+    pendingAnswer: String?, // 💡 추가됨: 임시 선택 상태 렌더링
     isAnswerChecked: Boolean,
 ): VocabOptionColors {
     if (!isAnswerChecked) {
-        return VocabOptionColors(
-            background = MaterialTheme.colorScheme.surface,
-            border = DarkOutline,
-            content = MaterialTheme.colorScheme.onSurface,
-        )
+        return if (option == pendingAnswer) {
+            VocabOptionColors(
+                background = BrandGreenLight.copy(alpha = 0.14f),
+                border = BrandGreenLight,
+                content = BrandGreenLight,
+            )
+        } else {
+            VocabOptionColors(
+                background = MaterialTheme.colorScheme.surface,
+                border = DarkOutline,
+                content = MaterialTheme.colorScheme.onSurface,
+            )
+        }
     }
 
     return when {

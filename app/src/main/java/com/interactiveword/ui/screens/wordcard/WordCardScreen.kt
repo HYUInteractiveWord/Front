@@ -159,8 +159,9 @@ fun WordCardScreen(
 
                         Column(modifier = Modifier.weight(1f)) {
                             if (!card.pos.isNullOrBlank()) {
+                                // 💡 수정됨: 품사 텍스트를 다국어 변환 함수로 감쌈
                                 Text(
-                                    text = stringResource(R.string.wordcard_category, card.pos),
+                                    text = stringResource(R.string.wordcard_category, getPosString(card.pos)),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = BrandGreenLight,
                                 )
@@ -537,6 +538,18 @@ fun WordCardScreen(
     }
 }
 
+// 💡 1. 하단에 품사 다국어 변환 헬퍼 함수 추가
+@Composable
+private fun getPosString(pos: String?): String {
+    if (pos == null) return ""
+    return when {
+        pos.contains("명사") -> stringResource(R.string.pos_noun)
+        pos.contains("동사") -> stringResource(R.string.pos_verb)
+        pos.contains("형용사") -> stringResource(R.string.pos_adjective)
+        pos.contains("부사") -> stringResource(R.string.pos_adverb)
+        else -> pos // 매칭 안 되면 원래 글자 그대로
+    }
+}
 
 private fun historyFloat(history: Map<String, Any>?, vararg keys: String): Float? {
     if (history == null) return null
@@ -559,7 +572,6 @@ private fun historyString(history: Map<String, Any>?, vararg keys: String): Stri
     return null
 }
 
-// 💡 널 체크(null check) 및 문자열 방어 로직 강화됨
 private fun exampleKorean(example: Any): String {
     val map = example as? Map<*, *> ?: return example.toString()
     for (key in listOf("korean", "kr", "sentence", "example")) {
@@ -595,7 +607,6 @@ private fun exampleTransTtsPath(example: Any): String? {
     }
     return null
 }
-
 
 @SuppressLint("DefaultLocale")
 @Composable
