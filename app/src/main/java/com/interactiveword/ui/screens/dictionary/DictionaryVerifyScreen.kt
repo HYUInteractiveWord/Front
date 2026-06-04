@@ -298,7 +298,8 @@ fun DictionaryVerifyScreen(
 
                 Button(
                     onClick = { vm.saveToCollection() },
-                    enabled = uiState.hasVerifiedOnce && !uiState.isSaving,
+                    // 💡 수정된 부분: 녹음을 한 번이라도 시도했다면 무조건 활성화
+                    enabled = uiState.hasRecordedOnce && !uiState.isSaving,
                     modifier = Modifier.weight(1f),
                     shape = MaterialTheme.shapes.large,
                     colors = ButtonDefaults.buttonColors(containerColor = BrandGreenLight),
