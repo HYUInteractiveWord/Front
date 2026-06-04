@@ -94,7 +94,7 @@ fun HomeScreen(
                                 )
                             }
                         }
-                        Text("말해봄", style = MaterialTheme.typography.titleLarge)
+                        Text("나만의 단어장", style = MaterialTheme.typography.titleLarge)
                     }
                 },
                 actions = {

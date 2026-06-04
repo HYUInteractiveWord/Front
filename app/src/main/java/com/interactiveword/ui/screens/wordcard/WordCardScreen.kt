@@ -350,7 +350,7 @@ fun WordCardScreen(
                                 }
                             }
 
-                            // 2. 💡 복구된 부분: 번역 예문 및 번역 오디오 재생 버튼
+                            // 2. 번역 예문 및 번역 오디오 재생 버튼
                             val english = exampleEnglish(example)
                             if (!english.isNullOrBlank()) {
                                 Spacer(Modifier.height(8.dp))
