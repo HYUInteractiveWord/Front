@@ -1,5 +1,6 @@
 package com.interactiveword.ui.screens.profile
 
+import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -75,11 +76,13 @@ fun PosQuizScreen(
                     definition = question.definition,
                     correctPos = question.correctPos,
                     audioPath = question.wordAudioPath,
+                    defAudioPath = question.definitionAudioPath,
                     selectedAnswer = uiState.selectedAnswer,
                     isAnswerChecked = uiState.isAnswerChecked,
                     onAnswerClick = vm::selectAnswer,
                     onNextClick = vm::goToNextQuestion,
-                    onPlayAudio = vm::playTts
+                    onPlayAudio = vm::playTts,
+                    onSpeakText = vm::speakText
                 )
             }
         }
@@ -95,14 +98,17 @@ private fun QuizQuestionState(
     definition: String,
     correctPos: String,
     audioPath: String?,
+    defAudioPath: String?,
     selectedAnswer: String?,
     isAnswerChecked: Boolean,
     onAnswerClick: (String) -> Unit,
     onNextClick: () -> Unit,
     onPlayAudio: (String?) -> Unit,
+    onSpeakText: (Context, String) -> Unit,
 ) {
     val progress = if (totalQuestions > 0) (currentIndex + 1) / totalQuestions.toFloat() else 0f
     var pendingAnswer by remember(currentIndex) { mutableStateOf<String?>(null) }
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     LazyColumn(
         modifier = Modifier.fillMaxSize().padding(padding),
@@ -126,7 +132,26 @@ private fun QuizQuestionState(
                         Text(text = word, style = MaterialTheme.typography.headlineMedium, modifier = Modifier.weight(1f))
                         IconButton(onClick = { onPlayAudio(audioPath) }) { Icon(Icons.Filled.VolumeUp, contentDescription = null, tint = BrandGreenLight) }
                     }
-                    Text(text = definition, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+                        Text(text = definition, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.weight(1f))
+                        IconButton(
+                            onClick = {
+                                if (!defAudioPath.isNullOrBlank()) {
+                                    onPlayAudio(defAudioPath)
+                                } else {
+                                    onSpeakText(context, definition)
+                                }
+                            },
+                            modifier = Modifier.size(32.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.VolumeUp,
+                                contentDescription = null,
+                                tint = BrandGreenLight.copy(alpha = 0.7f),
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                    }
                 }
             }
         }
