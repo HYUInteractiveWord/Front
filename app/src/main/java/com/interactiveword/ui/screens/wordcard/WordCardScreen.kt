@@ -328,6 +328,7 @@ fun WordCardScreen(
                         Column(
                             modifier = Modifier.padding(16.dp).fillMaxWidth()
                         ) {
+                            // 1. 한국어 예문 및 발음 버튼
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
                                     text = exampleKorean(example),
@@ -350,15 +351,30 @@ fun WordCardScreen(
                                 }
                             }
 
-                            val ttsPath = exampleTtsPath(example)
-                            if (!ttsPath.isNullOrBlank()) {
-                                Spacer(Modifier.width(8.dp))
-                                IconButton(onClick = { vm.playExampleTts(ttsPath) }) {
-                                    Icon(
-                                        Icons.Filled.VolumeUp,
-                                        contentDescription = stringResource(R.string.wordcard_example_listen),
-                                        tint = BrandGreenLight,
+                            val english = exampleEnglish(example)
+                            if (!english.isNullOrBlank()) {
+                                Spacer(Modifier.height(8.dp))
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(
+                                        text = english,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = DarkMutedText,
+                                        modifier = Modifier.weight(1f)
                                     )
+                                    val transTtsPath = exampleTransTtsPath(example) // 💡 올바른 번역 음성 경로 함수 호출
+                                    if (!transTtsPath.isNullOrBlank()) {
+                                        IconButton(
+                                            onClick = { vm.playExampleTts(transTtsPath) },
+                                            modifier = Modifier.size(32.dp)
+                                        ) {
+                                            Icon(
+                                                Icons.Filled.VolumeUp,
+                                                contentDescription = stringResource(R.string.wordcard_example_listen),
+                                                tint = DarkMutedText,
+                                                modifier = Modifier.size(20.dp)
+                                            )
+                                        }
+                                    }
                                 }
                             }
                         }

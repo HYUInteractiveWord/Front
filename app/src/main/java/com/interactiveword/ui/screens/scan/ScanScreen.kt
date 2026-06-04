@@ -181,8 +181,13 @@ fun ScanScreen(
 
                         Spacer(Modifier.height(48.dp))
 
-                        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                        // 수정됨: Row에 fillMaxWidth()를 주고 버튼들에 weight(1f) 적용
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
                             ScanTypeButton(
+                                modifier = Modifier.weight(1f),
                                 label = stringResource(R.string.scan_mic),
                                 subLabel = stringResource(R.string.scan_mic_sub),
                                 icon = Icons.Filled.Mic,
@@ -191,6 +196,7 @@ fun ScanScreen(
                             )
 
                             ScanTypeButton(
+                                modifier = Modifier.weight(1f),
                                 label = stringResource(R.string.scan_media),
                                 subLabel = stringResource(R.string.scan_media_sub),
                                 icon = Icons.Filled.OndemandVideo,
@@ -280,6 +286,7 @@ fun ScanScreen(
 
 @Composable
 private fun ScanTypeButton(
+    modifier: Modifier = Modifier, // 수정됨: modifier 파라미터 추가
     label: String,
     subLabel: String,
     icon: androidx.compose.ui.graphics.vector.ImageVector,
@@ -288,13 +295,16 @@ private fun ScanTypeButton(
 ) {
     Card(
         onClick = onClick,
+        modifier = modifier, // 수정됨: 전달받은 modifier를 Card에 적용
         shape = MaterialTheme.shapes.extraLarge,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         border = androidx.compose.foundation.BorderStroke(1.dp, DarkOutline),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
     ) {
         Column(
-            modifier = Modifier.padding(24.dp),
+            modifier = Modifier
+                .padding(24.dp)
+                .fillMaxWidth(), // 수정됨: 내부 컨텐츠가 좁아지지 않도록 꽉 채움
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
@@ -313,16 +323,25 @@ private fun ScanTypeButton(
                 }
             }
 
-            Text(label, style = MaterialTheme.typography.titleMedium)
             Text(
-                subLabel,
+                text = label,
+                style = MaterialTheme.typography.titleMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = subLabel,
                 style = MaterialTheme.typography.bodySmall,
                 color = DarkMutedText,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
             )
         }
     }
 }
 
+// ... 아래 RecordingView와 DetectedWordItem 코드는 기존과 동일합니다 ...
 @Composable
 private fun RecordingView(
     isMic: Boolean,
