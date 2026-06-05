@@ -8,6 +8,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
+import com.interactiveword.util.WordCardPointManager
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+
 data class DictionaryResult(
     val word: String,
     val pos: String?,
@@ -26,9 +30,11 @@ data class DictionaryUiState(
 )
 
 class DictionaryViewModel(
+    application: Application,
     private val repo: WordRepository = WordRepository(),
     private val userRepo: UserRepository = UserRepository(),
-) : ViewModel() {
+) : AndroidViewModel(application) {
+    private val context = getApplication<Application>()
 
     private val _uiState = MutableStateFlow(DictionaryUiState())
     val uiState: StateFlow<DictionaryUiState> = _uiState
@@ -97,7 +103,10 @@ class DictionaryViewModel(
     fun addToCollection(word: String) {
         viewModelScope.launch {
             try {
-                repo.createWord(word, source = "dictionary")
+                val newCard = repo.createWord(word, source = "dictionary")
+                // 💡 신규 추가된 단어 ID를 미확인 목록에 등록
+                WordCardPointManager.addUnseenWords(context, listOf(newCard.id))
+
                 _uiState.value = _uiState.value.copy(
                     addedWords = _uiState.value.addedWords + word,
                     addedSuccess = true,

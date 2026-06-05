@@ -26,6 +26,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.interactiveword.util.WordCardPointManager
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -49,6 +50,7 @@ data class ScanUiState(
 )
 
 class ScanViewModel(app: Application) : AndroidViewModel(app) {
+    private val context = getApplication<Application>()
 
     private val scanRepo = ScanRepository()
     private val wordRepo = WordRepository()
@@ -340,7 +342,10 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
     fun addWordToCollection(word: String) {
         viewModelScope.launch {
             try {
-                wordRepo.createWord(word, source = "scan")
+                val newCard = wordRepo.createWord(word, source = "scan")
+                // 💡 신규 추가된 단어 ID를 미확인 목록에 등록
+                WordCardPointManager.addUnseenWords(context, listOf(newCard.id))
+
                 _uiState.value = _uiState.value.copy(addedWords = _uiState.value.addedWords + word)
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(error = e.message)

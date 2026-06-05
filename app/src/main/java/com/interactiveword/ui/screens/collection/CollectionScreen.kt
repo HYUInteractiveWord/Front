@@ -8,9 +8,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -27,6 +25,8 @@ import androidx.compose.material.icons.filled.Sort
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.background
+import androidx.compose.ui.platform.LocalContext
+import com.interactiveword.util.WordCardPointManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,6 +36,7 @@ fun CollectionScreen(
 ) {
     val uiState by vm.uiState.collectAsState()
     val lifecycleOwner = LocalLifecycleOwner.current
+    val context = LocalContext.current
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -50,6 +51,20 @@ fun CollectionScreen(
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
+
+    // 💡 미확인 상태인 단어들을 "본 것"으로 표시
+    LaunchedEffect(uiState.words) {
+        val unseenIds = uiState.words
+            .filter { WordCardPointManager.isWordUnseen(context, it.id) }
+            .map { it.id }
+            
+        if (unseenIds.isNotEmpty()) {
+            // 약간의 지연 후 처리 (애니메이션이 시작된 후 "본 것"으로 기록)
+            kotlinx.coroutines.delay(2500)
+            WordCardPointManager.markWordsAsSeen(context, unseenIds)
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -126,13 +141,13 @@ fun CollectionScreen(
                 }
 
                 items(uiState.words, key = { it.id }) { card ->
-                    // 가장 최근에 추가된 단어 (ID가 가장 큼) 하나만 등장 애니메이션 적용
-                    val isNewest = uiState.words.maxByOrNull { it.id }?.id == card.id && uiState.sortOrder == SortOrder.NEWEST
+                    // 단어장에서 아직 "보지 않은" 신규 단어들만 등장 애니메이션 적용
+                    val isUnseen = WordCardPointManager.isWordUnseen(context, card.id)
 
                     WordCardItem(
                         card    = card,
                         animateProgress = true,
-                        animateEntrance = isNewest,
+                        animateEntrance = isUnseen,
                         //재생 콜백 함수 연결
                         onPlayTts = { vm.playTts(it.ttsAudioPath) },
                         onPlayTransTts = { vm.playTransTts(it.defTransAudioPath) },

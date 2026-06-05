@@ -95,18 +95,6 @@ fun WordCardItem(
         animationSpec = infiniteRepeatable(tween(1200, easing = LinearOutSlowInEasing), RepeatMode.Reverse),
         label = "glowAlpha"
     )
-    
-    // 신규 아이템을 위한 지속적인 Pulse 효과
-    val pulseScale by if (animateEntrance) {
-        infiniteTransition.animateFloat(
-            initialValue = 1f,
-            targetValue = 1.03f,
-            animationSpec = infiniteRepeatable(tween(800, easing = FastOutSlowInEasing), RepeatMode.Reverse),
-            label = "pulseScale"
-        )
-    } else {
-        remember { mutableStateOf(1f) }
-    }
 
     val borderWidth = when {
         displayPoint >= 100 -> 3.dp
@@ -117,7 +105,7 @@ fun WordCardItem(
     
     val borderAlpha = if (displayPoint >= 76) glowAlpha else 1f
 
-    Box(modifier = Modifier.fillMaxWidth().scale(entranceScale.value * pulseScale)) {
+    Box(modifier = Modifier.fillMaxWidth().scale(entranceScale.value)) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
