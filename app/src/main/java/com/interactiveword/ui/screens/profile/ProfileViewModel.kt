@@ -7,6 +7,7 @@ import com.interactiveword.data.model.User
 import com.interactiveword.data.repository.MissionRepository
 import com.interactiveword.data.repository.UserRepository
 import com.interactiveword.data.repository.WordRepository
+import com.interactiveword.ui.components.XpManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -35,6 +36,18 @@ class ProfileViewModel(
     init { loadData() }
 
     fun refresh() { loadData() }
+
+    fun claimMission(missionId: Int) {
+        viewModelScope.launch {
+            try {
+                val mission = missionRepo.completeMission(missionId)
+                XpManager.emitXpGain(mission.xpReward)
+                loadData()
+            } catch (e: Exception) {
+                // 필요시 에러 처리
+            }
+        }
+    }
 
     private fun loadData() {
         viewModelScope.launch {

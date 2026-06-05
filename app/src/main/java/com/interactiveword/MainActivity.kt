@@ -61,6 +61,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.sp
+import com.interactiveword.ui.components.XpGainOverlay
 class MainActivity : ComponentActivity() {
 
     override fun attachBaseContext(newBase: Context) {
@@ -190,10 +191,14 @@ private fun MainApp() {
             BottomNavBar(navController = navController, currentRoute = currentRoute)
         },
     ) { padding ->
-        AppNavHost(
-            navController = navController,
-            modifier = Modifier.padding(bottom = padding.calculateBottomPadding()),
-        )
+        Box(modifier = Modifier.fillMaxSize()) {
+            AppNavHost(
+                navController = navController,
+                modifier = Modifier.padding(bottom = padding.calculateBottomPadding()),
+            )
+            // 💡 전역 XP 획득 오버레이 추가
+            XpGainOverlay()
+        }
     }
 }
 

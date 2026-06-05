@@ -1,5 +1,6 @@
 package com.interactiveword.ui.screens.profile
 
+import androidx.compose.animation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -71,16 +72,34 @@ fun ProfileScreen(
             item {
                 Text(stringResource(R.string.profile_today_missions), style = MaterialTheme.typography.titleMedium)
             }
-            items(uiState.dailyMissions) { mission ->
-                val icon = when (mission.missionType) {
-                    "daily_pronunciation" -> Icons.Filled.Mic
-                    "daily_scan"         -> Icons.Filled.QrCodeScanner
-                    else                 -> Icons.Filled.MenuBook
+            
+            item {
+                val dailyMissionIds = uiState.dailyMissions.map { it.id }
+                AnimatedContent(
+                    targetState = uiState.dailyMissions,
+                    contentKey = { dailyMissionIds },
+                    transitionSpec = {
+                        (slideInHorizontally { it } + fadeIn()).togetherWith(
+                            slideOutHorizontally { -it } + fadeOut()
+                        )
+                    },
+                    label = "dailyMissionsAnimation"
+                ) { missions ->
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        missions.forEach { mission ->
+                            val icon = when (mission.missionType) {
+                                "daily_pronunciation" -> Icons.Filled.Mic
+                                "daily_scan"         -> Icons.Filled.QrCodeScanner
+                                else                 -> Icons.Filled.MenuBook
+                            }
+                            MissionCardItem(
+                                mission = mission,
+                                icon    = icon,
+                                onClaim = { vm.claimMission(it) }
+                            )
+                        }
+                    }
                 }
-                MissionCardItem(
-                    mission = mission,
-                    icon    = icon,
-                )
             }
 
             // 2. 퀴즈 진입 섹션
@@ -105,16 +124,32 @@ fun ProfileScreen(
                         style = MaterialTheme.typography.titleMedium,
                     )
                 }
-                items(uiState.allMissions) { mission ->
-                    val icon = when (mission.missionType) {
-                        "daily_pronunciation" -> Icons.Filled.Mic
-                        "daily_scan" -> Icons.Filled.QrCodeScanner
-                        else -> Icons.Filled.MenuBook
+                
+                item {
+                    AnimatedContent(
+                        targetState = uiState.allMissions,
+                        transitionSpec = {
+                            (slideInHorizontally { it } + fadeIn()).togetherWith(
+                                slideOutHorizontally { -it } + fadeOut()
+                            )
+                        },
+                        label = "allMissionsAnimation"
+                    ) { missions ->
+                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                            missions.forEach { mission ->
+                                val icon = when (mission.missionType) {
+                                    "daily_pronunciation" -> Icons.Filled.Mic
+                                    "daily_scan" -> Icons.Filled.QrCodeScanner
+                                    else -> Icons.Filled.MenuBook
+                                }
+                                MissionCardItem(
+                                    mission = mission,
+                                    icon = icon,
+                                    onClaim = { vm.claimMission(it) }
+                                )
+                            }
+                        }
                     }
-                    MissionCardItem(
-                        mission = mission,
-                        icon = icon,
-                    )
                 }
             }
         }

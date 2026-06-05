@@ -18,6 +18,7 @@ import kotlinx.coroutines.delay
 import java.io.File
 import org.json.JSONObject
 import com.interactiveword.R
+import com.interactiveword.ui.components.XpManager
 
 data class WordCardUiState(
     val card: WordCard? = null,
@@ -229,6 +230,11 @@ class WordCardViewModel(
                 )
 
                 saveLatestPronunciationResult(context, card.id, result)
+
+                // 💡 XP 획득 전역 이벤트 발생
+                if (result.xpGained > 0) {
+                    XpManager.emitXpGain(result.xpGained)
+                }
 
                 val refreshedCard = repo.getWord(card.id)
                 val latestHistory = try {

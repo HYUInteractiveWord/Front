@@ -57,6 +57,9 @@ import androidx.compose.material.icons.filled.DeleteForever
 import com.interactiveword.data.local.LanguageManager
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -231,21 +234,6 @@ fun HomeScreen(
                         user = user,
                         wordCount = uiState.wordCount,
                         dailyMissions = uiState.dailyMissions,
-                    )
-                }
-            }
-
-            if (uiState.dailyMissions.isNotEmpty()) {
-                item {
-                    SectionHeader(
-                        title = stringResource(R.string.home_today_missions),
-                        onMore = { navController.navigate(Screen.Profile.route) },
-                    )
-                }
-                items(uiState.dailyMissions.take(3)) { mission ->
-                    MissionCardItem(
-                        mission = mission,
-                        icon = missionIcon(mission.missionType),
                     )
                 }
             }

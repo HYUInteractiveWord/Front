@@ -8,6 +8,7 @@ import com.interactiveword.data.model.WordCard
 import com.interactiveword.data.repository.MissionRepository
 import com.interactiveword.data.repository.UserRepository
 import com.interactiveword.data.repository.WordRepository
+import com.interactiveword.ui.components.XpManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -58,6 +59,22 @@ class HomeViewModel(
                     isLoading = false,
                     error = e.message,
                 )
+            }
+        }
+    }
+
+    fun claimMission(missionId: Int) {
+        viewModelScope.launch {
+            try {
+                val mission = missionRepo.completeMission(missionId)
+                
+                // 💡 XP 획득 애니메이션 발동
+                XpManager.emitXpGain(mission.xpReward)
+                
+                // 데이터 갱신
+                loadData()
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(error = e.message)
             }
         }
     }

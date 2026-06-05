@@ -15,6 +15,7 @@ import retrofit2.HttpException
 import java.io.IOException
 import kotlin.math.min
 import kotlin.random.Random
+import com.interactiveword.ui.components.XpManager
 
 private const val VOCAB_QUIZ_LIMIT = 5
 
@@ -139,6 +140,11 @@ class VocabQuizViewModel(
                     submitResultMessage = "획득 XP +${response.quizXpGained}$missionText",
                     submitErrorMessage = null,
                 )
+
+                // 💡 XP 획득 전역 이벤트 발생
+                if (response.quizXpGained > 0) {
+                    XpManager.emitXpGain(response.quizXpGained)
+                }
             } catch (e: Throwable) {
                 _uiState.value = _uiState.value.copy(
                     submitErrorMessage = "퀴즈 결과를 서버에 반영하지 못했습니다.",
