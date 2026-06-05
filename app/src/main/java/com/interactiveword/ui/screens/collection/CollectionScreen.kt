@@ -127,12 +127,12 @@ fun CollectionScreen(
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             SortChip(
-                                label = "추가순",
+                                label = stringResource(R.string.collection_sort_newest),
                                 selected = uiState.sortOrder == SortOrder.NEWEST,
                                 onClick = { vm.setSortOrder(SortOrder.NEWEST) }
                             )
                             SortChip(
-                                label = "점수순",
+                                label = stringResource(R.string.collection_sort_score),
                                 selected = uiState.sortOrder == SortOrder.SCORE,
                                 onClick = { vm.setSortOrder(SortOrder.SCORE) }
                             )

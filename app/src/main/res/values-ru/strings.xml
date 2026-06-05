@@ -81,6 +81,9 @@
     <string name="collection_word_count">%1$d слов</string>
     <string name="collection_slots">Слоты: %1$d / %2$d</string>
 
+    <string name="collection_sort_newest">По дате</string>
+    <string name="collection_sort_score">По очкам</string>
+
     <!-- Dictionary Screen -->
     <string name="dictionary_title">Словарь</string>
     <string name="dictionary_search_hint">Поиск слов по смыслу…</string>

@@ -83,6 +83,9 @@
     <string name="collection_word_count">%1$d words</string>
     <string name="collection_slots">Slots: %1$d / %2$d</string>
 
+    <string name="collection_sort_newest">Newest</string>
+    <string name="collection_sort_score">Score</string>
+
     <!-- Dictionary Screen -->
     <string name="dictionary_title">Dictionary</string>
     <string name="dictionary_search_hint">Search words by meaning…</string>

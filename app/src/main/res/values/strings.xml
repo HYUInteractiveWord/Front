@@ -77,6 +77,9 @@
     <string name="collection_word_count">%1$d개의 단어</string>
     <string name="collection_slots">슬롯: %1$d / %2$d</string>
 
+    <string name="collection_sort_newest">추가순</string>
+    <string name="collection_sort_score">점수순</string>
+
     <string name="dictionary_title">사전</string>
     <string name="dictionary_search_hint">단어 뜻 검색…</string>
     <string name="action_search">검색</string>
