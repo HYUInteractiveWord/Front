@@ -30,10 +30,10 @@ data class DictionaryUiState(
 )
 
 class DictionaryViewModel(
-    application: Application,
-    private val repo: WordRepository = WordRepository(),
-    private val userRepo: UserRepository = UserRepository(),
+    application: Application
 ) : AndroidViewModel(application) {
+    private val repo: WordRepository = WordRepository()
+    private val userRepo: UserRepository = UserRepository()
     private val context = getApplication<Application>()
 
     private val _uiState = MutableStateFlow(DictionaryUiState())
