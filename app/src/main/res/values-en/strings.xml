@@ -12,7 +12,7 @@
 
     <!-- Bottom Nav -->
     <string name="nav_home">Home</string>
-    <string name="nav_dictionary">Dictionary</string>
+    <string name="nav_dictionary">Dict</string>
     <string name="nav_collection">Collection</string>
     <string name="nav_missions">Missions</string>
     <string name="nav_scan">Scan</string>
@@ -83,7 +83,7 @@
 
     <!-- Dictionary Screen -->
     <string name="dictionary_title">Dictionary</string>
-    <string name="dictionary_search_hint">Search Korean words…</string>
+    <string name="dictionary_search_hint">Search words by meaning…</string>
     <string name="action_search">Search</string>
     <string name="dictionary_search_failed">Search failed: %1$s</string>
     <string name="dictionary_result_count">%1$d results</string>

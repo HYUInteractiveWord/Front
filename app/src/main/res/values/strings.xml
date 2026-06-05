@@ -76,7 +76,7 @@
     <string name="collection_slots">슬롯: %1$d / %2$d</string>
 
     <string name="dictionary_title">사전</string>
-    <string name="dictionary_search_hint">한국어 단어 검색…</string>
+    <string name="dictionary_search_hint">단어 뜻 검색…</string>
     <string name="action_search">검색</string>
     <string name="dictionary_search_failed">검색 실패: %1$s</string>
     <string name="dictionary_result_count">검색 결과 %1$d개</string>

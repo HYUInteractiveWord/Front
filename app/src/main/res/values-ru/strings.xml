@@ -83,7 +83,7 @@
 
     <!-- Dictionary Screen -->
     <string name="dictionary_title">Словарь</string>
-    <string name="dictionary_search_hint">Поиск корейского слова…</string>
+    <string name="dictionary_search_hint">Поиск слов по смыслу…</string>
     <string name="action_search">Поиск</string>
     <string name="dictionary_search_failed">Ошибка поиска: %1$s</string>
     <string name="dictionary_result_count">Результатов: %1$d</string>
