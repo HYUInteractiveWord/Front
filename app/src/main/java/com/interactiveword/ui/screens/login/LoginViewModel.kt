@@ -95,14 +95,10 @@ class LoginViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch {
             _uiState.value = LoginUiState.Loading
             try {
-                // 1. 데모 서버 엔드포인트 호출 (가입 정보 포함)
-                val token = userRepo.demoLogin(username, email, password, preferredLanguage)
-                // 2. 토큰 저장
-                tokenDataStore.saveToken(token)
-                RetrofitClient.authToken = token
-                // 3. 언어 동기화 후 로그인 처리
-                val languageChanged = syncLanguageFromCurrentUser()
-                _uiState.value = LoginUiState.LoggedIn(languageChanged)
+                // 1. 데모 서버 엔드포인트 호출 (가입 및 데이터 이식)
+                userRepo.demoLogin(username, email, password, preferredLanguage)
+                // 2. 가입된 정보로 로그인 진행
+                login(username, password)
             } catch (e: Exception) {
                 _uiState.value = LoginUiState.Error(e.message ?: "데모 접속 실패")
             }

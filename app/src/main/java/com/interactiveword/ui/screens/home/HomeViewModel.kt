@@ -72,7 +72,7 @@ class HomeViewModel(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
             try {
-                // TODO: userRepo.changeLanguage(newLanguage) 백엔드 API 연동 필요 (단어 삭제 포함)
+                userRepo.updateLanguage(newLanguage)
                 loadData()
                 onSuccess()
             } catch (e: Exception) {
@@ -85,7 +85,7 @@ class HomeViewModel(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
             try {
-                // TODO: userRepo.deleteAccount() 백엔드 API 연동 필요
+                userRepo.deleteAccount()
                 onSuccess()
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(isLoading = false, error = e.message)
