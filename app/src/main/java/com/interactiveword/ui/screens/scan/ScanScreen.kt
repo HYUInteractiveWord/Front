@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -22,8 +23,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -181,7 +184,6 @@ fun ScanScreen(
 
                         Spacer(Modifier.height(48.dp))
 
-                        // 수정됨: Row에 fillMaxWidth()를 주고 버튼들에 weight(1f) 적용
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -281,30 +283,29 @@ fun ScanScreen(
             }
         }
     }
-
 }
 
 @Composable
 private fun ScanTypeButton(
-    modifier: Modifier = Modifier, // 수정됨: modifier 파라미터 추가
+    modifier: Modifier = Modifier,
     label: String,
     subLabel: String,
     icon: androidx.compose.ui.graphics.vector.ImageVector,
-    color: androidx.compose.ui.graphics.Color,
+    color: Color,
     onClick: () -> Unit,
 ) {
     Card(
         onClick = onClick,
-        modifier = modifier, // 수정됨: 전달받은 modifier를 Card에 적용
+        modifier = modifier,
         shape = MaterialTheme.shapes.extraLarge,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        border = androidx.compose.foundation.BorderStroke(1.dp, DarkOutline),
+        border = BorderStroke(1.dp, DarkOutline),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
     ) {
         Column(
             modifier = Modifier
                 .padding(24.dp)
-                .fillMaxWidth(), // 수정됨: 내부 컨텐츠가 좁아지지 않도록 꽉 채움
+                .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
@@ -333,7 +334,7 @@ private fun ScanTypeButton(
                 text = subLabel,
                 style = MaterialTheme.typography.bodySmall,
                 color = DarkMutedText,
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                textAlign = TextAlign.Center,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
@@ -341,7 +342,6 @@ private fun ScanTypeButton(
     }
 }
 
-// ... 아래 RecordingView와 DetectedWordItem 코드는 기존과 동일합니다 ...
 @Composable
 private fun RecordingView(
     isMic: Boolean,
@@ -410,17 +410,11 @@ private fun DetectedWordItem(
     added: Boolean,
     onAdd: () -> Unit,
     onDismiss: () -> Unit,
-) @Composable
-private fun DetectedWordItem(
-    result: ScanWordResult,
-    added: Boolean,
-    onAdd: () -> Unit,
-    onDismiss: () -> Unit,
 ) {
     Card(
         shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        border = androidx.compose.foundation.BorderStroke(1.dp, DarkOutline),
+        border = BorderStroke(1.dp, DarkOutline),
     ) {
         Row(
             modifier = Modifier
@@ -444,7 +438,6 @@ private fun DetectedWordItem(
                             shape = MaterialTheme.shapes.small,
                             color = BrandGreenLight.copy(alpha = 0.15f),
                         ) {
-                            // 💡 수정됨: it 대신 getPosString(it)을 사용하여 다국어 품사로 변환
                             Text(
                                 text = getPosString(it),
                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
@@ -481,5 +474,16 @@ private fun DetectedWordItem(
                 Icon(Icons.Filled.Close, null, tint = DarkMutedText)
             }
         }
+    }
+}
+@Composable
+private fun getPosString(pos: String?): String {
+    if (pos == null) return ""
+    return when {
+        pos.contains("명사") -> stringResource(R.string.pos_noun)
+        pos.contains("동사") -> stringResource(R.string.pos_verb)
+        pos.contains("형용사") -> stringResource(R.string.pos_adjective)
+        pos.contains("부사") -> stringResource(R.string.pos_adverb)
+        else -> pos
     }
 }
