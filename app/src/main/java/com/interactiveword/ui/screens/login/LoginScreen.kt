@@ -178,15 +178,14 @@ fun LoginScreen(navController: NavHostController) {
                 )
             }
 
-            // 💡 회원가입(Register) 모드일 때만 데모 버튼 보이기!
             if (isRegisterMode) {
                 Spacer(modifier = Modifier.height(16.dp))
                 TextButton(
-                    onClick = { vm.demoLogin(selectedLanguage) },
+                    onClick = { vm.demoLogin(username, email, password, selectedLanguage) },
                     enabled = uiState !is LoginUiState.Loading
                 ) {
                     Text(
-                        text = "DEMO login",
+                        text = "DEMO Register",
                         color = Color(0xFFF97316), // 주황색
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold

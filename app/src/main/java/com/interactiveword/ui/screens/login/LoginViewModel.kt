@@ -91,12 +91,12 @@ class LoginViewModel(app: Application) : AndroidViewModel(app) {
             }
         }
     }
-    fun demoLogin(preferredLanguage: String) {
+    fun demoLogin(username: String, email: String, password: String, preferredLanguage: String) {
         viewModelScope.launch {
             _uiState.value = LoginUiState.Loading
             try {
-                // 1. 데모 서버 엔드포인트 호출
-                val token = userRepo.demoLogin(preferredLanguage)
+                // 1. 데모 서버 엔드포인트 호출 (가입 정보 포함)
+                val token = userRepo.demoLogin(username, email, password, preferredLanguage)
                 // 2. 토큰 저장
                 tokenDataStore.saveToken(token)
                 RetrofitClient.authToken = token

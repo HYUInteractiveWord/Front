@@ -18,8 +18,8 @@ class UserRepository {
     }
 
     suspend fun getMe(): User = api.getMe()
-    suspend fun demoLogin(preferredLanguage: String): String {
-        val response = api.demoLogin(preferredLanguage)
+    suspend fun demoLogin(username: String, email: String, password: String, preferredLanguage: String): String {
+        val response = api.demoLogin(RegisterRequest(username, email, password, preferredLanguage))
         RetrofitClient.authToken = response.accessToken
         return response.accessToken
     }
