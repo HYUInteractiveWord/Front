@@ -2,6 +2,7 @@ package com.interactiveword.ui.screens.dictionary
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.interactiveword.data.repository.UserRepository
 import com.interactiveword.data.repository.WordRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,10 +22,12 @@ data class DictionaryUiState(
     val addedSuccess: Boolean = false,
     val addedWords: Set<String> = emptySet(),
     val errorMessage: String? = null,
+    val isSlotFull: Boolean = false,
 )
 
 class DictionaryViewModel(
     private val repo: WordRepository = WordRepository(),
+    private val userRepo: UserRepository = UserRepository(),
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DictionaryUiState())
@@ -45,8 +48,12 @@ class DictionaryViewModel(
         )
 
         try {
-            val response = repo.searchDictionary(query)
+            val user = userRepo.getMe()
+            val currentWords = repo.getMyWords()
+            val isFull = currentWords.size >= user.maxWordSlots
 
+            val response = repo.searchDictionary(query)
+            // ... (rest of search logic remains same but uses isFull)
             val candidateResults = response.candidates.map { (word, info) ->
                 DictionaryResult(
                     word = word,
@@ -76,6 +83,7 @@ class DictionaryViewModel(
                 isLoading = false,
                 candidates = results,
                 errorMessage = null,
+                isSlotFull = isFull
             )
         } catch (e: Exception) {
             _uiState.value = _uiState.value.copy(

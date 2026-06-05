@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.interactiveword.data.api.RetrofitClient
 import com.interactiveword.data.model.WordCard
+import com.interactiveword.data.repository.UserRepository
 import com.interactiveword.data.repository.WordRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,6 +20,7 @@ data class CollectionUiState(
 
 class CollectionViewModel(
     private val repo: WordRepository = WordRepository(),
+    private val userRepo: UserRepository = UserRepository(),
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CollectionUiState())
@@ -33,8 +35,13 @@ class CollectionViewModel(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
             try {
+                val user = userRepo.getMe()
                 val words = repo.getMyWords()
-                _uiState.value = _uiState.value.copy(words = words, isLoading = false)
+                _uiState.value = _uiState.value.copy(
+                    words = words,
+                    maxSlots = user.maxWordSlots,
+                    isLoading = false
+                )
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(isLoading = false)
             }

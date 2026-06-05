@@ -149,11 +149,16 @@ fun DictionaryScreen(
                                                     )
                                                 )
                                             },
-                                            enabled = !added,
+                                            enabled = !added && !uiState.isSlotFull,
                                             shape = MaterialTheme.shapes.large,
                                             colors = ButtonDefaults.buttonColors(containerColor = BrandGreenLight),
                                         ) {
-                                            Text(if (added) stringResource(R.string.dictionary_added) else stringResource(R.string.action_add))
+                                            val btnText = when {
+                                                added -> stringResource(R.string.dictionary_added)
+                                                uiState.isSlotFull -> "슬롯 부족"
+                                                else -> stringResource(R.string.action_add)
+                                            }
+                                            Text(btnText)
                                         }
                                     }
 
