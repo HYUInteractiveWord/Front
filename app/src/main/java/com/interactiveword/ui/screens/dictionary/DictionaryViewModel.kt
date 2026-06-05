@@ -29,11 +29,11 @@ data class DictionaryUiState(
     val isSlotFull: Boolean = false,
 )
 
-class DictionaryViewModel(
-    application: Application
+class DictionaryViewModel @JvmOverloads constructor(
+    application: Application,
+    private val repo: WordRepository = WordRepository(),
+    private val userRepo: UserRepository = UserRepository(),
 ) : AndroidViewModel(application) {
-    private val repo: WordRepository = WordRepository()
-    private val userRepo: UserRepository = UserRepository()
     private val context = getApplication<Application>()
 
     private val _uiState = MutableStateFlow(DictionaryUiState())
@@ -126,5 +126,11 @@ class DictionaryViewModel(
         viewModelScope.launch {
             search(query)
         }
+    }
+
+    fun clearAddedSuccess() {
+        _uiState.value = _uiState.value.copy(
+            addedSuccess = false
+        )
     }
 }
