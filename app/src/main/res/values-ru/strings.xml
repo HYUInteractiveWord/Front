@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">나만의 단어장</string>
+    <string name="app_name">InteractiveWord</string>
     <string name="notification_channel_capture">Захват аудио</string>
-    <string name="notification_title_capture">말해봐 - Ожидание захвата</string>
+    <string name="notification_title_capture">InteractiveWord - Ожидание захвата</string>
     <string name="notification_text_capture">Нажмите, чтобы захватить корейские слова</string>
     <string name="notification_action_capture">Начать захват</string>
     <string name="notification_action_stop">Остановить</string>
@@ -258,4 +258,20 @@
     <string name="pos_verb">Глагол</string>
     <string name="pos_adjective">Прилагательное</string>
     <string name="pos_adverb">Наречие</string>
+
+    <string name="lang_change_title">Сменить язык</string>
+    <string name="lang_change_warning">Предупреждение: Смена языка приведет к удалению всех карточек слов. Продолжить?</string>
+    <string name="lang_change_confirm">Сменить и удалить</string>
+    <string name="lang_change_cancel">Отмена</string>
+
+    <string name="delete_account_title">Удалить аккаунт</string>
+    <string name="delete_account_msg">Удаление аккаунта приведет к необратимой потере опыта, ранга и карточек. Продолжить?</string>
+    <string name="delete_account_confirm">Удалить</string>
+    <string name="delete_account_cancel">Отмена</string>
+
+    <string name="settings_section_title">Настройки пользователя</string>
+    <string name="settings_lang_change">Сменить язык</string>
+    <string name="settings_lang_sub">Сброс всех слов</string>
+    <string name="settings_delete_account">Удалить аккаунт</string>
+    <string name="settings_delete_sub">Данные не восстановить</string>
 </resources>

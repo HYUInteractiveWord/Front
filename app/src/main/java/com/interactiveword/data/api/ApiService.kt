@@ -99,4 +99,6 @@ interface ApiService {
     @POST("api/missions/{id}/complete")
     suspend fun completeMission(@Path("id") id: Int): Mission
 
+    @POST("/api/auth/demo") // 백엔드 라우터 경로에 맞게 수정
+    suspend fun demoLogin(@Query("preferred_language") preferredLanguage: String): TokenResponse
 }

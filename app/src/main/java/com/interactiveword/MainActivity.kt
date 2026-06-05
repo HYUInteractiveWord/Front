@@ -54,7 +54,13 @@ import com.interactiveword.ui.theme.DarkBackground
 import com.interactiveword.ui.theme.DarkSurface
 import com.interactiveword.ui.theme.GameMintDark
 import com.interactiveword.ui.theme.InteractiveWordTheme
-
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.sp
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.unit.sp
 class MainActivity : ComponentActivity() {
 
     override fun attachBaseContext(newBase: Context) {
@@ -192,6 +198,29 @@ private fun MainApp() {
 }
 
 @Composable
+private fun AutoResizeText(
+    text: String,
+    modifier: Modifier = Modifier
+) {
+    var textSize by remember { mutableStateOf(12.sp) }
+
+    Text(
+        text = text,
+        modifier = modifier,
+        fontSize = textSize,
+        maxLines = 1,
+        softWrap = false,
+        overflow = TextOverflow.Clip,
+        onTextLayout = { textLayoutResult ->
+            if (textLayoutResult.hasVisualOverflow) {
+                textSize = (textSize.value * 0.9f).sp
+            }
+        }
+    )
+}
+
+// 💡 2. 기존 BottomNavBar 수정
+@Composable
 private fun BottomNavBar(
     navController: NavHostController,
     currentRoute: String?,
@@ -201,6 +230,7 @@ private fun BottomNavBar(
         tonalElevation = 0.dp,
     ) {
         navItems.forEachIndexed { index, item ->
+            // 💡 스캔(Mic) 버튼 로직
             if (index == 2) {
                 NavigationBarItem(
                     selected = currentRoute == Screen.Scan.route,
@@ -213,7 +243,6 @@ private fun BottomNavBar(
                     icon  = {
                         Box(
                             modifier = Modifier
-                                .offset(y = (-6).dp)
                                 .size(44.dp)
                                 .background(
                                     brush = Brush.linearGradient(
@@ -233,7 +262,10 @@ private fun BottomNavBar(
                             )
                         }
                     },
-                    label = { Text(stringResource(R.string.nav_scan)) },
+                    // 🛠 수정됨: 일반 Text 대신 직접 만든 AutoResizeText 사용!
+                    label = {
+                        AutoResizeText(text = stringResource(R.string.nav_scan))
+                    },
                     colors = NavigationBarItemDefaults.colors(
                         indicatorColor      = Color.Transparent,
                         selectedIconColor   = com.interactiveword.ui.theme.BrandGreenLight,
@@ -243,6 +275,7 @@ private fun BottomNavBar(
                     ),
                 )
             }
+
             NavigationBarItem(
                 selected = currentRoute == item.screen.route,
                 onClick  = {
@@ -259,7 +292,10 @@ private fun BottomNavBar(
                     }
                 },
                 icon  = { Icon(item.icon, contentDescription = stringResource(item.labelRes)) },
-                label = { Text(stringResource(item.labelRes)) },
+                // 🛠 수정됨: 일반 Text 대신 직접 만든 AutoResizeText 사용!
+                label = {
+                    AutoResizeText(text = stringResource(item.labelRes))
+                },
                 colors = NavigationBarItemDefaults.colors(
                     indicatorColor      = com.interactiveword.ui.theme.BrandGreenDim,
                     selectedIconColor   = com.interactiveword.ui.theme.BrandGreenLight,

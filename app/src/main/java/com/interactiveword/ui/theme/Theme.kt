@@ -4,7 +4,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-
+import androidx.compose.ui.platform.LocalContext
+import com.interactiveword.data.local.LanguageManager
 private val AppColorScheme = lightColorScheme(
     primary             = BrandGreenLight,       // 버튼, 액티브 상태, XP바
     onPrimary           = Color.White,
@@ -33,9 +34,11 @@ private val AppColorScheme = lightColorScheme(
 
 @Composable
 fun InteractiveWordTheme(content: @Composable () -> Unit) {
+    val context = LocalContext.current
+    val currentLanguage = LanguageManager.getSavedLanguage(context)
     MaterialTheme(
         colorScheme = AppColorScheme,
-        typography  = AppTypography,
+        typography = getAppTypography(currentLanguage),
         shapes      = AppShapes,
         content     = content,
     )

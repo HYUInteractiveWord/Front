@@ -3,16 +3,22 @@ package com.interactiveword.ui.screens.login
 import android.app.Activity
 import android.app.Application
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -41,7 +47,6 @@ fun LoginScreen(navController: NavHostController) {
         (context as? Activity)?.recreate()
     }
 
-
     LaunchedEffect(uiState) {
         val loggedIn = uiState as? LoginUiState.LoggedIn
         if (loggedIn != null) {
@@ -61,22 +66,57 @@ fun LoginScreen(navController: NavHostController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
+            .imePadding(), // 키보드 올라올 때 스크롤 가능하게 밀어줌
         contentAlignment = Alignment.Center,
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp)
+                .verticalScroll(rememberScrollState()) // 스크롤 가능
         ) {
             Text(
                 text = if (isRegisterMode) stringResource(R.string.register_title) else stringResource(R.string.login_title),
                 style = MaterialTheme.typography.headlineMedium,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(bottom = 8.dp)
             )
+
+            // 언어 선택 라디오 버튼 영역
+            Column(modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)) {
+                Text(
+                    text = stringResource(R.string.label_language),
+                    style = MaterialTheme.typography.labelLarge,
+                )
+                Spacer(Modifier.height(4.dp))
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        RadioButton(
+                            selected = selectedLanguage == "en",
+                            onClick = { changeLanguage("en") },
+                        )
+                        Text("English", maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        RadioButton(
+                            selected = selectedLanguage == "ru",
+                            onClick = { changeLanguage("ru") },
+                        )
+                        Text("Русский", maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    }
+                }
+            }
 
             OutlinedTextField(
                 value = username,
                 onValueChange = { username = it },
-                label = { Text(stringResource(R.string.label_username)) },
+                label = { Text(stringResource(R.string.label_username), maxLines = 1, overflow = TextOverflow.Ellipsis) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
             )
@@ -85,7 +125,7 @@ fun LoginScreen(navController: NavHostController) {
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
-                    label = { Text(stringResource(R.string.label_email)) },
+                    label = { Text(stringResource(R.string.label_email), maxLines = 1, overflow = TextOverflow.Ellipsis) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
@@ -95,51 +135,21 @@ fun LoginScreen(navController: NavHostController) {
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text(stringResource(R.string.label_password)) },
+                label = { Text(stringResource(R.string.label_password), maxLines = 1, overflow = TextOverflow.Ellipsis) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
             )
 
-            if (isRegisterMode) {
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    Text(
-                        text = stringResource(R.string.label_language),
-                        style = MaterialTheme.typography.labelLarge,
-                    )
-                    Spacer(Modifier.height(4.dp))
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            RadioButton(
-                                selected = selectedLanguage == "en",
-                                onClick = {
-                                    changeLanguage("en")
-                                },
-                            )
-                            Text("English")
-                        }
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            RadioButton(
-                                selected = selectedLanguage == "ru",
-                                onClick = {
-                                    changeLanguage("ru")
-                                },
-                            )
-                            Text("Русский")
-                        }
-                    }
-                }
-            }
-
             if (uiState is LoginUiState.Error) {
                 Text(
                     text = (uiState as LoginUiState.Error).message,
                     color = MaterialTheme.colorScheme.error,
+                    textAlign = TextAlign.Center
                 )
             }
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             Button(
                 onClick = {
@@ -147,17 +157,41 @@ fun LoginScreen(navController: NavHostController) {
                     else vm.login(username, password)
                 },
                 enabled = uiState !is LoginUiState.Loading,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().height(52.dp),
             ) {
                 if (uiState is LoginUiState.Loading) {
                     CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
                 } else {
-                    Text(if (isRegisterMode) stringResource(R.string.action_register) else stringResource(R.string.action_login))
+                    Text(
+                        text = if (isRegisterMode) stringResource(R.string.action_register) else stringResource(R.string.action_login),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        textAlign = TextAlign.Center
+                    )
                 }
             }
 
             TextButton(onClick = { isRegisterMode = !isRegisterMode }) {
-                Text(if (isRegisterMode) stringResource(R.string.link_to_login) else stringResource(R.string.link_to_register))
+                Text(
+                    text = if (isRegisterMode) stringResource(R.string.link_to_login) else stringResource(R.string.link_to_register),
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            // 💡 회원가입(Register) 모드일 때만 데모 버튼 보이기!
+            if (isRegisterMode) {
+                Spacer(modifier = Modifier.height(16.dp))
+                TextButton(
+                    onClick = { vm.demoLogin(selectedLanguage) },
+                    enabled = uiState !is LoginUiState.Loading
+                ) {
+                    Text(
+                        text = "DEMO login",
+                        color = Color(0xFFF97316), // 주황색
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
         }
     }

@@ -239,4 +239,20 @@
     <string name="pos_verb">동사</string>
     <string name="pos_adjective">형용사</string>
     <string name="pos_adverb">부사</string>
+
+    <string name="lang_change_title">학습 언어 변경</string>
+    <string name="lang_change_warning">경고: 언어를 변경하면 기존에 저장된 모든 단어 카드가 영구적으로 삭제됩니다. 정말 변경하시겠습니까?</string>
+    <string name="lang_change_confirm">변경 및 삭제</string>
+    <string name="lang_change_cancel">취소</string>
+
+    <string name="delete_account_title">계정 영구 삭제</string>
+    <string name="delete_account_msg">계정을 삭제하면 모든 경험치, 랭크, 단어장이 복구 불가능하게 영구적으로 삭제됩니다. 계속하시겠습니까?</string>
+    <string name="delete_account_confirm">탈퇴하기</string>
+    <string name="delete_account_cancel">취소</string>
+
+    <string name="settings_section_title">유저 설정</string>
+    <string name="settings_lang_change">학습 언어 변경</string>
+    <string name="settings_lang_sub">단어장 초기화 포함</string>
+    <string name="settings_delete_account">계정 영구 삭제</string>
+    <string name="settings_delete_sub">경험치 및 랭크 복구 불가</string>
 </resources>

@@ -67,4 +67,29 @@ class HomeViewModel(
             isCaptureServiceRunning = !_uiState.value.isCaptureServiceRunning,
         )
     }
+
+    fun changeLanguage(newLanguage: String, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoading = true)
+            try {
+                // TODO: userRepo.changeLanguage(newLanguage) 백엔드 API 연동 필요 (단어 삭제 포함)
+                loadData()
+                onSuccess()
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(isLoading = false, error = e.message)
+            }
+        }
+    }
+
+    fun deleteAccount(onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoading = true)
+            try {
+                // TODO: userRepo.deleteAccount() 백엔드 API 연동 필요
+                onSuccess()
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(isLoading = false, error = e.message)
+            }
+        }
+    }
 }

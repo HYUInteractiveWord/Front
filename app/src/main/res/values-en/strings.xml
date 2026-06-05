@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">나만의 단어장</string>
+    <string name="app_name">InteractiveWord</string>
     <string name="notification_channel_capture">Audio Capture</string>
-    <string name="notification_title_capture">말해봐 - Waiting for Capture</string>
+    <string name="notification_title_capture">InteractiveWord - Waiting for Capture</string>
     <string name="notification_text_capture">Tap to capture Korean words</string>
     <string name="notification_action_capture">Start Capture</string>
     <string name="notification_action_stop">Stop</string>
@@ -259,4 +259,19 @@
     <string name="pos_adjective">Adjective</string>
     <string name="pos_adverb">Adverb</string>
 
+    <string name="lang_change_title">Change Language</string>
+    <string name="lang_change_warning">Warning: Changing language will permanently delete all saved word cards. Continue?</string>
+    <string name="lang_change_confirm">Change &amp; Delete</string>
+    <string name="lang_change_cancel">Cancel</string>
+
+    <string name="delete_account_title">Delete Account</string>
+    <string name="delete_account_msg">Deleting the account will permanently remove all XP, rank, and word cards. Continue?</string>
+    <string name="delete_account_confirm">Delete</string>
+    <string name="delete_account_cancel">Cancel</string>
+
+    <string name="settings_section_title">User Settings</string>
+    <string name="settings_lang_change">Change Language</string>
+    <string name="settings_lang_sub">Includes word card reset</string>
+    <string name="settings_delete_account">Delete Account</string>
+    <string name="settings_delete_sub">Cannot recover data</string>
 </resources>

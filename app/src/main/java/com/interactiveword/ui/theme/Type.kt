@@ -2,49 +2,64 @@ package com.interactiveword.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-// v0: font-sans = Geist → Android 시스템 기본 폰트 사용
-val AppTypography = Typography(
-    headlineLarge = TextStyle(
-        fontWeight = FontWeight.Bold,
-        fontSize   = 28.sp,
-        lineHeight = 36.sp,
-    ),
-    headlineMedium = TextStyle(
-        fontWeight = FontWeight.Bold,
-        fontSize   = 24.sp,
-        lineHeight = 32.sp,
-    ),
-    titleLarge = TextStyle(
-        fontWeight = FontWeight.Bold,
-        fontSize   = 20.sp,
-        lineHeight = 28.sp,
-    ),
-    titleMedium = TextStyle(
-        fontWeight = FontWeight.SemiBold,
-        fontSize   = 16.sp,
-        lineHeight = 24.sp,
-    ),
-    bodyLarge = TextStyle(
-        fontWeight = FontWeight.Normal,
-        fontSize   = 16.sp,
-        lineHeight = 24.sp,
-    ),
-    bodyMedium = TextStyle(
-        fontWeight = FontWeight.Normal,
-        fontSize   = 14.sp,
-        lineHeight = 20.sp,
-    ),
-    bodySmall = TextStyle(
-        fontWeight = FontWeight.Normal,
-        fontSize   = 12.sp,
-        lineHeight = 16.sp,
-    ),
-    labelMedium = TextStyle(
-        fontWeight = FontWeight.Medium,
-        fontSize   = 12.sp,
-        lineHeight = 16.sp,
-    ),
-)
+val defaultFontFamily = FontFamily.SansSerif
+
+fun getAppTypography(languageCode: String): Typography {
+    val isRu = languageCode == "ru"
+    val diff = if (isRu) 2 else 0
+
+    return Typography(
+        headlineLarge = TextStyle(
+            fontFamily = defaultFontFamily,
+            fontWeight = FontWeight.Bold,
+            fontSize   = (28 - diff).sp,
+            lineHeight = (36 - diff).sp,
+        ),
+        headlineMedium = TextStyle(
+            fontFamily = defaultFontFamily,
+            fontWeight = FontWeight.Bold,
+            fontSize   = (24 - diff).sp,
+            lineHeight = (32 - diff).sp,
+        ),
+        titleLarge = TextStyle(
+            fontFamily = defaultFontFamily,
+            fontWeight = FontWeight.Bold,
+            fontSize   = (20 - diff).sp,
+            lineHeight = (28 - diff).sp,
+        ),
+        titleMedium = TextStyle(
+            fontFamily = defaultFontFamily,
+            fontWeight = FontWeight.SemiBold,
+            fontSize   = (16 - (diff / 2)).sp, // 중간 크기는 1sp만 줄임
+            lineHeight = (24 - diff).sp,
+        ),
+        bodyLarge = TextStyle(
+            fontFamily = defaultFontFamily,
+            fontWeight = FontWeight.Normal,
+            fontSize   = (16 - diff).sp,
+            lineHeight = (24 - diff).sp,
+        ),
+        bodyMedium = TextStyle(
+            fontFamily = defaultFontFamily,
+            fontWeight = FontWeight.Normal,
+            fontSize   = (14 - diff).sp,
+            lineHeight = (20 - diff).sp,
+        ),
+        bodySmall = TextStyle(
+            fontFamily = defaultFontFamily,
+            fontWeight = FontWeight.Normal,
+            fontSize   = (12 - diff).sp,
+            lineHeight = (16 - diff).sp,
+        ),
+        labelMedium = TextStyle(
+            fontFamily = defaultFontFamily,
+            fontWeight = FontWeight.Medium,
+            fontSize   = (12 - diff).sp,
+            lineHeight = (16 - diff).sp,
+        ),
+    )
+}

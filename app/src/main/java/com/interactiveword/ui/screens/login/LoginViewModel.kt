@@ -91,4 +91,21 @@ class LoginViewModel(app: Application) : AndroidViewModel(app) {
             }
         }
     }
+    fun demoLogin(preferredLanguage: String) {
+        viewModelScope.launch {
+            _uiState.value = LoginUiState.Loading
+            try {
+                // 1. 데모 서버 엔드포인트 호출
+                val token = userRepo.demoLogin(preferredLanguage)
+                // 2. 토큰 저장
+                tokenDataStore.saveToken(token)
+                RetrofitClient.authToken = token
+                // 3. 언어 동기화 후 로그인 처리
+                val languageChanged = syncLanguageFromCurrentUser()
+                _uiState.value = LoginUiState.LoggedIn(languageChanged)
+            } catch (e: Exception) {
+                _uiState.value = LoginUiState.Error(e.message ?: "데모 접속 실패")
+            }
+        }
+    }
 }
