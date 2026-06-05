@@ -71,6 +71,8 @@
     <string name="profile_pos_quiz_sub">Identify the part of speech</string>
     <string name="profile_vocab_quiz_title">Vocabulary Quiz</string>
     <string name="profile_vocab_quiz_sub">Test your collected words</string>
+    <string name="profile_example_quiz_title">Example Sentence Quiz</string>
+    <string name="profile_example_quiz_sub">Test your skills with collected example sentences</string>
     <string name="profile_failed_to_load">Failed to load profile</string>
     <string name="profile_daily_mission_status">Daily Mission Status</string>
     <string name="action_start_test">Start Test</string>
@@ -187,6 +189,13 @@
     <string name="posquiz_type_label">Identify Part of Speech</string>
     <string name="posquiz_local_note">Part of speech quiz scores are calculated locally at this stage.</string>
     <string name="posquiz_cannot_start">Cannot start part of speech quiz</string>
+
+    <string name="examplequiz_title">Example Sentence Quiz</string>
+    <string name="examplequiz_kr_to_trans">Choose Translation</string>
+    <string name="examplequiz_trans_to_kr">Choose Korean</string>
+    <string name="examplequiz_kr_prompt">Choose the correct translation for this sentence</string>
+    <string name="examplequiz_trans_prompt">Choose the correct Korean for this sentence</string>
+    <string name="examplequiz_no_words">No words with example sentences found.\nPlease add words first!</string>
 
     <!-- Mission display names -->
     <string name="mission_daily_pronunciation">Daily Pronunciation</string>

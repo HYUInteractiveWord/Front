@@ -194,10 +194,12 @@ fun DictionaryVerifyScreen(
                         Text(text = definitionEnglish, style = MaterialTheme.typography.bodyMedium, color = DarkMutedText)
                     }
 
+                    /*
                     if (!pronunciation.isNullOrBlank()) {
                         Spacer(Modifier.height(12.dp))
                         Text(text = "[$pronunciation]", style = MaterialTheme.typography.bodyMedium, color = DarkMutedText)
                     }
+                    */
                 }
             }
 

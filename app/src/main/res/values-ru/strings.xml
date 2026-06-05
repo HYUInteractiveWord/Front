@@ -188,6 +188,13 @@
     <string name="posquiz_local_note">Счет</string>
     <string name="posquiz_cannot_start">Не удаётся начать тест частей речи</string>
 
+    <string name="examplequiz_title">Тест на примеры</string>
+    <string name="examplequiz_kr_to_trans">Выбрать перевод</string>
+    <string name="examplequiz_trans_to_kr">Выбрать корейский</string>
+    <string name="examplequiz_kr_prompt">Выберите правильный перевод для этого предложения</string>
+    <string name="examplequiz_trans_prompt">Выберите правильный корейский для этого предложения</string>
+    <string name="examplequiz_no_words">Слов с примерами не найдено.\nПожалуйста, сначала добавьте слова!</string>
+
     <!-- Mission display names -->
     <string name="mission_daily_pronunciation">Ежедневное произношение</string>
     <string name="mission_daily_scan">Сканирование слов</string>

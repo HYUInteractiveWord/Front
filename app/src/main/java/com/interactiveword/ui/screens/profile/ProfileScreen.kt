@@ -1,6 +1,7 @@
 package com.interactiveword.ui.screens.profile
 
 import androidx.compose.animation.*
+import androidx.compose.runtime.key
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -74,29 +75,29 @@ fun ProfileScreen(
             }
             
             item {
-                val dailyMissionIds = uiState.dailyMissions.map { it.id }
-                AnimatedContent(
-                    targetState = uiState.dailyMissions,
-                    contentKey = { dailyMissionIds },
-                    transitionSpec = {
-                        (slideInHorizontally { it } + fadeIn()).togetherWith(
-                            slideOutHorizontally { -it } + fadeOut()
-                        )
-                    },
-                    label = "dailyMissionsAnimation"
-                ) { missions ->
-                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        missions.forEach { mission ->
-                            val icon = when (mission.missionType) {
-                                "daily_pronunciation" -> Icons.Filled.Mic
-                                "daily_scan"         -> Icons.Filled.QrCodeScanner
-                                else                 -> Icons.Filled.MenuBook
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    uiState.dailyMissions.forEach { mission ->
+                        key(mission.id) {
+                            AnimatedContent(
+                                targetState = mission,
+                                transitionSpec = {
+                                    (slideInHorizontally { it } + fadeIn()).togetherWith(
+                                        slideOutHorizontally { -it } + fadeOut()
+                                    )
+                                },
+                                label = "singleDailyMissionAnimation"
+                            ) { targetMission ->
+                                val icon = when (targetMission.missionType) {
+                                    "daily_pronunciation" -> Icons.Filled.Mic
+                                    "daily_scan"         -> Icons.Filled.QrCodeScanner
+                                    else                 -> Icons.Filled.MenuBook
+                                }
+                                MissionCardItem(
+                                    mission = targetMission,
+                                    icon    = icon,
+                                    onClaim = { vm.claimMission(it) }
+                                )
                             }
-                            MissionCardItem(
-                                mission = mission,
-                                icon    = icon,
-                                onClaim = { vm.claimMission(it) }
-                            )
                         }
                     }
                 }
@@ -114,6 +115,16 @@ fun ProfileScreen(
                     onStartClick = { navController.navigate(Screen.VocabQuiz.route) }
                 )
             }
+            item {
+                ExampleQuizEntryCard(
+                    onStartClick = { navController.navigate(Screen.ExampleQuiz.route) }
+                )
+            }
+            item {
+                ExampleQuizEntryCard(
+                    onStartClick = { navController.navigate(Screen.ExampleQuiz.route) }
+                )
+            }
 
             // 3. 전체 미션 섹션
             if (uiState.allMissions.isNotEmpty()) {
@@ -126,27 +137,29 @@ fun ProfileScreen(
                 }
                 
                 item {
-                    AnimatedContent(
-                        targetState = uiState.allMissions,
-                        transitionSpec = {
-                            (slideInHorizontally { it } + fadeIn()).togetherWith(
-                                slideOutHorizontally { -it } + fadeOut()
-                            )
-                        },
-                        label = "allMissionsAnimation"
-                    ) { missions ->
-                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                            missions.forEach { mission ->
-                                val icon = when (mission.missionType) {
-                                    "daily_pronunciation" -> Icons.Filled.Mic
-                                    "daily_scan" -> Icons.Filled.QrCodeScanner
-                                    else -> Icons.Filled.MenuBook
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        uiState.allMissions.forEach { mission ->
+                            key(mission.id) {
+                                AnimatedContent(
+                                    targetState = mission,
+                                    transitionSpec = {
+                                        (slideInHorizontally { it } + fadeIn()).togetherWith(
+                                            slideOutHorizontally { -it } + fadeOut()
+                                        )
+                                    },
+                                    label = "singleAllMissionAnimation"
+                                ) { targetMission ->
+                                    val icon = when (targetMission.missionType) {
+                                        "daily_pronunciation" -> Icons.Filled.Mic
+                                        "daily_scan" -> Icons.Filled.QrCodeScanner
+                                        else -> Icons.Filled.MenuBook
+                                    }
+                                    MissionCardItem(
+                                        mission = targetMission,
+                                        icon = icon,
+                                        onClaim = { vm.claimMission(it) }
+                                    )
                                 }
-                                MissionCardItem(
-                                    mission = mission,
-                                    icon = icon,
-                                    onClaim = { vm.claimMission(it) }
-                                )
                             }
                         }
                     }
@@ -244,6 +257,43 @@ private fun VocabQuizEntryCard(onStartClick: () -> Unit) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(text = stringResource(R.string.profile_vocab_quiz_title), style = MaterialTheme.typography.titleMedium)
                     Text(text = stringResource(R.string.profile_vocab_quiz_sub), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+            Button(onClick = onStartClick, modifier = Modifier.fillMaxWidth()) {
+                Text(stringResource(R.string.action_start_test))
+            }
+        }
+    }
+}
+
+@Composable
+private fun ExampleQuizEntryCard(onStartClick: () -> Unit) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = androidx.compose.foundation.BorderStroke(1.dp, DarkOutline),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+    ) {
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Surface(
+                    shape = MaterialTheme.shapes.medium,
+                    color = BrandGreenLight,
+                    modifier = Modifier.size(44.dp),
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Filled.AutoStories,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.size(22.dp),
+                        )
+                    }
+                }
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(text = stringResource(R.string.profile_example_quiz_title), style = MaterialTheme.typography.titleMedium)
+                    Text(text = stringResource(R.string.profile_example_quiz_sub), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
             Button(onClick = onStartClick, modifier = Modifier.fillMaxWidth()) {

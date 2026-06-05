@@ -21,6 +21,12 @@ import com.interactiveword.ui.components.WordCardItem
 import com.interactiveword.ui.navigation.Screen
 import com.interactiveword.ui.theme.BrandGreenLight
 import com.interactiveword.ui.theme.DarkMutedText
+import com.interactiveword.ui.theme.DarkOutline
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Sort
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.background
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,25 +86,53 @@ fun CollectionScreen(
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 item {
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Text(
-                            stringResource(R.string.collection_word_count, uiState.words.size),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = DarkMutedText,
-                        )
-                        Text(
-                            stringResource(R.string.collection_slots, uiState.words.size, uiState.maxSlots),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = BrandGreenLight,
-                        )
+                    Column {
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Text(
+                                stringResource(R.string.collection_word_count, uiState.words.size),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = DarkMutedText,
+                            )
+                            Text(
+                                stringResource(R.string.collection_slots, uiState.words.size, uiState.maxSlots),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = BrandGreenLight,
+                            )
+                        }
+
+                        Spacer(Modifier.height(12.dp))
+
+                        // 💡 정렬 선택 UI
+                        Row(
+                            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            SortChip(
+                                label = "추가순",
+                                selected = uiState.sortOrder == SortOrder.NEWEST,
+                                onClick = { vm.setSortOrder(SortOrder.NEWEST) }
+                            )
+                            SortChip(
+                                label = "점수순",
+                                selected = uiState.sortOrder == SortOrder.SCORE,
+                                onClick = { vm.setSortOrder(SortOrder.SCORE) }
+                            )
+                        }
                     }
                 }
+
                 items(uiState.words, key = { it.id }) { card ->
+                    // 가장 최근에 추가된 단어 (ID가 가장 큼) 하나만 등장 애니메이션 적용
+                    val isNewest = uiState.words.maxByOrNull { it.id }?.id == card.id && uiState.sortOrder == SortOrder.NEWEST
+
                     WordCardItem(
                         card    = card,
+                        animateProgress = true,
+                        animateEntrance = isNewest,
                         //재생 콜백 함수 연결
                         onPlayTts = { vm.playTts(it.ttsAudioPath) },
                         onPlayTransTts = { vm.playTransTts(it.defTransAudioPath) },
@@ -106,6 +140,29 @@ fun CollectionScreen(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun SortChip(
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    Surface(
+        onClick = onClick,
+        shape = MaterialTheme.shapes.medium,
+        color = if (selected) BrandGreenLight else MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, if (selected) BrandGreenLight else DarkOutline),
+        modifier = Modifier.height(32.dp)
+    ) {
+        Box(contentAlignment = androidx.compose.ui.Alignment.Center, modifier = Modifier.padding(horizontal = 12.dp)) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium,
+                color = if (selected) Color.White else DarkMutedText
+            )
         }
     }
 }

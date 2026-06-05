@@ -6,6 +6,9 @@ import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -20,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -93,10 +97,23 @@ fun WordCardScreen(
         val effect = wordCardEffectStyle(displayPoint)
         val containerColor = effect.containerColor ?: MaterialTheme.colorScheme.surface
 
+        // 애니메이션 포인트 상태 관리
+        val animatedPoints = remember { Animatable(displayPoint.toFloat()) }
+        
+        LaunchedEffect(displayPoint) {
+            animatedPoints.animateTo(
+                targetValue = displayPoint.toFloat(),
+                animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing)
+            )
+        }
+        
+        val currentDisplayPoint = animatedPoints.value.toInt()
+        val currentEffect = wordCardEffectStyle(currentDisplayPoint)
+
         val borderWidth = when {
-            displayPoint >= 100 -> 3.dp
-            displayPoint >= 76  -> 2.dp
-            displayPoint >= 26  -> 1.5.dp
+            currentDisplayPoint >= 100 -> 3.dp
+            currentDisplayPoint >= 76  -> 2.dp
+            currentDisplayPoint >= 51  -> 1.5.dp
             else -> 1.dp
         }
 
@@ -110,7 +127,7 @@ fun WordCardScreen(
             Card(
                 shape = MaterialTheme.shapes.large,
                 colors = CardDefaults.cardColors(containerColor = containerColor),
-                border = BorderStroke(borderWidth, effect.borderColor),
+                border = BorderStroke(borderWidth, currentEffect.borderColor),
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Column(modifier = Modifier.padding(20.dp)) {
@@ -122,17 +139,8 @@ fun WordCardScreen(
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(card.koreanWord, style = MaterialTheme.typography.headlineMedium)
                                 Spacer(Modifier.width(8.dp))
-                                WordCardEffectBadge(effect)
+                                WordCardEffectBadge(currentEffect)
                             }
-                        }
-
-                        if (!card.pronunciation.isNullOrBlank()) {
-                            Text(
-                                text = "[ ${card.pronunciation} ]",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = DarkMutedText,
-                                modifier = Modifier.padding(end = 8.dp)
-                            )
                         }
 
                         IconButton(onClick = { vm.playTts() }) {
@@ -153,7 +161,7 @@ fun WordCardScreen(
                             modifier = Modifier
                                 .width(4.dp)
                                 .fillMaxHeight()
-                                .background(effect.borderColor, shape = MaterialTheme.shapes.small),
+                                .background(currentEffect.borderColor, shape = MaterialTheme.shapes.small),
                         )
                         Spacer(Modifier.width(12.dp))
 
@@ -229,22 +237,22 @@ fun WordCardScreen(
                                 color = DarkMutedText,
                             )
                             Text(
-                                text = stringResource(R.string.wordcard_point_format, displayPoint),
+                                text = stringResource(R.string.wordcard_point_format, currentDisplayPoint),
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = effect.borderColor,
+                                color = currentEffect.borderColor,
                             )
                         }
 
                         Spacer(Modifier.height(8.dp))
 
                         LinearProgressIndicator(
-                            progress = { displayPoint.coerceIn(0, 100) / 100f },
+                            progress = { currentDisplayPoint / 100f },
                             modifier = Modifier.fillMaxWidth().height(6.dp),
-                            color = effect.progressColor,
+                            color = currentEffect.progressColor,
                             trackColor = DarkOutline,
                         )
 
-                        if (displayPoint >= 100) {
+                        if (currentDisplayPoint >= 100) {
                             Spacer(Modifier.height(12.dp))
                             Card(
                                 shape = MaterialTheme.shapes.medium,

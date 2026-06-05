@@ -66,6 +66,8 @@
     <string name="profile_pos_quiz_sub">단어의 품사 맞추기</string>
     <string name="profile_vocab_quiz_title">단어 암기 테스트</string>
     <string name="profile_vocab_quiz_sub">수집한 단어로 실력을 테스트해보세요</string>
+    <string name="profile_example_quiz_title">예문 활용 테스트</string>
+    <string name="profile_example_quiz_sub">수집한 단어의 예문으로 실력을 확인하세요</string>
     <string name="profile_failed_to_load">프로필 정보를 불러오지 못했습니다</string>
     <string name="profile_daily_mission_status">일일 미션 상태</string>
     <string name="action_start_test">테스트 시작</string>
@@ -179,6 +181,13 @@
     <string name="posquiz_type_label">품사 맞추기</string>
     <string name="posquiz_local_note">현재 단계에서는 품사 테스트 점수를 로컬로만 계산합니다.</string>
     <string name="posquiz_cannot_start">품사 테스트를 시작할 수 없어요</string>
+
+    <string name="examplequiz_title">예문 활용 테스트</string>
+    <string name="examplequiz_kr_to_trans">번역 예문 맞추기</string>
+    <string name="examplequiz_trans_to_kr">한국어 예문 맞추기</string>
+    <string name="examplequiz_kr_prompt">다음에 알맞은 번역 예문을 고르세요</string>
+    <string name="examplequiz_trans_prompt">다음에 알맞은 한국어 예문을 고르세요</string>
+    <string name="examplequiz_no_words">학습 예문이 포함된 단어가 없습니다.\n단어를 먼저 추가해 보세요!</string>
 
     <string name="mission_daily_pronunciation">일일 발음 연습</string>
     <string name="mission_daily_scan">단어 스캔</string>

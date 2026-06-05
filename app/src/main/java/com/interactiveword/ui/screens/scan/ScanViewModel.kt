@@ -308,7 +308,7 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
     // ── 공통 ────────────────────────────────────────────────────────────────
 
     private fun writePcmToWav(pcm: ByteArray): File {
-        val file     = File(getApplication<Application>().cacheDir, "scan.wav")
+        val file     = File(getApplication<Application>().cacheDir, "scan_${System.currentTimeMillis()}.wav")
         val byteRate = SAMPLE_RATE * 2
         FileOutputStream(file).use { out ->
             fun wi(v: Int) = ByteArray(4) { i -> ((v shr (i * 8)) and 0xFF).toByte() }.let(out::write)

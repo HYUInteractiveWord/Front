@@ -12,10 +12,15 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+enum class SortOrder {
+    NEWEST, SCORE
+}
+
 data class CollectionUiState(
     val words: List<WordCard> = emptyList(),
     val maxSlots: Int = 20,
     val isLoading: Boolean = false,
+    val sortOrder: SortOrder = SortOrder.NEWEST
 )
 
 class CollectionViewModel(
@@ -37,14 +42,30 @@ class CollectionViewModel(
             try {
                 val user = userRepo.getMe()
                 val words = repo.getMyWords()
+                
+                val sortedWords = sortWords(words, _uiState.value.sortOrder)
+
                 _uiState.value = _uiState.value.copy(
-                    words = words,
+                    words = sortedWords,
                     maxSlots = user.maxWordSlots,
                     isLoading = false
                 )
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(isLoading = false)
             }
+        }
+    }
+
+    fun setSortOrder(order: SortOrder) {
+        if (_uiState.value.sortOrder == order) return
+        _uiState.value = _uiState.value.copy(sortOrder = order)
+        _uiState.value = _uiState.value.copy(words = sortWords(_uiState.value.words, order))
+    }
+
+    private fun sortWords(list: List<WordCard>, order: SortOrder): List<WordCard> {
+        return when (order) {
+            SortOrder.NEWEST -> list.sortedByDescending { it.id }
+            SortOrder.SCORE -> list.sortedByDescending { it.wordPoint.coerceAtLeast(it.bestScore.toInt()) }
         }
     }
 

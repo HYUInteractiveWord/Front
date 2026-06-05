@@ -188,13 +188,16 @@ private fun MainApp() {
         modifier       = Modifier.fillMaxSize(),
         containerColor = DarkBackground,
         bottomBar = {
-            BottomNavBar(navController = navController, currentRoute = currentRoute)
+            // 💡 로그인 페이지가 아닐 때만 BottomNavBar 표시
+            if (currentRoute != Screen.Login.route) {
+                BottomNavBar(navController = navController, currentRoute = currentRoute)
+            }
         },
     ) { padding ->
         Box(modifier = Modifier.fillMaxSize()) {
             AppNavHost(
                 navController = navController,
-                modifier = Modifier.padding(bottom = padding.calculateBottomPadding()),
+                modifier = Modifier.padding(bottom = if (currentRoute != Screen.Login.route) padding.calculateBottomPadding() else 0.dp),
             )
             // 💡 전역 XP 획득 오버레이 추가
             XpGainOverlay()
