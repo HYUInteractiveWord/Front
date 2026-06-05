@@ -5,9 +5,7 @@ import android.app.Application
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,10 +13,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Mic
@@ -26,8 +22,6 @@ import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -46,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -54,7 +49,6 @@ import com.interactiveword.R
 import com.interactiveword.ui.navigation.Screen
 import com.interactiveword.ui.theme.BrandGreenLight
 import com.interactiveword.ui.theme.DarkMutedText
-import com.interactiveword.ui.theme.DarkOutline
 import com.interactiveword.ui.theme.ErrorRed
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -77,8 +71,6 @@ fun DictionaryVerifyScreen(
         )
     )
     val uiState by vm.uiState.collectAsState()
-    val definitionEnglish = uiState.definitionEnglish
-    val pronunciation = uiState.pronunciation
 
     val micPermLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -134,158 +126,114 @@ fun DictionaryVerifyScreen(
         },
         containerColor = MaterialTheme.colorScheme.background,
     ) { padding ->
-        if (uiState.isLoadingPreview) {
-            Box(
-                modifier = Modifier.fillMaxSize().padding(padding),
-                contentAlignment = Alignment.Center,
-            ) {
-                CircularProgressIndicator(color = BrandGreenLight)
-            }
-            return@Scaffold
-        }
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Card(
-                shape = MaterialTheme.shapes.large,
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                border = BorderStroke(1.dp, DarkOutline),
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Column(modifier = Modifier.padding(20.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(text = uiState.word, style = MaterialTheme.typography.headlineMedium)
+            Spacer(modifier = Modifier.weight(1f))
 
-                            if (uiState.pos.isNotBlank()) {
-                                Spacer(Modifier.height(6.dp))
-                                Text(
-                                    text = stringResource(R.string.dictionary_category, uiState.pos),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = BrandGreenLight,
-                                )
-                            }
-                        }
+            // 단어 표시
+            Text(
+                text = uiState.word,
+                style = MaterialTheme.typography.displayMedium,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onBackground
+            )
 
-                        IconButton(onClick = { vm.playPreviewAudio() }) {
-                            Icon(
-                                Icons.Filled.VolumeUp,
-                                contentDescription = stringResource(R.string.wordcard_listen),
-                                tint = BrandGreenLight,
-                            )
-                        }
-                    }
+            Spacer(Modifier.height(24.dp))
 
-                    Spacer(Modifier.height(16.dp))
-
-                    Text(text = uiState.definition, style = MaterialTheme.typography.bodyLarge)
-
-                    if (!definitionEnglish.isNullOrBlank()) {
-                        Spacer(Modifier.height(10.dp))
-                        Text(text = definitionEnglish, style = MaterialTheme.typography.bodyMedium, color = DarkMutedText)
-                    }
-
-                    /*
-                    if (!pronunciation.isNullOrBlank()) {
-                        Spacer(Modifier.height(12.dp))
-                        Text(text = "[$pronunciation]", style = MaterialTheme.typography.bodyMedium, color = DarkMutedText)
-                    }
-                    */
+            // TTS 버튼 (로딩 중이면 인디케이터 표시)
+            if (uiState.isLoadingPreview) {
+                CircularProgressIndicator(
+                    color = BrandGreenLight,
+                    modifier = Modifier.size(48.dp)
+                )
+            } else {
+                IconButton(
+                    onClick = { vm.playPreviewAudio() },
+                    modifier = Modifier.size(72.dp)
+                ) {
+                    Icon(
+                        Icons.Filled.VolumeUp,
+                        contentDescription = stringResource(R.string.wordcard_listen),
+                        tint = BrandGreenLight,
+                        modifier = Modifier.fillMaxSize()
+                    )
                 }
+            }
+
+            Spacer(Modifier.height(64.dp))
+
+            // 발음 체크 (마이크)
+            Button(
+                onClick = { onMicClick() },
+                modifier = Modifier.size(84.dp),
+                shape = CircleShape,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (uiState.isRecording) ErrorRed else BrandGreenLight,
+                ),
+                contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)
+            ) {
+                Icon(
+                    imageVector = if (uiState.isRecording) Icons.Filled.Stop else Icons.Filled.Mic,
+                    contentDescription = null,
+                    modifier = Modifier.size(36.dp)
+                )
             }
 
             Spacer(Modifier.height(20.dp))
 
-            Card(
-                shape = MaterialTheme.shapes.large,
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                border = BorderStroke(1.dp, DarkOutline),
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Column(modifier = Modifier.padding(20.dp)) {
-                    Text(text = stringResource(R.string.verify_pronunciation_check), style = MaterialTheme.typography.titleMedium)
-
-                    Spacer(Modifier.height(12.dp))
-
-                    Button(
-                        onClick = { onMicClick() },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = CircleShape,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (uiState.isRecording) ErrorRed else BrandGreenLight,
-                        ),
-                    ) {
-                        Icon(
-                            imageVector = if (uiState.isRecording) Icons.Filled.Stop else Icons.Filled.Mic,
-                            contentDescription = null,
-                        )
-                        Spacer(Modifier.width(8.dp))
-                        Text(if (uiState.isRecording) stringResource(R.string.verify_stop_recording) else stringResource(R.string.verify_start_recording))
+            Text(
+                text = when {
+                    uiState.isRecording -> stringResource(R.string.verify_recording)
+                    uiState.isVerifying -> stringResource(R.string.verify_ai_checking)
+                    uiState.isMatch == true -> {
+                        val spoken = uiState.spokenCorrected ?: uiState.word
+                        stringResource(R.string.verify_match, spoken)
                     }
-
-                    Spacer(Modifier.height(16.dp))
-
-                    Text(
-                        text = when {
-                            uiState.isRecording -> stringResource(R.string.verify_recording)
-                            uiState.isVerifying -> stringResource(R.string.verify_ai_checking)
-                            uiState.isMatch == true -> {
-                                val spoken = uiState.spokenCorrected ?: uiState.word
-                                stringResource(R.string.verify_match, spoken)
-                            }
-                            uiState.isMatch == false -> {
-                                val spoken = (uiState.spokenCorrected ?: uiState.spokenRaw) ?: "알 수 없음"
-                                stringResource(R.string.verify_no_match, spoken)
-                            }
-                            uiState.hasRecordedOnce -> stringResource(R.string.verify_complete)
-                            else -> stringResource(R.string.verify_prompt)
-                        },
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = if (uiState.isMatch == false) {
-                            MaterialTheme.colorScheme.error
-                        } else {
-                            DarkMutedText
-                        },
-                    )
-
-                    val spokenRaw = uiState.spokenRaw
-                    if (!spokenRaw.isNullOrBlank()) {
-                        Spacer(Modifier.height(12.dp))
-                        Text(
-                            text = stringResource(R.string.verify_raw_text, spokenRaw),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = DarkMutedText,
-                        )
+                    uiState.isMatch == false -> {
+                        val spoken = (uiState.spokenCorrected ?: uiState.spokenRaw) ?: "알 수 없음"
+                        stringResource(R.string.verify_no_match, spoken)
                     }
+                    uiState.hasRecordedOnce -> stringResource(R.string.verify_complete)
+                    else -> stringResource(R.string.verify_prompt)
+                },
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center,
+                color = if (uiState.isMatch == false) {
+                    MaterialTheme.colorScheme.error
+                } else {
+                    DarkMutedText
+                },
+            )
 
-                    val spokenCorrected = uiState.spokenCorrected
-                    if (!spokenCorrected.isNullOrBlank()) {
-                        Spacer(Modifier.height(4.dp))
-                        Text(
-                            text = stringResource(R.string.verify_corrected, spokenCorrected),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = DarkMutedText,
-                        )
-                    }
-                }
+            val spokenRaw = uiState.spokenRaw
+            if (!spokenRaw.isNullOrBlank() && uiState.isMatch == false) {
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = stringResource(R.string.verify_raw_text, spokenRaw),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = DarkMutedText,
+                    textAlign = TextAlign.Center
+                )
             }
+
+            Spacer(modifier = Modifier.weight(1.5f))
 
             uiState.errorMessage?.let { error ->
+                Text(
+                    text = error,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.error,
+                    textAlign = TextAlign.Center
+                )
                 Spacer(Modifier.height(16.dp))
-                Text(text = error, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.error)
             }
 
-            Spacer(Modifier.height(24.dp))
-
+            // 하단 버튼
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -300,7 +248,6 @@ fun DictionaryVerifyScreen(
 
                 Button(
                     onClick = { vm.saveToCollection() },
-                    // 💡 수정된 부분: 녹음을 한 번이라도 시도했다면 무조건 활성화
                     enabled = uiState.hasRecordedOnce && !uiState.isSaving,
                     modifier = Modifier.weight(1f),
                     shape = MaterialTheme.shapes.large,
