@@ -18,9 +18,9 @@ object WordCardPointManager {
     fun getPointLevel(points: Int): Int {
         return when {
             points >= 100 -> 5 // MASTER (100)
-            points >= 85  -> 4 // 숙련 (85-99)
-            points >= 65  -> 3 // 성장 (65-84)
-            points >= 50  -> 2 // 연습 (50-64)
+            points >= 80  -> 4 // 숙련 (85-99)
+            points >= 60  -> 3 // 성장 (65-84)
+            points >= 40  -> 2 // 연습 (50-64)
             points >= 20  -> 1 // 기초 (20-49)
             else          -> 0 // 새 단어 (0-19)
         }
