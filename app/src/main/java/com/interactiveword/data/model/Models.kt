@@ -194,6 +194,7 @@ data class PronunciationResponse(
 )
 
 data class PronunciationDetails(
+    val total: Float,
     val pronunciation: Float,
     val formant: Float,
     val pitch: Float,

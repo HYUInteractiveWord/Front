@@ -71,6 +71,7 @@
     <string name="profile_pos_quiz_sub">Угадайте часть речи слова</string>
     <string name="profile_vocab_quiz_title">Тест на запоминание слов</string>
     <string name="profile_vocab_quiz_sub">Проверьте знания собранных слов</string>
+    <string name="profile_example_quiz_sub">Проверьте свои навыки на примере собранных слов.</string>
     <string name="profile_failed_to_load">Не удалось загрузить профиль</string>
     <string name="profile_daily_mission_status">Статус ежедневных миссий</string>
     <string name="action_start_test">Начать тест</string>
@@ -261,6 +262,7 @@
     <string name="pronunciation_label_intonation">Интонация</string>
     <string name="pronunciation_label_speed">Скорость</string>
     <string name="pronunciation_label_total">Итог</string>
+    <string name="pronunciation_label_final">Итоговый балл</string>
     <string name="pronunciation_label_penalty">Штраф за нераспознавание</string>
     <string name="penalty_none">Нет</string>
     <string name="wordcard_translation_listen">Послушать перевод</string>
@@ -295,4 +297,5 @@
     <string name="noti_new_word_added">Новое слово добавлено: %1$s</string>
     <string name="noti_word_best_score_achieved">🎉 Новый рекорд! (%1$d баллов)</string>
     <string name="noti_word_master_achieved">🎉 Поздравляем! Вы достигли уровня MASTER для слова \'%1$s\'!</string>
+    <string name="profile_example_quiz_title">Пример запроса на предложения</string>
 </resources>

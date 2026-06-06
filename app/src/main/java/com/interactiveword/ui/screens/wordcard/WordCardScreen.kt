@@ -488,11 +488,12 @@ fun WordCardScreen(
 
                             Spacer(Modifier.height(12.dp))
                             PronunciationScoreChart(
+                                finalScore = saved.score,
+                                totalScore = saved.total,
                                 pronunciation = saved.pronunciation,
                                 formant = saved.formant,
                                 pitch = saved.pitch,
                                 timing = saved.timing,
-                                total = saved.score,
                                 penaltyFactor = saved.penaltyFactor,
                             )
                             Spacer(Modifier.height(8.dp))
@@ -543,11 +544,12 @@ fun WordCardScreen(
                         result.details?.let { details ->
                             Spacer(Modifier.height(12.dp))
                             PronunciationScoreChart(
+                                finalScore = result.score,
+                                totalScore = details.total,
                                 pronunciation = details.pronunciation,
                                 formant = details.formant,
                                 pitch = details.pitch,
                                 timing = details.timing,
-                                total = result.score,
                                 penaltyFactor = result.penaltyFactor,
                             )
                             Spacer(Modifier.height(8.dp))
@@ -641,15 +643,16 @@ private fun exampleTransTtsPath(example: Any): String? {
 @SuppressLint("DefaultLocale")
 @Composable
 private fun PronunciationScoreChart(
+    finalScore: Float,
+    totalScore: Float,
     pronunciation: Float,
     formant: Float,
     pitch: Float,
     timing: Float,
-    total: Float,
-    penaltyFactor: Float = 1.0f,
+    penaltyFactor: Float = 0.0f,
 ) {
-    val items = mutableListOf(
-        stringResource(R.string.pronunciation_label_total) to total,
+    val items = listOf(
+        stringResource(R.string.pronunciation_label_total) to totalScore,
         stringResource(R.string.pronunciation_label_pronunciation) to pronunciation,
         stringResource(R.string.pronunciation_label_formants) to formant,
         stringResource(R.string.pronunciation_label_intonation) to pitch,
@@ -689,10 +692,12 @@ private fun PronunciationScoreChart(
                     text = label,
                     style = MaterialTheme.typography.bodySmall,
                     color = DarkMutedText,
-                    modifier = Modifier.width(64.dp), // 너비 약간 확장
+                    modifier = Modifier.width(64.dp),
                 )
 
                 val clamped = score.coerceIn(0f, 100f)
+                val isTotalScore = label == stringResource(R.string.pronunciation_label_total)
+
                 Box(
                     modifier = Modifier
                         .weight(1f)
@@ -704,10 +709,7 @@ private fun PronunciationScoreChart(
                             .fillMaxHeight()
                             .fillMaxWidth(clamped / 100f)
                             .background(
-                                if (label == stringResource(R.string.pronunciation_label_total)) 
-                                    BrandGreenLight 
-                                else 
-                                    BrandGreenLight.copy(alpha = 0.7f),
+                                color = if (isTotalScore) Color(0xFFF97316) else BrandGreenLight,
                                 shape = MaterialTheme.shapes.small
                             ),
                     )

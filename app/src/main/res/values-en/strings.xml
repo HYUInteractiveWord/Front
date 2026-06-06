@@ -263,6 +263,7 @@
     <string name="pronunciation_label_intonation">Intonation</string>
     <string name="pronunciation_label_speed">Speed</string>
     <string name="pronunciation_label_total">Total</string>
+    <string name="pronunciation_label_final">Final Score</string>
     <string name="pronunciation_label_penalty">Recognition Penalty</string>
     <string name="penalty_none">None</string>
     <string name="wordcard_translation_listen">Listen to translation</string>

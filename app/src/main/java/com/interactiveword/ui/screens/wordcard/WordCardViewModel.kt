@@ -40,6 +40,7 @@ data class WordCardUiState(
 data class SavedPronunciationResult(
     val score: Float,
     val xpGained: Int,
+    val total: Float,
     val pronunciation: Float,
     val formant: Float,
     val pitch: Float,
@@ -315,6 +316,7 @@ class WordCardViewModel(
         val json = JSONObject().apply {
             put("score", result.score)
             put("xpGained", result.xpGained)
+            put("total", details?.total ?: 0f)
             put("pronunciation", details?.pronunciation ?: 0f)
             put("formant", details?.formant ?: 0f)
             put("pitch", details?.pitch ?: 0f)
@@ -343,6 +345,7 @@ class WordCardViewModel(
             SavedPronunciationResult(
                 score = json.optDouble("score", 0.0).toFloat(),
                 xpGained = json.optInt("xpGained", 0),
+                total = json.optDouble("total", 0.0).toFloat(),
                 pronunciation = json.optDouble("pronunciation", 0.0).toFloat(),
                 formant = json.optDouble("formant", 0.0).toFloat(),
                 pitch = json.optDouble("pitch", 0.0).toFloat(),
