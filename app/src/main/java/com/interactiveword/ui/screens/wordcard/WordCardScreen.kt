@@ -126,8 +126,8 @@ fun WordCardScreen(
 
         val borderWidth = when {
             currentDisplayPoint >= 100 -> 3.dp
-            currentDisplayPoint >= 76  -> 2.dp
-            currentDisplayPoint >= 51  -> 1.5.dp
+            currentDisplayPoint >= 80  -> 2.dp
+            currentDisplayPoint >= 60  -> 1.5.dp
             else -> 1.dp
         }
 
