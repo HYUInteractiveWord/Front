@@ -109,7 +109,7 @@ fun WordCardScreen(
         val containerColor = effect.containerColor ?: MaterialTheme.colorScheme.surface
 
         // 애니메이션 포인트 상태 관리
-        val animatedPoints = remember { Animatable(startPoints.toFloat()) }
+        val animatedPoints = remember(card.id) { Animatable(startPoints.toFloat()) }
         
         LaunchedEffect(displayPoint) {
             // 💡 loadCard나 refreshCard로 인해 displayPoint가 변경되면 애니메이션 실행
@@ -512,6 +512,7 @@ fun WordCardScreen(
             uiState.pronunciationResult?.let { result ->
                 LaunchedEffect(result) {
                     scrollState.animateScrollTo(scrollState.maxValue)
+                    vm.refreshCard(wordId)
                 }
                 Spacer(Modifier.height(16.dp))
                 Card(
