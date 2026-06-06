@@ -65,7 +65,7 @@ class CollectionViewModel(
     private fun sortWords(list: List<WordCard>, order: SortOrder): List<WordCard> {
         return when (order) {
             SortOrder.NEWEST -> list.sortedByDescending { it.id }
-            SortOrder.SCORE -> list.sortedByDescending { it.wordPoint.coerceAtLeast(it.bestScore.toInt()) }
+            SortOrder.SCORE -> list.sortedByDescending { it.wordPoint }
         }
     }
 

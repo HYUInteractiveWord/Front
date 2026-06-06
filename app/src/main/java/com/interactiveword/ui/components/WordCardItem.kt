@@ -54,7 +54,7 @@ fun WordCardItem(
     // 등장 효과를 위한 scale 애니메이션
     val entranceScale = remember { Animatable(if (animateEntrance) 0.8f else 1f) }
 
-    LaunchedEffect(card.id, animateProgress, animateEntrance) {
+    LaunchedEffect(card.id, card.wordPoint,animateProgress, animateEntrance) {
         if (animateEntrance) {
             // "통!" 튀어오르는 효과
             entranceScale.animateTo(
@@ -65,7 +65,7 @@ fun WordCardItem(
         }
 
         if (animateProgress && unseenIncrease > 0) {
-            delay(300) // 약간의 지연 후 상승 시작
+            delay(300)
             animatedPoints.animateTo(
                 targetValue = currentPoints.toFloat(),
                 animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing)

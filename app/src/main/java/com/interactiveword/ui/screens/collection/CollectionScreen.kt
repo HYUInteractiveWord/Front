@@ -26,6 +26,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.background
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.repeatOnLifecycle
 import com.interactiveword.util.WordCardPointManager
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,7 +36,12 @@ fun CollectionScreen(
     vm: CollectionViewModel = viewModel(),
 ) {
     val uiState by vm.uiState.collectAsState()
-    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    LaunchedEffect(lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.RESUMED) {
+            vm.loadWords()
+        }
+    }
     val context = LocalContext.current
 
     DisposableEffect(lifecycleOwner) {
