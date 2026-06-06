@@ -147,7 +147,7 @@ class ExampleQuizViewModel(
                 }
 
                 val questions = validWords.shuffled().take(EXAMPLE_QUIZ_LIMIT).mapNotNull { card ->
-                    buildQuestionForCard(card)
+                    buildQuestionForCard(card, validWords)
                 }
 
                 if (questions.isEmpty()) {
@@ -162,7 +162,7 @@ class ExampleQuizViewModel(
         }
     }
 
-    private fun buildQuestionForCard(card: WordCard): ExampleQuizQuestion? {
+    private fun buildQuestionForCard(card: WordCard, allWords: List<WordCard>): ExampleQuizQuestion? {
         val examples = card.exampleSentences ?: return null
         if (examples.isEmpty()) return null
 
@@ -174,17 +174,33 @@ class ExampleQuizViewModel(
         val trans = getExValue(correctExample, "translation", "russian", "ru", "english", "en") ?: return null
 
         val isKrToTrans = Random.nextBoolean()
+        val targetCorrect = if (isKrToTrans) trans else kr
         
-        // 오답 리스트 생성 (같은 단어의 다른 예문들)
-        val wrongOptions = examples.filterIndexed { index, _ -> index != correctIndex }
+        // 오답 리스트 생성 (먼저 같은 단어의 다른 예문들)
+        val wrongOptionsFromSame = examples.filterIndexed { index, _ -> index != correctIndex }
             .mapNotNull { it as? Map<*, *> }
             .mapNotNull { getExValue(it, if (isKrToTrans) "translation" else "korean", "ru", "en", "kr", "sentence") }
-            .distinct()
-            .shuffled()
-            .take(2) // 최대 2개 (총 3지선다)
+            .toMutableSet()
 
-        // 만약 예문이 부족하면 다른 단어의 예문에서 가져옴 (추가 구현 가능하나 일단 카드 내에서 해결)
-        if (wrongOptions.size < 2) return null 
+        // 부족하면 다른 단어의 예문에서 가져옴
+        if (wrongOptionsFromSame.size < 3) {
+            val otherExamples = allWords.filter { it.id != card.id }
+                .flatMap { it.exampleSentences ?: emptyList<Any>() }
+                .mapNotNull { it as? Map<*, *> }
+                .shuffled()
+            
+            for (ex in otherExamples) {
+                val value = getExValue(ex, if (isKrToTrans) "translation" else "korean", "ru", "en", "kr", "sentence")
+                if (value != null && value != targetCorrect) {
+                    wrongOptionsFromSame.add(value)
+                    if (wrongOptionsFromSame.size >= 3) break
+                }
+            }
+        }
+
+        if (wrongOptionsFromSame.size < 3) return null 
+
+        val finalOptions = (wrongOptionsFromSame.take(3) + targetCorrect).shuffled()
 
         return if (isKrToTrans) {
             ExampleQuizQuestion(
@@ -192,7 +208,7 @@ class ExampleQuizViewModel(
                 type = ExampleQuizType.KOREAN_TO_TRANSLATION,
                 prompt = kr,
                 correctAnswer = trans,
-                options = (wrongOptions + trans).shuffled(),
+                options = finalOptions,
                 audioPath = getExValue(correctExample, "audio_path", "tts_audio_path")
             )
         } else {
@@ -201,7 +217,7 @@ class ExampleQuizViewModel(
                 type = ExampleQuizType.TRANSLATION_TO_KOREAN,
                 prompt = trans,
                 correctAnswer = kr,
-                options = (wrongOptions + kr).shuffled(),
+                options = finalOptions,
                 audioPath = getExValue(correctExample, "trans_audio_path", "translation_audio_path")
             )
         }

@@ -41,8 +41,8 @@ fun WordCardItem(
 ) {
     val context = LocalContext.current
     
-    // 포인트 정보 계산
-    val currentPoints = card.wordPoint.coerceAtLeast(card.bestScore.toInt())
+    // 포인트 정보 계산 (bestScore 대신 wordPoint 기반으로 통일)
+    val currentPoints = card.wordPoint.coerceIn(0, 100)
     val unseenIncrease = if (animateProgress) WordCardPointManager.getUnseenPointIncrease(context, card) else 0
     val startPoints = (currentPoints - unseenIncrease).coerceAtLeast(0)
     val newLevel = if (animateProgress) WordCardPointManager.checkLevelUp(context, card) else null

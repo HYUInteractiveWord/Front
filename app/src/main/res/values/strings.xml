@@ -195,6 +195,7 @@
     <string name="mission_daily_pronunciation">일일 발음 연습</string>
     <string name="mission_daily_scan">단어 스캔</string>
     <string name="mission_daily_word_quiz">단어 테스트</string>
+    <string name="mission_daily_example_quiz">예문 테스트</string>
     <string name="mission_daily_collect_noun">명사 단어 수집</string>
 
     <string name="profile_reward_title">프로필 꾸미기</string>

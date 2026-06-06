@@ -155,6 +155,9 @@ private fun missionDisplayName(missionType: String): String = when (missionType)
     "daily_pronunciation" -> stringResource(R.string.mission_daily_pronunciation)
     "daily_scan"          -> stringResource(R.string.mission_daily_scan)
     "daily_word_quiz"     -> stringResource(R.string.mission_daily_word_quiz)
+    "daily_example_quiz"  -> stringResource(R.string.mission_daily_example_quiz)
+    "daily_example_quiz_kr" -> stringResource(R.string.mission_daily_example_quiz)
+    "daily_example_quiz_trans" -> stringResource(R.string.mission_daily_example_quiz)
     "daily_collect_noun"  -> stringResource(R.string.mission_daily_collect_noun)
     else -> missionType
 }

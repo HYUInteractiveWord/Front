@@ -109,6 +109,7 @@ fun WordCardScreen(
         val animatedPoints = remember { Animatable(displayPoint.toFloat()) }
         
         LaunchedEffect(displayPoint) {
+            // 💡 loadCard나 refreshCard로 인해 displayPoint가 변경되면 애니메이션 실행
             animatedPoints.animateTo(
                 targetValue = displayPoint.toFloat(),
                 animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing)

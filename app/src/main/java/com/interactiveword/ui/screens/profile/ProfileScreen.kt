@@ -90,6 +90,7 @@ fun ProfileScreen(
                                 val icon = when (targetMission.missionType) {
                                     "daily_pronunciation" -> Icons.Filled.Mic
                                     "daily_scan"         -> Icons.Filled.QrCodeScanner
+                                    "daily_example_quiz", "daily_example_quiz_kr", "daily_example_quiz_trans" -> Icons.Filled.AutoStories
                                     else                 -> Icons.Filled.MenuBook
                                 }
                                 MissionCardItem(
@@ -113,11 +114,6 @@ fun ProfileScreen(
             item {
                 VocabQuizEntryCard(
                     onStartClick = { navController.navigate(Screen.VocabQuiz.route) }
-                )
-            }
-            item {
-                ExampleQuizEntryCard(
-                    onStartClick = { navController.navigate(Screen.ExampleQuiz.route) }
                 )
             }
             item {
@@ -152,6 +148,7 @@ fun ProfileScreen(
                                     val icon = when (targetMission.missionType) {
                                         "daily_pronunciation" -> Icons.Filled.Mic
                                         "daily_scan" -> Icons.Filled.QrCodeScanner
+                                        "daily_example_quiz", "daily_example_quiz_kr", "daily_example_quiz_trans" -> Icons.Filled.AutoStories
                                         else -> Icons.Filled.MenuBook
                                     }
                                     MissionCardItem(

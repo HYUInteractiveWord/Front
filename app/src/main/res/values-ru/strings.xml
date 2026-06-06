@@ -202,6 +202,7 @@
     <string name="mission_daily_pronunciation">Ежедневное произношение</string>
     <string name="mission_daily_scan">Сканирование слов</string>
     <string name="mission_daily_word_quiz">Тест слов</string>
+    <string name="mission_daily_example_quiz">Тест на примеры</string>
     <string name="mission_daily_collect_noun">Сбор существительных</string>
 
     <!-- Profile rewards -->

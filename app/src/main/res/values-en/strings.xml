@@ -204,6 +204,7 @@
     <string name="mission_daily_pronunciation">Daily Pronunciation</string>
     <string name="mission_daily_scan">Word Scan</string>
     <string name="mission_daily_word_quiz">Word Quiz</string>
+    <string name="mission_daily_example_quiz">Example Quiz</string>
     <string name="mission_daily_collect_noun">Collect Nouns</string>
 
     <!-- Profile rewards -->
