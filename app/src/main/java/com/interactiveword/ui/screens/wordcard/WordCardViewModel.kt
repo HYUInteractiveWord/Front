@@ -19,6 +19,11 @@ import java.io.File
 import org.json.JSONObject
 import com.interactiveword.R
 import com.interactiveword.ui.components.XpManager
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.ui.graphics.Color
+import com.interactiveword.ui.components.AppNotification
+import com.interactiveword.ui.components.NotiType
 
 data class WordCardUiState(
     val card: WordCard? = null,
@@ -245,7 +250,32 @@ class WordCardViewModel(
                     XpManager.emitXpGain(result.xpGained)
                 }
 
+                // 💡 최고 점수 경신 알림 (결과 응답의 isNewBest가 true인 경우)
+                if (result.isNewBest) {
+                    XpManager.emitNotification(
+                        AppNotification(
+                            type = NotiType.BEST_SCORE,
+                            message = context.getString(R.string.noti_word_best_score_achieved, result.score.toInt()),
+                            color = Color(0xFFFFC107), // Amber/Gold
+                            icon = Icons.Default.EmojiEvents
+                        )
+                    )
+                }
+
                 val refreshedCard = repo.getWord(card.id)
+
+                // 💡 MASTER 달성 알림 (기존 점수가 100 미만이었다가 100이 된 경우)
+                if (refreshedCard.wordPoint >= 97 && (card.wordPoint < 97)) {
+                    XpManager.emitNotification(
+                        AppNotification(
+                            type = NotiType.MASTER_ACHIEVED,
+                            message = context.getString(R.string.noti_word_master_achieved, card.koreanWord),
+                            color = Color(0xFFFFC107), // Amber/Gold
+                            icon = Icons.Default.EmojiEvents
+                        )
+                    )
+                }
+
                 val latestHistory = try {
                     repo.getPronunciationHistory(card.id).firstOrNull()
                 } catch (_: Exception) {

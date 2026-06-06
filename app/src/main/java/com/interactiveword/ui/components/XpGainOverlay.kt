@@ -30,7 +30,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlin.random.Random
 
 enum class NotiType {
-    XP, RANK_UP, SLOT_INCREASE, TICKET, NEW_WORD
+    XP, RANK_UP, SLOT_INCREASE, TICKET, NEW_WORD, MASTER_ACHIEVED, BEST_SCORE
 }
 
 data class AppNotification(
@@ -73,14 +73,14 @@ fun XpGainOverlay() {
             
             // 타입별 파티클 생성
             val count = when (notification.type) {
-                NotiType.RANK_UP -> 80
+                NotiType.RANK_UP, NotiType.MASTER_ACHIEVED, NotiType.BEST_SCORE -> 80
                 NotiType.XP -> if (notification.amount >= 150) 40 else 15
                 else -> 30
             }
             
             particles.clear()
             val colors = when(notification.type) {
-                NotiType.RANK_UP -> listOf(Color(0xFFFFD700), Color.White, Color(0xFFFFA000))
+                NotiType.RANK_UP, NotiType.MASTER_ACHIEVED, NotiType.BEST_SCORE -> listOf(Color(0xFFFFD700), Color.White, Color(0xFFFFA000), BrandGreenLight)
                 NotiType.TICKET -> listOf(Color(0xFFE91E63), Color.White, Color(0xFFFF4081))
                 NotiType.NEW_WORD -> listOf(BrandGreenLight, Color.White, Color(0xFFB9F6CA))
                 else -> listOf(Color.Yellow, Color.White, Color(0xFFFFD700), Color(0xFF00E676))
