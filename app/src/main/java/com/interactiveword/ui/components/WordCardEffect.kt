@@ -33,7 +33,7 @@ fun wordCardEffectStyle(wordPoint: Int): WordCardEffectStyle {
             showSparkle = true,
         )
 
-        point >= 76 -> WordCardEffectStyle(
+        point >= 85 -> WordCardEffectStyle(
             label = "숙련",
             borderColor = Color(0xFF9B7EDE),      // 보라색
             progressColor = Color(0xFF9B7EDE),
@@ -41,7 +41,7 @@ fun wordCardEffectStyle(wordPoint: Int): WordCardEffectStyle {
             showSparkle = false,
         )
 
-        point >= 51 -> WordCardEffectStyle(
+        point >= 65 -> WordCardEffectStyle(
             label = "성장 중",
             borderColor = Color(0xFF5B8DEF),      // 파란색
             progressColor = Color(0xFF5B8DEF),
@@ -49,10 +49,18 @@ fun wordCardEffectStyle(wordPoint: Int): WordCardEffectStyle {
             showSparkle = false,
         )
 
-        point >= 26 -> WordCardEffectStyle(
+        point >= 50 -> WordCardEffectStyle(
             label = "연습 중",
             borderColor = Color(0xFFC0C0C0),      // 은색
             progressColor = Color(0xFFC0C0C0),
+            containerColor = null,
+            showSparkle = false,
+        )
+
+        point >= 20 -> WordCardEffectStyle(
+            label = "기초 단계",
+            borderColor = Color(0xFF4CAF50),      // 초록색
+            progressColor = Color(0xFF4CAF50),
             containerColor = null,
             showSparkle = false,
         )
