@@ -22,6 +22,8 @@ import com.interactiveword.util.WordCardPointManager
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MenuBook
 import kotlinx.coroutines.Dispatchers
+import retrofit2.HttpException
+import org.json.JSONObject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -252,11 +254,62 @@ class DictionaryVerifyViewModel(
                     saveCompleted = true,
                 )
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(
-                    isSaving = false,
-                    errorMessage = e.message ?: "단어장 추가에 실패했습니다.",
-                )
+                val errorMessage = parseErrorMessage(e)
+                val isDuplicate = (e is HttpException && e.code() == 400 && errorMessage.contains("already in your collection", ignoreCase = true))
+                
+                if (isDuplicate) {
+                    // 중복 에러일 경우 무시하고 이미 추가된 것으로 처리
+                    cleanupDuplicates(_uiState.value.word)
+                    _uiState.value = _uiState.value.copy(
+                        isSaving = false,
+                        saveCompleted = true,
+                    )
+                } else {
+                    val localizedError = when {
+                        errorMessage.contains("Word is empty", ignoreCase = true) -> getApplication<Application>().getString(R.string.error_word_empty)
+                        errorMessage.contains("Word slot limit reached", ignoreCase = true) -> getApplication<Application>().getString(R.string.error_word_slot_limit)
+                        errorMessage.contains("already in your collection", ignoreCase = true) -> getApplication<Application>().getString(R.string.error_word_already_exists)
+                        else -> getApplication<Application>().getString(R.string.error_unknown) + ": $errorMessage"
+                    }
+
+                    _uiState.value = _uiState.value.copy(
+                        isSaving = false,
+                        errorMessage = localizedError,
+                    )
+                }
             }
+        }
+    }
+
+    private fun parseErrorMessage(e: Exception): String {
+        return if (e is HttpException) {
+            try {
+                val errorBody = e.response()?.errorBody()?.string()
+                if (errorBody != null) {
+                    val json = JSONObject(errorBody)
+                    json.optString("detail", e.message())
+                } else {
+                    e.message()
+                }
+            } catch (ex: Exception) {
+                e.message()
+            }
+        } else {
+            e.message ?: "Unknown error"
+        }
+    }
+
+    private suspend fun cleanupDuplicates(targetWord: String) {
+        try {
+            val allWords = repo.getMyWords()
+            val duplicates = allWords.filter { it.koreanWord == targetWord }
+            if (duplicates.size > 1) {
+                val sorted = duplicates.sortedByDescending { it.wordPoint }
+                val toDelete = sorted.drop(1)
+                toDelete.forEach { repo.deleteWord(it.id) }
+            }
+        } catch (e: Exception) {
+            // 무시
         }
     }
 
