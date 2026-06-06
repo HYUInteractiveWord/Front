@@ -266,7 +266,8 @@ fun ScanScreen(
                         DetectedWordItem(
                             result = result,
                             added = result.word in uiState.addedWords,
-                            onAdd = { vm.addWordToCollection(result.word) },
+                            loading = result.word in uiState.loadingWords,
+                            onAdd = { vm.addWordToCollection(result.word, result.pos, result.definition) },
                             onDismiss = { vm.dismissWord(result.word) },
                         )
                     }
@@ -413,6 +414,7 @@ private fun RecordingView(
 private fun DetectedWordItem(
     result: ScanWordResult,
     added: Boolean,
+    loading: Boolean = false,
     onAdd: () -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -464,15 +466,23 @@ private fun DetectedWordItem(
                 }
             }
 
-            IconButton(
-                onClick = { if (!added) onAdd() },
-                enabled = !added,
-            ) {
-                Icon(
-                    if (added) Icons.Filled.Check else Icons.Filled.Add,
-                    null,
-                    tint = if (added) DarkMutedText else BrandGreenLight,
+            if (loading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp).padding(4.dp),
+                    color = BrandGreenLight,
+                    strokeWidth = 2.dp
                 )
+            } else {
+                IconButton(
+                    onClick = { if (!added) onAdd() },
+                    enabled = !added,
+                ) {
+                    Icon(
+                        if (added) Icons.Filled.Check else Icons.Filled.Add,
+                        null,
+                        tint = if (added) DarkMutedText else BrandGreenLight,
+                    )
+                }
             }
 
             IconButton(onClick = onDismiss) {

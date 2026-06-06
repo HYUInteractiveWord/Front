@@ -302,6 +302,11 @@
     <string name="settings_delete_account">Удалить аккаунт</string>
     <string name="settings_delete_sub">Данные не восстановить</string>
 
+    <string name="error_word_empty">Слово не введено.</string>
+    <string name="error_word_slot_limit">Предел слотов для слов достигнут. Выполните миссии, чтобы разблокировать больше.</string>
+    <string name="error_word_already_exists">Слово уже есть в вашем словнике.</string>
+    <string name="error_unknown">Произошла неизвестная ошибка.</string>
+
     <!-- Notifications -->
     <string name="noti_rank_up">Повышение ранга! %1$s</string>
     <string name="noti_word_slot_increase">Слоты слов увеличены! (%1$d слотов)</string>

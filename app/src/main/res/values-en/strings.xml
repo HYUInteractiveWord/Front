@@ -303,6 +303,11 @@
     <string name="settings_delete_account">Delete Account</string>
     <string name="settings_delete_sub">Cannot recover data</string>
 
+    <string name="error_word_empty">Word is empty.</string>
+    <string name="error_word_slot_limit">Word slot limit reached. Complete missions to unlock more.</string>
+    <string name="error_word_already_exists">Word already in your collection.</string>
+    <string name="error_unknown">An unknown error occurred.</string>
+
     <!-- Notifications -->
     <string name="noti_rank_up">Rank Up! %1$s</string>
     <string name="noti_word_slot_increase">Word Slot Increased! (%1$d slots)</string>

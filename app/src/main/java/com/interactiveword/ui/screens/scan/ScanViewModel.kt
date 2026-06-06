@@ -34,6 +34,8 @@ import androidx.compose.material.icons.filled.MenuBook
 import com.interactiveword.R
 import com.interactiveword.ui.theme.BrandGreenLight
 import com.interactiveword.util.WordCardPointManager
+import retrofit2.HttpException
+import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -52,6 +54,7 @@ data class ScanUiState(
     val elapsedSeconds: Int = 0,
     val detectedWords: List<ScanWordResult> = emptyList(),
     val addedWords: Set<String> = emptySet(),
+    val loadingWords: Set<String> = emptySet(),
     val isLoading: Boolean = false,
     val error: String? = null,
 )
@@ -346,10 +349,21 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun addWordToCollection(word: String) {
+    fun addWordToCollection(word: String, pos: String?, definition: String?) {
+        val state = _uiState.value
+        if (word in state.addedWords || word in state.loadingWords) return
+
+        _uiState.value = state.copy(loadingWords = state.loadingWords + word)
+
         viewModelScope.launch {
             try {
-                val newCard = wordRepo.createWord(word, source = "scan")
+                val newCard = wordRepo.createWord(
+                    word = word,
+                    source = "dictionary",
+                    pos = pos,
+                    definition = definition
+                )
+                
                 // 💡 신규 추가된 단어 ID를 미확인 목록에 등록
                 WordCardPointManager.addUnseenWords(context, listOf(newCard.id))
 
@@ -363,10 +377,75 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
                     )
                 )
 
-                _uiState.value = _uiState.value.copy(addedWords = _uiState.value.addedWords + word)
+                // 중복 단어 정리 (포인트 높은 것 유지)
+                cleanupDuplicates(word)
+
+                _uiState.value = _uiState.value.copy(
+                    addedWords = _uiState.value.addedWords + word,
+                    loadingWords = _uiState.value.loadingWords - word
+                )
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(error = e.message)
+                val errorMessage = parseErrorMessage(e)
+                val isDuplicate = (e is HttpException && e.code() == 400 && errorMessage.contains("already in your collection", ignoreCase = true))
+                
+                if (isDuplicate) {
+                    // 중복 에러일 경우 무시하고 이미 추가된 것으로 처리
+                    cleanupDuplicates(word)
+                    _uiState.value = _uiState.value.copy(
+                        addedWords = _uiState.value.addedWords + word,
+                        loadingWords = _uiState.value.loadingWords - word
+                    )
+                } else {
+                    val localizedError = when {
+                        errorMessage.contains("Word is empty", ignoreCase = true) -> context.getString(R.string.error_word_empty)
+                        errorMessage.contains("Word slot limit reached", ignoreCase = true) -> context.getString(R.string.error_word_slot_limit)
+                        errorMessage.contains("already in your collection", ignoreCase = true) -> context.getString(R.string.error_word_already_exists)
+                        else -> context.getString(R.string.error_unknown) + ": $errorMessage"
+                    }
+
+                    _uiState.value = _uiState.value.copy(
+                        error = localizedError,
+                        loadingWords = _uiState.value.loadingWords - word
+                    )
+                }
             }
+        }
+    }
+
+    private fun parseErrorMessage(e: Exception): String {
+        return if (e is HttpException) {
+            try {
+                val errorBody = e.response()?.errorBody()?.string()
+                if (errorBody != null) {
+                    val json = JSONObject(errorBody)
+                    json.optString("detail", e.message())
+                } else {
+                    e.message()
+                }
+            } catch (ex: Exception) {
+                e.message()
+            }
+        } else {
+            e.message ?: "Unknown error"
+        }
+    }
+
+    private suspend fun cleanupDuplicates(targetWord: String) {
+        try {
+            val allWords = wordRepo.getMyWords()
+            val duplicates = allWords.filter { it.koreanWord == targetWord }
+            if (duplicates.size > 1) {
+                // 포인트 높은 순으로 정렬
+                val sorted = duplicates.sortedByDescending { it.wordPoint }
+                val toKeep = sorted.first()
+                val toDelete = sorted.drop(1)
+                
+                toDelete.forEach { 
+                    wordRepo.deleteWord(it.id)
+                }
+            }
+        } catch (e: Exception) {
+            // 정리 실패 시 무시
         }
     }
 
