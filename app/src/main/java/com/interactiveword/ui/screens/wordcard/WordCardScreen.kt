@@ -32,6 +32,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.interactiveword.ui.components.WordCardEffectBadge
@@ -62,6 +64,16 @@ fun WordCardScreen(
         vm.loadCard(wordId, context)
     }
 
+    // 💡 화면 재입장 시 최신 점수 반영을 위해 Resume 시점에 리프레시
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    LaunchedEffect(lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.RESUMED) {
+            vm.refreshCard(wordId)
+        }
+    }
+
+    val scrollState = rememberScrollState()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -88,11 +100,7 @@ fun WordCardScreen(
             return@Scaffold
         }
 
-        val displayPoint = if (card.wordPoint > 0) {
-            card.wordPoint
-        } else {
-            card.bestScore.toInt().coerceIn(0, 100)
-        }
+        val displayPoint = card.wordPoint.coerceIn(0, 100)
 
         val effect = wordCardEffectStyle(displayPoint)
         val containerColor = effect.containerColor ?: MaterialTheme.colorScheme.surface
@@ -122,7 +130,7 @@ fun WordCardScreen(
                 .fillMaxSize()
                 .padding(padding)
                 .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(scrollState),
         ) {
             Card(
                 shape = MaterialTheme.shapes.large,
@@ -321,116 +329,36 @@ fun WordCardScreen(
                 }
             }
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(24.dp))
 
-            // 💡 발음 평가 결과를 예문보다 위로 이동
-            if (uiState.pronunciationResult == null) {
-                uiState.savedPronunciationResult?.let { saved ->
-                    Card(
-                        shape = MaterialTheme.shapes.large,
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                        ),
-                        border = BorderStroke(1.dp, BrandGreenLight),
-                        modifier = Modifier.fillMaxWidth(),
+            // 💡 발음 연습 버튼을 예문 위로 이동
+            Button(
+                onClick = {
+                    if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) ==
+                        PackageManager.PERMISSION_GRANTED
                     ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Text(
-                                text = stringResource(R.string.pronunciation_result_title),
-                                style = MaterialTheme.typography.titleMedium,
-                                color = BrandGreenLight,
-                            )
-                            Spacer(Modifier.height(8.dp))
-                            Text(
-                                text = stringResource(R.string.pronunciation_score_format, saved.score.toInt()),
-                                style = MaterialTheme.typography.bodyMedium,
-                            )
-                            Text(
-                                text = stringResource(R.string.pronunciation_xp_gained_format, saved.xpGained),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = DarkMutedText,
-                            )
-                            if (!saved.recordedAt.isNullOrBlank()) {
-                                Text(
-                                    text = stringResource(R.string.pronunciation_saved_at_format, saved.recordedAt),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = DarkMutedText,
-                                )
-                            }
-
-                            Spacer(Modifier.height(12.dp))
-                            PronunciationScoreChart(
-                                pronunciation = saved.pronunciation,
-                                formant = saved.formant,
-                                pitch = saved.pitch,
-                                timing = saved.timing,
-                                total = saved.score,
-                            )
-                            Spacer(Modifier.height(8.dp))
-                            Text(
-                                text = if (saved.isIntensityGood) {
-                                    stringResource(R.string.pronunciation_volume_ok)
-                                } else {
-                                    stringResource(R.string.pronunciation_volume_low)
-                                },
-                                style = MaterialTheme.typography.bodySmall,
-                                color = DarkMutedText,
-                            )
-                        }
+                        vm.togglePronunciationPractice(context)
+                    } else {
+                        micPermLauncher.launch(Manifest.permission.RECORD_AUDIO)
                     }
-                    Spacer(Modifier.height(16.dp))
-                }
+                },
+                modifier = Modifier.fillMaxWidth().height(52.dp),
+                shape = MaterialTheme.shapes.extraLarge,
+                colors = ButtonDefaults.buttonColors(containerColor = BrandGreenLight),
+            ) {
+                Icon(Icons.Filled.Mic, null, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    when {
+                        uiState.isSubmittingPronunciation -> stringResource(R.string.pronunciation_evaluating)
+                        uiState.isRecording -> stringResource(R.string.wordcard_stop_recording_and_evaluate)
+                        else -> stringResource(R.string.wordcard_start_pronunciation)
+                    },
+                    style = MaterialTheme.typography.titleMedium,
+                )
             }
 
-            uiState.pronunciationResult?.let { result ->
-                Card(
-                    shape = MaterialTheme.shapes.large,
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    ),
-                    border = BorderStroke(1.dp, BrandGreenLight),
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(
-                            text = stringResource(R.string.pronunciation_result_title),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = BrandGreenLight,
-                        )
-                        Spacer(Modifier.height(8.dp))
-                        Text(
-                            text = stringResource(R.string.pronunciation_score_format, result.score.toInt()),
-                            style = MaterialTheme.typography.bodyMedium,
-                        )
-                        Text(
-                            text = stringResource(R.string.pronunciation_xp_gained_format, result.xpGained),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = DarkMutedText,
-                        )
-                        result.details?.let { details ->
-                            Spacer(Modifier.height(12.dp))
-                            PronunciationScoreChart(
-                                pronunciation = details.pronunciation,
-                                formant = details.formant,
-                                pitch = details.pitch,
-                                timing = details.timing,
-                                total = result.score,
-                            )
-                            Spacer(Modifier.height(8.dp))
-                            Text(
-                                text = if (details.isIntensityGood) {
-                                    stringResource(R.string.pronunciation_volume_ok)
-                                } else {
-                                    stringResource(R.string.pronunciation_volume_low)
-                                },
-                                style = MaterialTheme.typography.bodySmall,
-                                color = DarkMutedText,
-                            )
-                        }
-                    }
-                }
-                Spacer(Modifier.height(16.dp))
-            }
+            Spacer(Modifier.height(24.dp))
 
             Text(stringResource(R.string.wordcard_learning_examples), style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(8.dp))
@@ -516,32 +444,116 @@ fun WordCardScreen(
                 }
             }
 
-            Spacer(Modifier.height(16.dp))
-
-            Button(
-                onClick = {
-                    if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) ==
-                        PackageManager.PERMISSION_GRANTED
+            // 💡 평가 결과는 다시 예문 아래로 이동하고, 결과가 나오면 자동 스크롤
+            if (uiState.pronunciationResult == null) {
+                uiState.savedPronunciationResult?.let { saved ->
+                    Spacer(Modifier.height(16.dp))
+                    Card(
+                        shape = MaterialTheme.shapes.large,
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        ),
+                        border = BorderStroke(1.dp, BrandGreenLight),
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
-                        vm.togglePronunciationPractice(context)
-                    } else {
-                        micPermLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(
+                                text = stringResource(R.string.pronunciation_result_title),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = BrandGreenLight,
+                            )
+                            Spacer(Modifier.height(8.dp))
+                            Text(
+                                text = stringResource(R.string.pronunciation_score_format, saved.score.toInt()),
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                            Text(
+                                text = stringResource(R.string.pronunciation_xp_gained_format, saved.xpGained),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = DarkMutedText,
+                            )
+                            if (!saved.recordedAt.isNullOrBlank()) {
+                                Text(
+                                    text = stringResource(R.string.pronunciation_saved_at_format, saved.recordedAt),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = DarkMutedText,
+                                )
+                            }
+
+                            Spacer(Modifier.height(12.dp))
+                            PronunciationScoreChart(
+                                pronunciation = saved.pronunciation,
+                                formant = saved.formant,
+                                pitch = saved.pitch,
+                                timing = saved.timing,
+                                total = saved.score,
+                            )
+                            Spacer(Modifier.height(8.dp))
+                            Text(
+                                text = if (saved.isIntensityGood) {
+                                    stringResource(R.string.pronunciation_volume_ok)
+                                } else {
+                                    stringResource(R.string.pronunciation_volume_low)
+                                },
+                                style = MaterialTheme.typography.bodySmall,
+                                color = DarkMutedText,
+                            )
+                        }
                     }
-                },
-                modifier = Modifier.fillMaxWidth().height(52.dp),
-                shape = MaterialTheme.shapes.extraLarge,
-                colors = ButtonDefaults.buttonColors(containerColor = BrandGreenLight),
-            ) {
-                Icon(Icons.Filled.Mic, null, modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    when {
-                        uiState.isSubmittingPronunciation -> stringResource(R.string.pronunciation_evaluating)
-                        uiState.isRecording -> stringResource(R.string.wordcard_stop_recording_and_evaluate)
-                        else -> stringResource(R.string.wordcard_start_pronunciation)
-                    },
-                    style = MaterialTheme.typography.titleMedium,
-                )
+                }
+            }
+
+            uiState.pronunciationResult?.let { result ->
+                LaunchedEffect(result) {
+                    scrollState.animateScrollTo(scrollState.maxValue)
+                }
+                Spacer(Modifier.height(16.dp))
+                Card(
+                    shape = MaterialTheme.shapes.large,
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    ),
+                    border = BorderStroke(1.dp, BrandGreenLight),
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            text = stringResource(R.string.pronunciation_result_title),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = BrandGreenLight,
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            text = stringResource(R.string.pronunciation_score_format, result.score.toInt()),
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                        Text(
+                            text = stringResource(R.string.pronunciation_xp_gained_format, result.xpGained),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = DarkMutedText,
+                        )
+                        result.details?.let { details ->
+                            Spacer(Modifier.height(12.dp))
+                            PronunciationScoreChart(
+                                pronunciation = details.pronunciation,
+                                formant = details.formant,
+                                pitch = details.pitch,
+                                timing = details.timing,
+                                total = result.score,
+                            )
+                            Spacer(Modifier.height(8.dp))
+                            Text(
+                                text = if (details.isIntensityGood) {
+                                    stringResource(R.string.pronunciation_volume_ok)
+                                } else {
+                                    stringResource(R.string.pronunciation_volume_low)
+                                },
+                                style = MaterialTheme.typography.bodySmall,
+                                color = DarkMutedText,
+                            )
+                        }
+                    }
+                }
             }
         }
     }

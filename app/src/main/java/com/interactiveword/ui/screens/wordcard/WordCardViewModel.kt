@@ -80,6 +80,15 @@ class WordCardViewModel(
         }
     }
 
+    fun refreshCard(wordId: Int) {
+        viewModelScope.launch {
+            try {
+                val refreshedCard = repo.getWord(wordId)
+                _uiState.value = _uiState.value.copy(card = refreshedCard)
+            } catch (_: Exception) {}
+        }
+    }
+
     // 1. 한국어 표제어 오디오 재생
     fun playTts() {
         val path = _uiState.value.card?.ttsAudioPath
