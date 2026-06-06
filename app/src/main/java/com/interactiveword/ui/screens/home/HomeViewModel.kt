@@ -72,7 +72,7 @@ class HomeViewModel @JvmOverloads constructor(
                         XpManager.emitNotification(
                             AppNotification(
                                 type = NotiType.RANK_UP,
-                                message = context.getString(R.string.noti_rank_up, RankManager.getRankLabel(newRank)),
+                                message = context.getString(R.string.noti_rank_up, RankManager.getRankLabel(context, newRank)),
                                 color = Color(0xFFFFA000), // Gold
                                 icon = Icons.Default.EmojiEvents
                             )

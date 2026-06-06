@@ -1,5 +1,6 @@
 package com.interactiveword.util
 
+import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -39,7 +40,17 @@ object RankManager {
 
     @Composable
     fun getRankLabel(rank: String?): String {
-        val resId = when (rank?.lowercase()) {
+        val resId = getRankResId(rank) ?: return rank ?: ""
+        return stringResource(resId)
+    }
+
+    fun getRankLabel(context: Context, rank: String?): String {
+        val resId = getRankResId(rank) ?: return rank ?: ""
+        return context.getString(resId)
+    }
+
+    private fun getRankResId(rank: String?): Int? {
+        return when (rank?.lowercase()) {
             "bronze"   -> R.string.rank_bronze
             "silver"   -> R.string.rank_silver
             "gold"     -> R.string.rank_gold
@@ -52,9 +63,8 @@ object RankManager {
             "obsidian" -> R.string.rank_obsidian
             "diamond"  -> R.string.rank_diamond
             "master"   -> R.string.rank_master
-            else -> return rank ?: ""
+            else -> null
         }
-        return stringResource(resId)
     }
 
     fun getRankColor(rank: String?): Color {
