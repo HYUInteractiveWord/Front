@@ -41,6 +41,7 @@ import com.interactiveword.ui.components.wordCardEffectStyle
 import com.interactiveword.ui.theme.BrandGreenLight
 import com.interactiveword.ui.theme.DarkMutedText
 import com.interactiveword.ui.theme.DarkOutline
+import com.interactiveword.util.WordCardPointManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -101,12 +102,14 @@ fun WordCardScreen(
         }
 
         val displayPoint = card.wordPoint.coerceIn(0, 100)
+        val unseenIncrease = WordCardPointManager.getUnseenPointIncrease(context, card)
+        val startPoints = (displayPoint - unseenIncrease).coerceAtLeast(0)
 
         val effect = wordCardEffectStyle(displayPoint)
         val containerColor = effect.containerColor ?: MaterialTheme.colorScheme.surface
 
         // 애니메이션 포인트 상태 관리
-        val animatedPoints = remember { Animatable(displayPoint.toFloat()) }
+        val animatedPoints = remember { Animatable(startPoints.toFloat()) }
         
         LaunchedEffect(displayPoint) {
             // 💡 loadCard나 refreshCard로 인해 displayPoint가 변경되면 애니메이션 실행
@@ -114,6 +117,8 @@ fun WordCardScreen(
                 targetValue = displayPoint.toFloat(),
                 animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing)
             )
+            // 확인 완료 처리
+            WordCardPointManager.markAsSeen(context, card)
         }
         
         val currentDisplayPoint = animatedPoints.value.toInt()

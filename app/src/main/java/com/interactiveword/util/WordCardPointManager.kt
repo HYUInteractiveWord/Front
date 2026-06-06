@@ -31,7 +31,7 @@ object WordCardPointManager {
     fun getUnseenPointIncrease(context: Context, card: WordCard): Int {
         val prefs = getPrefs(context)
         val lastPoints = prefs.getInt("${KEY_PREFIX_POINTS}${card.id}", 0)
-        val currentPoints = card.wordPoint.coerceAtLeast(card.bestScore.toInt())
+        val currentPoints = card.wordPoint.coerceIn(0, 100)
         return (currentPoints - lastPoints).coerceAtLeast(0)
     }
 
@@ -41,7 +41,7 @@ object WordCardPointManager {
     fun checkLevelUp(context: Context, card: WordCard): Int? {
         val prefs = getPrefs(context)
         val lastLevel = prefs.getInt("${KEY_PREFIX_LEVEL}${card.id}", 1)
-        val currentPoints = card.wordPoint.coerceAtLeast(card.bestScore.toInt())
+        val currentPoints = card.wordPoint.coerceIn(0, 100)
         val currentLevel = getPointLevel(currentPoints)
 
         return if (currentLevel > lastLevel) currentLevel else null
@@ -51,7 +51,7 @@ object WordCardPointManager {
      * 현재 포인트와 레벨을 "확인함"으로 저장합니다.
      */
     fun markAsSeen(context: Context, card: WordCard) {
-        val currentPoints = card.wordPoint.coerceAtLeast(card.bestScore.toInt())
+        val currentPoints = card.wordPoint.coerceIn(0, 100)
         val currentLevel = getPointLevel(currentPoints)
         getPrefs(context).edit()
             .putInt("${KEY_PREFIX_POINTS}${card.id}", currentPoints)
