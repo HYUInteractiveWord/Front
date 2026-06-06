@@ -1,5 +1,10 @@
 package com.interactiveword.ui.components
 
+import android.content.Context
+import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.*
@@ -18,6 +23,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -56,9 +62,21 @@ object XpManager {
 
 @Composable
 fun XpGainOverlay() {
+    val context = LocalContext.current
     var currentNoti by remember { mutableStateOf<AppNotification?>(null) }
     var visible by remember { mutableStateOf(false) }
     val particles = remember { mutableStateListOf<Particle>() }
+
+    // 진동 서비스 가져오기
+    val vibrator = remember(context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val vibratorManager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+            vibratorManager.defaultVibrator
+        } else {
+            @Suppress("DEPRECATION")
+            context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        }
+    }
     
     // 알림 큐 처리를 위한 로직
     LaunchedEffect(Unit) {
@@ -70,6 +88,18 @@ fun XpGainOverlay() {
             
             currentNoti = notification
             visible = true
+
+            // 진동 발생
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    vibrator.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
+                } else {
+                    @Suppress("DEPRECATION")
+                    vibrator.vibrate(50)
+                }
+            } catch (e: Exception) {
+                // 진동 실패 시 무시
+            }
             
             // 타입별 파티클 생성
             val count = when (notification.type) {
