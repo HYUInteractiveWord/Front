@@ -277,9 +277,14 @@
     <string name="wordcard_point_format">%1$d / 100 pt</string>
     <string name="action_confirm">Confirm</string>
     <string name="pos_noun">Noun</string>
+    <string name="pos_pronoun">Pronoun</string>
+    <string name="pos_numeral">Numeral</string>
     <string name="pos_verb">Verb</string>
     <string name="pos_adjective">Adjective</string>
+    <string name="pos_determiner">Determiner</string>
     <string name="pos_adverb">Adverb</string>
+    <string name="pos_particle">Particle</string>
+    <string name="pos_interjection">Interjection</string>
 
     <string name="lang_change_title">Change Language</string>
     <string name="lang_change_warning">Warning: Changing language will permanently delete all saved word cards. Continue?</string>

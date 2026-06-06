@@ -89,6 +89,7 @@ data class PosQuizQuestion(
     val correctPos: String,
     val wordAudioPath: String?,
     val definitionAudioPath: String?,
+    val options: List<String> = emptyList(),
 )
 
 data class PosQuizUiState(
@@ -116,7 +117,7 @@ class PosQuizViewModel(
 ) : ViewModel() {
 
     companion object {
-        val options = listOf("명사", "동사", "형용사", "부사")
+        private val ALL_POS = listOf("명사", "대명사", "수사", "동사", "형용사", "관형사", "부사", "조사", "감탄사")
     }
 
     private val _uiState = MutableStateFlow(PosQuizUiState())
@@ -296,9 +297,38 @@ class PosQuizViewModel(
                     return@launch
                 }
 
+                val shuffledQuestions = validQuestions.shuffled().take(min(POS_QUIZ_LIMIT, validQuestions.size))
+
+                // 사용자 단어장에 존재하는 모든 품사 추출
+                val existingPosList = validQuestions.map { it.correctPos }.distinct()
+
+                // 각 질문에 대해 랜덤 보기 생성
+                val questionsWithOptions = shuffledQuestions.map { question ->
+                    // 1. 정답 포함
+                    val questionOptions = mutableSetOf(question.correctPos)
+
+                    // 2. 단어장에 있는 다른 품사들 중 랜덤 추가 (최대 4개까지)
+                    val otherExistingPos = (existingPosList - question.correctPos).shuffled()
+                    for (pos in otherExistingPos) {
+                        if (questionOptions.size >= 4) break
+                        questionOptions.add(pos)
+                    }
+
+                    // 3. 4개가 안 되면 전체 품사 중 랜덤 추가
+                    if (questionOptions.size < 4) {
+                        val remainingAllPos = (ALL_POS - questionOptions).shuffled()
+                        for (pos in remainingAllPos) {
+                            if (questionOptions.size >= 4) break
+                            questionOptions.add(pos)
+                        }
+                    }
+
+                    question.copy(options = questionOptions.toList().shuffled())
+                }
+
                 _uiState.value = PosQuizUiState(
                     isLoading = false,
-                    questions = validQuestions.shuffled().take(min(POS_QUIZ_LIMIT, validQuestions.size)),
+                    questions = questionsWithOptions,
                 )
             } catch (e: Throwable) {
                 _uiState.value = PosQuizUiState(
@@ -322,21 +352,32 @@ class PosQuizViewModel(
         if (pos.isBlank()) return null
         return when {
             "명사" in pos -> "명사"
+            "대명사" in pos -> "대명사"
+            "수사" in pos -> "수사"
             "동사" in pos -> "동사"
             "형용사" in pos -> "형용사"
+            "관형사" in pos -> "관형사"
             "부사" in pos -> "부사"
+            "조사" in pos -> "조사"
+            "감탄사" in pos -> "감탄사"
             else -> null
         }
     }
 }
+
 @Composable
 private fun getPosString(pos: String?): String {
     if (pos == null) return ""
     return when {
         pos.contains("명사") -> stringResource(R.string.pos_noun)
+        pos.contains("대명사") -> stringResource(R.string.pos_pronoun)
+        pos.contains("수사") -> stringResource(R.string.pos_numeral)
         pos.contains("동사") -> stringResource(R.string.pos_verb)
         pos.contains("형용사") -> stringResource(R.string.pos_adjective)
+        pos.contains("관형사") -> stringResource(R.string.pos_determiner)
         pos.contains("부사") -> stringResource(R.string.pos_adverb)
+        pos.contains("조사") -> stringResource(R.string.pos_particle)
+        pos.contains("감탄사") -> stringResource(R.string.pos_interjection)
         else -> pos
     }
 }

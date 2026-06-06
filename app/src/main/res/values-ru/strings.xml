@@ -276,9 +276,14 @@
     <string name="wordcard_point_format">%1$d / 100 pt</string>
     <string name="action_confirm">Подтвердить</string>
     <string name="pos_noun">Существительное</string>
+    <string name="pos_pronoun">Местоимение</string>
+    <string name="pos_numeral">Числительное</string>
     <string name="pos_verb">Глагол</string>
     <string name="pos_adjective">Прилагательное</string>
+    <string name="pos_determiner">Атрибутив</string>
     <string name="pos_adverb">Наречие</string>
+    <string name="pos_particle">Частица</string>
+    <string name="pos_interjection">Междометие</string>
 
     <string name="lang_change_title">Сменить язык</string>
     <string name="lang_change_warning">Предупреждение: Смена языка приведет к удалению всех карточек слов. Продолжить?</string>

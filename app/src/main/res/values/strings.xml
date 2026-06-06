@@ -258,9 +258,14 @@
     <string name="penalty_none">없음</string>
     <string name="action_confirm">확인</string>
     <string name="pos_noun">명사</string>
+    <string name="pos_pronoun">대명사</string>
+    <string name="pos_numeral">수사</string>
     <string name="pos_verb">동사</string>
     <string name="pos_adjective">형용사</string>
+    <string name="pos_determiner">관형사</string>
     <string name="pos_adverb">부사</string>
+    <string name="pos_particle">조사</string>
+    <string name="pos_interjection">감탄사</string>
 
     <string name="lang_change_title">학습 언어 변경</string>
     <string name="lang_change_warning">경고: 언어를 변경하면 기존에 저장된 모든 단어 카드가 영구적으로 삭제됩니다. 정말 변경하시겠습니까?</string>
