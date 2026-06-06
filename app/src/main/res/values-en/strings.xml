@@ -208,7 +208,7 @@
 
     <!-- Profile rewards -->
     <string name="profile_reward_title">Customize Profile</string>
-    <string name="profile_reward_desc">Unlock one avatar or background of your choice for every 1500 XP.</string>
+    <string name="profile_reward_desc">Unlock one avatar or background of your choice for every 500 XP.</string>
     <string name="profile_reward_remaining_tickets">Remaining unlocks: %1$d</string>
     <string name="profile_reward_avatar_section">Avatar</string>
     <string name="profile_reward_background_section">Background</string>
@@ -234,7 +234,7 @@
     <string name="profile_asset_bg_campfire">Campfire</string>
     <string name="profile_asset_bg_cyberpunk">Cyberpunk</string>
     <string name="profile_asset_bg_halloween">Halloween</string>
-    <string name="profile_reward_unlock_hint">Unlock one avatar or background for every 1500 XP.</string>
+    <string name="profile_reward_unlock_hint">Unlock one avatar or background for every 500 XP.</string>
     <string name="profile_reward_stat_words">Words</string>
     <string name="profile_reward_stat_rank">Rank</string>
     <string name="profile_reward_stat_xp">Total XP</string>
@@ -286,4 +286,10 @@
     <string name="settings_lang_sub">Includes word card reset</string>
     <string name="settings_delete_account">Delete Account</string>
     <string name="settings_delete_sub">Cannot recover data</string>
+
+    <!-- Notifications -->
+    <string name="noti_rank_up">Rank Up! %1$s</string>
+    <string name="noti_word_slot_increase">Word Slot Increased! (%1$d slots)</string>
+    <string name="noti_ticket_acquired">Customization Ticket Acquired!</string>
+    <string name="noti_new_word_added">New Word Added: %1$s</string>
 </resources>

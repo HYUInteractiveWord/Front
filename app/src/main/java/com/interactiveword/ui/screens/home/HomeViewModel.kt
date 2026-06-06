@@ -1,14 +1,26 @@
 package com.interactiveword.ui.screens.home
 
+import android.app.Application
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bolt
+import androidx.compose.material.icons.filled.ConfirmationNumber
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.interactiveword.R
 import com.interactiveword.data.model.Mission
 import com.interactiveword.data.model.User
 import com.interactiveword.data.model.WordCard
 import com.interactiveword.data.repository.MissionRepository
 import com.interactiveword.data.repository.UserRepository
 import com.interactiveword.data.repository.WordRepository
+import com.interactiveword.ui.components.AppNotification
+import com.interactiveword.ui.components.NotiType
 import com.interactiveword.ui.components.XpManager
+import com.interactiveword.ui.theme.BrandAmberLight
+import com.interactiveword.ui.theme.BrandGreenLight
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,12 +36,14 @@ data class HomeUiState(
     val error: String? = null,
 )
 
-class HomeViewModel(
+class HomeViewModel @JvmOverloads constructor(
+    application: Application,
     private val userRepo: UserRepository = UserRepository(),
     private val wordRepo: WordRepository = WordRepository(),
     private val missionRepo: MissionRepository = MissionRepository(),
-) : ViewModel() {
+) : AndroidViewModel(application) {
 
+    private val context = getApplication<Application>()
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
@@ -39,12 +53,54 @@ class HomeViewModel(
 
     fun loadData() {
         viewModelScope.launch {
+            val oldUser = _uiState.value.user
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
 
             try {
                 val user = userRepo.getMe()
                 val words = wordRepo.getMyWords()
                 val missions = missionRepo.getDailyMissions()
+
+                // 변경 감지 및 알림
+                if (oldUser != null) {
+                    // 1. 랭크 업 감지
+                    if (user.rank != oldUser.rank) {
+                        XpManager.emitNotification(
+                            AppNotification(
+                                type = NotiType.RANK_UP,
+                                message = context.getString(R.string.noti_rank_up, rankLabel(user.rank)),
+                                color = Color(0xFFFFA000), // Gold
+                                icon = Icons.Default.EmojiEvents
+                            )
+                        )
+                    }
+
+                    // 2. 단어 슬롯 확장 감지
+                    if (user.maxWordSlots > oldUser.maxWordSlots) {
+                        XpManager.emitNotification(
+                            AppNotification(
+                                type = NotiType.SLOT_INCREASE,
+                                message = context.getString(R.string.noti_word_slot_increase, user.maxWordSlots),
+                                color = Color(0xFF2196F3), // Blue
+                                icon = Icons.Default.Bolt
+                            )
+                        )
+                    }
+
+                    // 3. 티켓 획득 감지 (500 XP 마다)
+                    val oldTickets = oldUser.xp / 500
+                    val newTickets = user.xp / 500
+                    if (newTickets > oldTickets) {
+                        XpManager.emitNotification(
+                            AppNotification(
+                                type = NotiType.TICKET,
+                                message = context.getString(R.string.noti_ticket_acquired),
+                                color = Color(0xFFE91E63), // Pink
+                                icon = Icons.Default.ConfirmationNumber
+                            )
+                        )
+                    }
+                }
 
                 _uiState.value = _uiState.value.copy(
                     user = user,
@@ -61,6 +117,22 @@ class HomeViewModel(
                 )
             }
         }
+    }
+
+    private fun rankLabel(rank: String): String = when (rank.lowercase()) {
+        "bronze"   -> "브론즈"
+        "silver"   -> "실버"
+        "gold"     -> "골드"
+        "platinum" -> "플래티넘"
+        "sapphire" -> "사파이어"
+        "ruby"     -> "루비"
+        "emerald"  -> "에메랄드"
+        "amethyst" -> "자수정"
+        "pearl"    -> "진주"
+        "obsidian" -> "흑요석"
+        "diamond"  -> "다이아몬드"
+        "master"   -> "마스터"
+        else -> rank
     }
 
     fun claimMission(missionId: Int) {

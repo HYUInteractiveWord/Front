@@ -56,7 +56,7 @@ data class Mission(
 data class LoginRequest(val username: String, val password: String)
 data class RegisterRequest(
     val username: String,
-    val email: String,
+    val email: String?,
     val password: String,
     @SerializedName("preferred_language") val preferredLanguage: String = "en",
 )

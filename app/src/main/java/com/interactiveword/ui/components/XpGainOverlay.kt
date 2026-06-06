@@ -6,69 +6,105 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.ConfirmationNumber
+import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.interactiveword.ui.theme.BrandGreenLight
+import com.interactiveword.ui.theme.BrandAmberLight
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlin.random.Random
 
+enum class NotiType {
+    XP, RANK_UP, SLOT_INCREASE, TICKET, NEW_WORD
+}
+
+data class AppNotification(
+    val type: NotiType,
+    val message: String,
+    val amount: Int = 0,
+    val color: Color = BrandGreenLight,
+    val icon: ImageVector = Icons.Default.Star
+)
+
 object XpManager {
-    private val _xpEvents = MutableSharedFlow<Int>()
-    val xpEvents = _xpEvents.asSharedFlow()
+    private val _notifications = MutableSharedFlow<AppNotification>()
+    val notifications = _notifications.asSharedFlow()
 
     suspend fun emitXpGain(amount: Int) {
-        _xpEvents.emit(amount)
+        _notifications.emit(AppNotification(NotiType.XP, "XP +$amount!", amount))
+    }
+
+    suspend fun emitNotification(notification: AppNotification) {
+        _notifications.emit(notification)
     }
 }
 
 @Composable
 fun XpGainOverlay() {
+    var currentNoti by remember { mutableStateOf<AppNotification?>(null) }
     var visible by remember { mutableStateOf(false) }
-    var xpAmount by remember { mutableIntStateOf(0) }
     val particles = remember { mutableStateListOf<Particle>() }
-
+    
+    // 알림 큐 처리를 위한 로직
     LaunchedEffect(Unit) {
-        XpManager.xpEvents.collect { amount ->
-            xpAmount = amount
+        XpManager.notifications.collect { notification ->
+            // 이전 알림이 있으면 대기
+            while (visible) {
+                delay(100)
+            }
+            
+            currentNoti = notification
             visible = true
             
-            // XP 양에 비례한 파티클 생성
-            val count = when {
-                amount >= 500 -> 60
-                amount >= 150 -> 35
-                else -> 15
+            // 타입별 파티클 생성
+            val count = when (notification.type) {
+                NotiType.RANK_UP -> 80
+                NotiType.XP -> if (notification.amount >= 150) 40 else 15
+                else -> 30
             }
             
             particles.clear()
+            val colors = when(notification.type) {
+                NotiType.RANK_UP -> listOf(Color(0xFFFFD700), Color.White, Color(0xFFFFA000))
+                NotiType.TICKET -> listOf(Color(0xFFE91E63), Color.White, Color(0xFFFF4081))
+                NotiType.NEW_WORD -> listOf(BrandGreenLight, Color.White, Color(0xFFB9F6CA))
+                else -> listOf(Color.Yellow, Color.White, Color(0xFFFFD700), Color(0xFF00E676))
+            }
+
             repeat(count) {
                 particles.add(Particle(
-                    color = listOf(Color.Yellow, Color.White, Color(0xFFFFD700), Color(0xFF00E676), Color(0xFF64FFDA)).random(),
+                    color = colors.random(),
                     size = Random.nextFloat() * 10f + 6f,
                     angle = Random.nextFloat() * 360f,
                     velocity = Random.nextFloat() * 25f + 10f,
-                    shapeType = Random.nextInt(3) // 0: Square, 1: Circle, 2: Star-ish
+                    shapeType = Random.nextInt(3)
                 ))
             }
             
             delay(2500)
             visible = false
+            delay(300) // 알림 간 간격
         }
     }
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
-        if (visible) {
-            ConfettiEffect(particles, xpAmount)
+        if (visible && currentNoti != null) {
+            ConfettiEffect(particles, currentNoti?.type == NotiType.RANK_UP)
         }
 
         AnimatedVisibility(
@@ -76,22 +112,24 @@ fun XpGainOverlay() {
             enter = slideInVertically(initialOffsetY = { -it }) + fadeIn(),
             exit = slideOutVertically(targetOffsetY = { -it }) + fadeOut()
         ) {
-            Surface(
-                modifier = Modifier
-                    .padding(top = 100.dp)
-                    .wrapContentSize(),
-                shape = RoundedCornerShape(50.dp),
-                color = BrandGreenLight,
-                tonalElevation = 8.dp,
-                shadowElevation = 16.dp
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+            currentNoti?.let { noti ->
+                Surface(
+                    modifier = Modifier
+                        .padding(top = 100.dp)
+                        .wrapContentSize(),
+                    shape = RoundedCornerShape(50.dp),
+                    color = noti.color,
+                    tonalElevation = 8.dp,
+                    shadowElevation = 16.dp
                 ) {
-                    Icon(Icons.Default.Star, null, tint = Color.White, modifier = Modifier.size(26.dp))
-                    Text("XP +$xpAmount!", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
+                    Row(
+                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        Icon(noti.icon, null, tint = Color.White, modifier = Modifier.size(26.dp))
+                        Text(noti.message, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
+                    }
                 }
             }
         }
@@ -107,8 +145,8 @@ data class Particle(
 )
 
 @Composable
-private fun ConfettiEffect(particles: List<Particle>, amount: Int) {
-    val duration = if (amount >= 500) 2500 else 1800
+private fun ConfettiEffect(particles: List<Particle>, isBig: Boolean) {
+    val duration = if (isBig) 2500 else 1800
     val infiniteTransition = rememberInfiniteTransition(label = "confetti")
     val progress by infiniteTransition.animateFloat(
         initialValue = 0f,

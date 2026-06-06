@@ -8,7 +8,7 @@ import com.interactiveword.data.model.User
 class UserRepository {
     private val api = RetrofitClient.api
 
-    suspend fun register(username: String, email: String, password: String, preferredLanguage: String = "ko"): User =
+    suspend fun register(username: String, email: String?, password: String, preferredLanguage: String = "ko"): User =
         api.register(RegisterRequest(username, email, password, preferredLanguage))
 
     suspend fun login(username: String, password: String): String {
@@ -23,7 +23,7 @@ class UserRepository {
         return api.updateMe(mapOf("preferred_language" to newLanguage))
     }
 
-    suspend fun demoLogin(username: String, email: String, password: String, preferredLanguage: String): User {
+    suspend fun demoLogin(username: String, email: String?, password: String, preferredLanguage: String): User {
         return api.demoLogin(RegisterRequest(username, email, password, preferredLanguage))
     }
 

@@ -318,7 +318,7 @@ fun HomeScreen(
 private const val PROFILE_REWARD_PREFS = "profile_reward_prefs"
 private const val DEFAULT_AVATAR_ID = "avatar_newbie"
 private const val DEFAULT_BACKGROUND_ID = "bg_forest"
-private const val UNLOCK_XP_STEP = 1500
+private const val UNLOCK_XP_STEP = 500
 
 private data class ProfileRewardAsset(
     val id: String,

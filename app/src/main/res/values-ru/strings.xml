@@ -206,7 +206,7 @@
 
     <!-- Profile rewards -->
     <string name="profile_reward_title">Настройка профиля</string>
-    <string name="profile_reward_desc">За каждые 1500 XP можно разблокировать один аватар или фон на выбор.</string>
+    <string name="profile_reward_desc">За каждые 500 XP можно разблокировать один аватар или фон на выбор.</string>
     <string name="profile_reward_remaining_tickets">Доступно разблокировок: %1$d</string>
     <string name="profile_reward_avatar_section">Аватар</string>
     <string name="profile_reward_background_section">Фон</string>
@@ -218,21 +218,21 @@
     <string name="profile_reward_tap_to_unlock">Нажмите, чтобы открыть</string>
     <string name="profile_asset_avatar_newbie">Новичок</string>
     <string name="profile_asset_avatar_reading_bear">Читающий медведь</string>
-    <string name="profile_asset_avatar_crown_bear">Медведь с короной</string>
+    <string name="profile_asset_avatar_crown_bear">Ме드ведь с короной</string>
     <string name="profile_asset_avatar_writing_rabbit">Пишущий кролик</string>
     <string name="profile_asset_avatar_headset_cat">Кот в наушниках</string>
     <string name="profile_asset_avatar_parrot">Говорящий попугай</string>
     <string name="profile_asset_avatar_explorer">Исследователь</string>
     <string name="profile_asset_avatar_ghost">Призрак</string>
     <string name="profile_asset_avatar_holy_fox">Священная лиса</string>
-    <string name="profile_asset_avatar_cyberpunk_robot">Кибер-робот</string>
+    <string name="profile_asset_avatar_cyberpunk_robot">Кибер-ро봇</string>
     <string name="profile_asset_bg_library">Библиотека</string>
     <string name="profile_asset_bg_goldenlake">Золотое озеро</string>
     <string name="profile_asset_bg_forest">Лесная долина</string>
     <string name="profile_asset_bg_campfire">Костёр</string>
     <string name="profile_asset_bg_cyberpunk">Киберпанк</string>
     <string name="profile_asset_bg_halloween">Хэллоуин</string>
-    <string name="profile_reward_unlock_hint">За каждые 1500 XP можно разблокировать один аватар или фон на выбор.</string>
+    <string name="profile_reward_unlock_hint">За каждые 500 XP можно разблокировать один аватар или фон на выбор.</string>
     <string name="profile_reward_stat_words">Собрано слов</string>
     <string name="profile_reward_stat_rank">Текущий ранг</string>
     <string name="profile_reward_stat_xp">Всего XP</string>
@@ -284,4 +284,10 @@
     <string name="settings_lang_sub">Сброс всех слов</string>
     <string name="settings_delete_account">Удалить аккаунт</string>
     <string name="settings_delete_sub">Данные не восстановить</string>
+
+    <!-- Notifications -->
+    <string name="noti_rank_up">Повышение ранга! %1$s</string>
+    <string name="noti_word_slot_increase">Слоты слов увеличены! (%1$d слотов)</string>
+    <string name="noti_ticket_acquired">Получен билет кастомизации!</string>
+    <string name="noti_new_word_added">Новое слово добавлено: %1$s</string>
 </resources>

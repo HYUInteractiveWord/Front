@@ -4,7 +4,6 @@ import android.app.Activity
 import android.app.Application
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -15,7 +14,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -37,7 +35,6 @@ fun LoginScreen(navController: NavHostController) {
 
     var username by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
-    var email by rememberSaveable { mutableStateOf("") }
     var isRegisterMode by rememberSaveable { mutableStateOf(false) }
     var selectedLanguage by rememberSaveable { mutableStateOf(LanguageManager.getSavedLanguage(context)) }
 
@@ -121,17 +118,6 @@ fun LoginScreen(navController: NavHostController) {
                 singleLine = true,
             )
 
-            if (isRegisterMode) {
-                OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = { Text(stringResource(R.string.label_email), maxLines = 1, overflow = TextOverflow.Ellipsis) },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                )
-            }
-
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
@@ -153,7 +139,7 @@ fun LoginScreen(navController: NavHostController) {
 
             Button(
                 onClick = {
-                    if (isRegisterMode) vm.register(username, email, password, selectedLanguage)
+                    if (isRegisterMode) vm.register(username, null, password, selectedLanguage)
                     else vm.login(username, password)
                 },
                 enabled = uiState !is LoginUiState.Loading,
@@ -181,7 +167,9 @@ fun LoginScreen(navController: NavHostController) {
             if (isRegisterMode) {
                 Spacer(modifier = Modifier.height(16.dp))
                 TextButton(
-                    onClick = { vm.demoLogin(username, email, password, selectedLanguage) },
+                    onClick = {
+                        vm.demoLogin(username, null, password, selectedLanguage)
+                    },
                     enabled = uiState !is LoginUiState.Loading
                 ) {
                     Text(

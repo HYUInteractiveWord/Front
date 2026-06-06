@@ -80,7 +80,7 @@ class LoginViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun register(username: String, email: String, password: String, preferredLanguage: String = "ko") {
+    fun register(username: String, email: String?, password: String, preferredLanguage: String = "ko") {
         viewModelScope.launch {
             _uiState.value = LoginUiState.Loading
             try {
@@ -91,7 +91,7 @@ class LoginViewModel(app: Application) : AndroidViewModel(app) {
             }
         }
     }
-    fun demoLogin(username: String, email: String, password: String, preferredLanguage: String) {
+    fun demoLogin(username: String, email: String?, password: String, preferredLanguage: String) {
         viewModelScope.launch {
             _uiState.value = LoginUiState.Loading
             try {

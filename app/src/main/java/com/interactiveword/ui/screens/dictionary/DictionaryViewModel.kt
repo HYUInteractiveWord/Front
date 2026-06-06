@@ -12,6 +12,14 @@ import com.interactiveword.util.WordCardPointManager
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 
+import com.interactiveword.ui.components.XpManager
+import com.interactiveword.ui.components.AppNotification
+import com.interactiveword.ui.components.NotiType
+import com.interactiveword.R
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MenuBook
+import com.interactiveword.ui.theme.BrandGreenLight
+
 data class DictionaryResult(
     val word: String,
     val pos: String?,
@@ -106,6 +114,16 @@ class DictionaryViewModel @JvmOverloads constructor(
                 val newCard = repo.createWord(word, source = "dictionary")
                 // 💡 신규 추가된 단어 ID를 미확인 목록에 등록
                 WordCardPointManager.addUnseenWords(context, listOf(newCard.id))
+
+                // 알림 추가
+                XpManager.emitNotification(
+                    AppNotification(
+                        type = NotiType.NEW_WORD,
+                        message = context.getString(R.string.noti_new_word_added, word),
+                        color = BrandGreenLight,
+                        icon = Icons.Default.MenuBook
+                    )
+                )
 
                 _uiState.value = _uiState.value.copy(
                     addedWords = _uiState.value.addedWords + word,

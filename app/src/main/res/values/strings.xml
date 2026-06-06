@@ -198,7 +198,7 @@
     <string name="mission_daily_collect_noun">명사 단어 수집</string>
 
     <string name="profile_reward_title">프로필 꾸미기</string>
-    <string name="profile_reward_desc">1500 XP마다 원하는 아바타 또는 배경을 하나씩 해금할 수 있어요.</string>
+    <string name="profile_reward_desc">500 XP마다 원하는 아바타 또는 배경을 하나씩 해금할 수 있어요.</string>
     <string name="profile_reward_remaining_tickets">남은 해금권: %1$d개</string>
     <string name="profile_reward_avatar_section">아바타</string>
     <string name="profile_reward_background_section">배경</string>
@@ -224,7 +224,7 @@
     <string name="profile_asset_bg_campfire">모닥불</string>
     <string name="profile_asset_bg_cyberpunk">사이버펑크</string>
     <string name="profile_asset_bg_halloween">할로윈</string>
-    <string name="profile_reward_unlock_hint">1500 XP마다 아바타 또는 배경 1개를 해금할 수 있습니다.</string>
+    <string name="profile_reward_unlock_hint">500 XP마다 아바타 또는 배경 1개를 해금할 수 있습니다.</string>
     <string name="profile_reward_stat_words">단어 수</string>
     <string name="profile_reward_stat_rank">랭크</string>
     <string name="profile_reward_stat_xp">총 XP</string>
@@ -267,4 +267,10 @@
     <string name="settings_lang_sub">단어장 초기화 포함</string>
     <string name="settings_delete_account">계정 영구 삭제</string>
     <string name="settings_delete_sub">경험치 및 랭크 복구 불가</string>
+
+    <!-- Notifications -->
+    <string name="noti_rank_up">랭크 승급! %1$s</string>
+    <string name="noti_word_slot_increase">단어 슬롯 확장! (%1$d개)</string>
+    <string name="noti_ticket_acquired">커스터마이징 티켓 획득!</string>
+    <string name="noti_new_word_added">새로운 단어 수집: %1$s</string>
 </resources>
