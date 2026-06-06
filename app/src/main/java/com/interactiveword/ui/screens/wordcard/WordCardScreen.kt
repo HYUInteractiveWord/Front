@@ -646,11 +646,11 @@ private fun PronunciationScoreChart(
     total: Float,
 ) {
     val items = listOf(
+        stringResource(R.string.pronunciation_label_total) to total,
         stringResource(R.string.pronunciation_label_pronunciation) to pronunciation,
         stringResource(R.string.pronunciation_label_formants) to formant,
         stringResource(R.string.pronunciation_label_intonation) to pitch,
         stringResource(R.string.pronunciation_label_speed) to timing,
-        stringResource(R.string.pronunciation_label_total) to total,
     )
 
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -672,7 +672,7 @@ private fun PronunciationScoreChart(
                     text = label,
                     style = MaterialTheme.typography.bodySmall,
                     color = DarkMutedText,
-                    modifier = Modifier.width(52.dp),
+                    modifier = Modifier.width(64.dp), // 너비 약간 확장
                 )
 
                 val clamped = score.coerceIn(0f, 100f)
@@ -686,7 +686,13 @@ private fun PronunciationScoreChart(
                         modifier = Modifier
                             .fillMaxHeight()
                             .fillMaxWidth(clamped / 100f)
-                            .background(BrandGreenLight, shape = MaterialTheme.shapes.small),
+                            .background(
+                                if (label == stringResource(R.string.pronunciation_label_total)) 
+                                    BrandGreenLight 
+                                else 
+                                    BrandGreenLight.copy(alpha = 0.7f),
+                                shape = MaterialTheme.shapes.small
+                            ),
                     )
                 }
 
