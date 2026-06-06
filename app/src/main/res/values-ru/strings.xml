@@ -311,8 +311,8 @@
     <string name="noti_rank_up">Повышение ранга! %1$s</string>
     <string name="noti_word_slot_increase">Слоты слов увеличены! (%1$d слотов)</string>
     <string name="noti_ticket_acquired">Получен билет кастомизации!</string>
-    <string name="noti_new_word_added">слово добавлено: %1$s</string>
-    <string name="noti_duplicate_bonus">\'%1$s\' уже в словнике! (Бонус: Очки+5, XP+10)</string>
+    <string name="noti_new_word_added">Новое слово добавлено: %1$s</string>
+    <string name="noti_duplicate_bonus">Бонус за повторный сбор \'%1$s\'!</string>
     <string name="noti_word_best_score_achieved">🎉 Новый рекорд! (%1$d баллов)</string>
     <string name="noti_word_master_achieved">🎉 Поздравляем! Вы достигли уровня MASTER для слова \'%1$s\'!</string>
     <string name="profile_example_quiz_title">Пример запроса на предложения</string>

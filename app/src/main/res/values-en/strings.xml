@@ -312,8 +312,7 @@
     <string name="noti_rank_up">Rank Up! %1$s</string>
     <string name="noti_word_slot_increase">Word Slot Increased! (%1$d slots)</string>
     <string name="noti_ticket_acquired">Customization Ticket Acquired!</string>
-    <string name="noti_new_word_added">Word Added: %1$s</string>
-    <string name="noti_duplicate_bonus">\'%1$s\' already in collection! (Bonus: Pt+5, XP+10)</string>
+    <string name="noti_duplicate_bonus">\'%1$s\' Duplicate Collection Bonus!</string>
     <string name="noti_word_best_score_achieved">🎉 New Best Score! (%1$d pts)</string>
     <string name="noti_word_master_achieved">🎉 Congratulations! Mastered the word \'%1$s\'!</string>
 </resources>

@@ -293,8 +293,8 @@
     <string name="noti_rank_up">랭크 승급! %1$s</string>
     <string name="noti_word_slot_increase">단어 슬롯 확장! (%1$d개)</string>
     <string name="noti_ticket_acquired">커스터마이징 티켓 획득!</string>
-    <string name="noti_new_word_added">단어 수집: %1$s</string>
-    <string name="noti_duplicate_bonus">\'%1$s\' 중복 수집! (포인트+5, XP+10)</string>
+    <string name="noti_new_word_added">새로운 단어 수집: %1$s</string>
+    <string name="noti_duplicate_bonus">\'%1$s\' 중복 수집 보너스!</string>
     <string name="noti_word_best_score_achieved">🎉 최고 점수 경신! (%1$d점)</string>
     <string name="noti_word_master_achieved">🎉 축하합니다! \'%1$s\' 단어 MASTER 달성!</string>
 </resources>
