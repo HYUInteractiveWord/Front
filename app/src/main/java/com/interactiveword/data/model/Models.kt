@@ -93,7 +93,13 @@ data class WordQuizMissionSummary(
     @SerializedName("is_completed") val isCompleted: Boolean,
     @SerializedName("xp_reward") val xpReward: Int,
 )
-
+data class CheckedWord(
+    val id: Int,
+    @SerializedName("korean_word") val koreanWord: String,
+    @SerializedName("is_correct") val isCorrect: Boolean,
+    @SerializedName("word_point") val wordPoint: Int,
+    @SerializedName("effect_level") val effectLevel: Int
+)
 data class WordQuizResultResponse(
     @SerializedName("quiz_type") val quizType: String,
     val total: Int,
@@ -103,6 +109,7 @@ data class WordQuizResultResponse(
     @SerializedName("quiz_xp_gained") val quizXpGained: Int,
     val user: WordQuizUserSummary?,
     val mission: WordQuizMissionSummary?,
+    @SerializedName("checked_words") val checkedWords: List<CheckedWord>? = emptyList()
 )
 
 data class DictionaryCandidateInfo(
@@ -177,6 +184,9 @@ data class PronunciationResponse(
     @SerializedName("is_new_best") val isNewBest: Boolean,
     @SerializedName("xp_gained") val xpGained: Int,
     @SerializedName("word_card_level") val wordCardLevel: Int,
+    @SerializedName("word_point") val wordPoint: Int = 0,
+    @SerializedName("effect_level") val effectLevel: Int = 0,
+
     val graphs: Map<String, String>? = null,
     val details: PronunciationDetails? = null,
     @SerializedName("raw_graph_data") val rawGraphData: RawGraphData? = null,
