@@ -239,15 +239,28 @@ class DictionaryVerifyViewModel(
                 // 💡 신규 추가된 단어 ID를 미확인 목록에 등록
                 WordCardPointManager.addUnseenWords(getApplication(), listOf(newCard.id))
 
-                // 알림 추가
-                XpManager.emitNotification(
-                    AppNotification(
-                        type = NotiType.NEW_WORD,
-                        message = getApplication<Application>().getString(R.string.noti_new_word_added, _uiState.value.word),
-                        color = BrandGreenLight,
-                        icon = Icons.Default.MenuBook
+                // 중복 보너스 여부 판단 (wordPoint가 이미 있다면 중복 누적 상황)
+                val isBonusTriggered = newCard.wordPoint > 0
+
+                if (isBonusTriggered) {
+                    XpManager.emitNotification(
+                        AppNotification(
+                            type = NotiType.XP,
+                            message = getApplication<Application>().getString(R.string.noti_duplicate_bonus, _uiState.value.word),
+                            color = BrandGreenLight,
+                            icon = Icons.Default.MenuBook
+                        )
                     )
-                )
+                } else {
+                    XpManager.emitNotification(
+                        AppNotification(
+                            type = NotiType.NEW_WORD,
+                            message = getApplication<Application>().getString(R.string.noti_new_word_added, _uiState.value.word),
+                            color = BrandGreenLight,
+                            icon = Icons.Default.MenuBook
+                        )
+                    )
+                }
 
                 _uiState.value = _uiState.value.copy(
                     isSaving = false,
@@ -255,30 +268,22 @@ class DictionaryVerifyViewModel(
                 )
             } catch (e: Exception) {
                 val errorMessage = parseErrorMessage(e)
-                val isDuplicate = (e is HttpException && e.code() == 400 && errorMessage.contains("already in your collection", ignoreCase = true))
-                
-                if (isDuplicate) {
-                    // 중복 에러일 경우 무시하고 이미 추가된 것으로 처리
-                    cleanupDuplicates(_uiState.value.word)
-                    _uiState.value = _uiState.value.copy(
-                        isSaving = false,
-                        saveCompleted = true,
-                    )
-                } else {
-                    val localizedError = when {
-                        errorMessage.contains("Word is empty", ignoreCase = true) -> getApplication<Application>().getString(R.string.error_word_empty)
-                        errorMessage.contains("Word slot limit reached", ignoreCase = true) -> getApplication<Application>().getString(R.string.error_word_slot_limit)
-                        errorMessage.contains("already in your collection", ignoreCase = true) -> getApplication<Application>().getString(R.string.error_word_already_exists)
-                        else -> getApplication<Application>().getString(R.string.error_unknown) + ": $errorMessage"
-                    }
-
-                    _uiState.value = _uiState.value.copy(
-                        isSaving = false,
-                        errorMessage = localizedError,
-                    )
+                val localizedError = when {
+                    errorMessage.contains("Word is empty", ignoreCase = true) -> getApplication<Application>().getString(R.string.error_word_empty)
+                    errorMessage.contains("Word slot limit reached", ignoreCase = true) -> getApplication<Application>().getString(R.string.error_word_slot_limit)
+                    else -> getApplication<Application>().getString(R.string.error_unknown) + ": $errorMessage"
                 }
+
+                _uiState.value = _uiState.value.copy(
+                    isSaving = false,
+                    errorMessage = localizedError,
+                )
             }
         }
+    }
+
+    fun consumeSaveCompleted() {
+        _uiState.value = _uiState.value.copy(saveCompleted = false)
     }
 
     private fun parseErrorMessage(e: Exception): String {
@@ -297,24 +302,6 @@ class DictionaryVerifyViewModel(
         } else {
             e.message ?: "Unknown error"
         }
-    }
-
-    private suspend fun cleanupDuplicates(targetWord: String) {
-        try {
-            val allWords = repo.getMyWords()
-            val duplicates = allWords.filter { it.koreanWord == targetWord }
-            if (duplicates.size > 1) {
-                val sorted = duplicates.sortedByDescending { it.wordPoint }
-                val toDelete = sorted.drop(1)
-                toDelete.forEach { repo.deleteWord(it.id) }
-            }
-        } catch (e: Exception) {
-            // 무시
-        }
-    }
-
-    fun consumeSaveCompleted() {
-        _uiState.value = _uiState.value.copy(saveCompleted = false)
     }
 
     @RequiresPermission(Manifest.permission.RECORD_AUDIO)

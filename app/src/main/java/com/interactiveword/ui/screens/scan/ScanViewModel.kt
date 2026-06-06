@@ -8,7 +8,6 @@ import android.media.AudioRecord
 import android.media.MediaCodec
 import android.media.MediaExtractor
 import android.media.MediaFormat
-import android.media.MediaMetadataRetriever
 import android.media.MediaRecorder
 import android.net.Uri
 import android.os.Build
@@ -349,6 +348,12 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    fun dismissWord(word: String) {
+        _uiState.value = _uiState.value.copy(
+            detectedWords = _uiState.value.detectedWords.filter { it.word != word }
+        )
+    }
+
     fun addWordToCollection(word: String, pos: String?, definition: String?) {
         val state = _uiState.value
         if (word in state.addedWords || word in state.loadingWords) return
@@ -357,6 +362,7 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
 
         viewModelScope.launch {
             try {
+                // 💡 백엔드에서 중복 시에도 201(또는 200)과 함께 기존/업데이트된 객체를 리턴함
                 val newCard = wordRepo.createWord(
                     word = word,
                     source = "dictionary",
@@ -364,21 +370,32 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
                     definition = definition
                 )
                 
-                // 💡 신규 추가된 단어 ID를 미확인 목록에 등록
+                // 💡 신규 추가된 단어 ID를 미확인 목록에 등록 (포인트가 올랐으므로 애니메이션 대상)
                 WordCardPointManager.addUnseenWords(context, listOf(newCard.id))
 
-                // 알림 추가
-                XpManager.emitNotification(
-                    AppNotification(
-                        type = NotiType.NEW_WORD,
-                        message = context.getString(R.string.noti_new_word_added, word),
-                        color = BrandGreenLight,
-                        icon = Icons.Default.MenuBook
-                    )
-                )
+                // 중복 여부 판단 (이미 wordPoint가 0보다 크거나 하면 중복 보너스 상황일 가능성 높음)
+                // 하지만 백엔드 로직상 points+5가 되었으므로 이를 UI에 알림
+                val isBonusTriggered = newCard.wordPoint > 0 // 새 단어면 보통 0일 것이므로
 
-                // 중복 단어 정리 (포인트 높은 것 유지)
-                cleanupDuplicates(word)
+                if (isBonusTriggered) {
+                    XpManager.emitNotification(
+                        AppNotification(
+                            type = NotiType.XP,
+                            message = context.getString(R.string.noti_duplicate_bonus, word),
+                            color = BrandGreenLight,
+                            icon = Icons.Default.MenuBook
+                        )
+                    )
+                } else {
+                    XpManager.emitNotification(
+                        AppNotification(
+                            type = NotiType.NEW_WORD,
+                            message = context.getString(R.string.noti_new_word_added, word),
+                            color = BrandGreenLight,
+                            icon = Icons.Default.MenuBook
+                        )
+                    )
+                }
 
                 _uiState.value = _uiState.value.copy(
                     addedWords = _uiState.value.addedWords + word,
@@ -386,28 +403,16 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
                 )
             } catch (e: Exception) {
                 val errorMessage = parseErrorMessage(e)
-                val isDuplicate = (e is HttpException && e.code() == 400 && errorMessage.contains("already in your collection", ignoreCase = true))
-                
-                if (isDuplicate) {
-                    // 중복 에러일 경우 무시하고 이미 추가된 것으로 처리
-                    cleanupDuplicates(word)
-                    _uiState.value = _uiState.value.copy(
-                        addedWords = _uiState.value.addedWords + word,
-                        loadingWords = _uiState.value.loadingWords - word
-                    )
-                } else {
-                    val localizedError = when {
-                        errorMessage.contains("Word is empty", ignoreCase = true) -> context.getString(R.string.error_word_empty)
-                        errorMessage.contains("Word slot limit reached", ignoreCase = true) -> context.getString(R.string.error_word_slot_limit)
-                        errorMessage.contains("already in your collection", ignoreCase = true) -> context.getString(R.string.error_word_already_exists)
-                        else -> context.getString(R.string.error_unknown) + ": $errorMessage"
-                    }
-
-                    _uiState.value = _uiState.value.copy(
-                        error = localizedError,
-                        loadingWords = _uiState.value.loadingWords - word
-                    )
+                val localizedError = when {
+                    errorMessage.contains("Word is empty", ignoreCase = true) -> context.getString(R.string.error_word_empty)
+                    errorMessage.contains("Word slot limit reached", ignoreCase = true) -> context.getString(R.string.error_word_slot_limit)
+                    else -> context.getString(R.string.error_unknown) + ": $errorMessage"
                 }
+
+                _uiState.value = _uiState.value.copy(
+                    error = localizedError,
+                    loadingWords = _uiState.value.loadingWords - word
+                )
             }
         }
     }
@@ -428,31 +433,6 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
         } else {
             e.message ?: "Unknown error"
         }
-    }
-
-    private suspend fun cleanupDuplicates(targetWord: String) {
-        try {
-            val allWords = wordRepo.getMyWords()
-            val duplicates = allWords.filter { it.koreanWord == targetWord }
-            if (duplicates.size > 1) {
-                // 포인트 높은 순으로 정렬
-                val sorted = duplicates.sortedByDescending { it.wordPoint }
-                val toKeep = sorted.first()
-                val toDelete = sorted.drop(1)
-                
-                toDelete.forEach { 
-                    wordRepo.deleteWord(it.id)
-                }
-            }
-        } catch (e: Exception) {
-            // 정리 실패 시 무시
-        }
-    }
-
-    fun dismissWord(word: String) {
-        _uiState.value = _uiState.value.copy(
-            detectedWords = _uiState.value.detectedWords.filter { it.word != word },
-        )
     }
 
     override fun onCleared() {
