@@ -26,6 +26,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.interactiveword.ui.components.AppNotification
+import com.interactiveword.ui.components.NotiType
+import com.interactiveword.ui.components.XpManager
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MenuBook
+import com.interactiveword.R
+import com.interactiveword.ui.theme.BrandGreenLight
 import com.interactiveword.util.WordCardPointManager
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -345,6 +352,16 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
                 val newCard = wordRepo.createWord(word, source = "scan")
                 // 💡 신규 추가된 단어 ID를 미확인 목록에 등록
                 WordCardPointManager.addUnseenWords(context, listOf(newCard.id))
+
+                // 알림 추가
+                XpManager.emitNotification(
+                    AppNotification(
+                        type = NotiType.NEW_WORD,
+                        message = context.getString(R.string.noti_new_word_added, word),
+                        color = BrandGreenLight,
+                        icon = Icons.Default.MenuBook
+                    )
+                )
 
                 _uiState.value = _uiState.value.copy(addedWords = _uiState.value.addedWords + word)
             } catch (e: Exception) {

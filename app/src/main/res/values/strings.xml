@@ -121,6 +121,7 @@
     <string name="scan_detected_words">감지된 단어 (%1$d개)</string>
     <string name="scan_listening">듣는 중…</string>
     <string name="scan_elapsed">%1$d초  /  최대 30초</string>
+    <string name="scan_collection_complete">수집 완료!</string>
     <string name="action_done">완료</string>
 
     <string name="wordcard_title">단어 카드</string>

@@ -128,6 +128,7 @@
     <string name="scan_detected_words">Обнаружено слов: %1$d</string>
     <string name="scan_listening">Слушаю…</string>
     <string name="scan_elapsed">%1$dс  /  макс. 30с</string>
+    <string name="scan_collection_complete">Сбор завершен!</string>
     <string name="action_done">Готово</string>
 
     <!-- WordCard Screen -->

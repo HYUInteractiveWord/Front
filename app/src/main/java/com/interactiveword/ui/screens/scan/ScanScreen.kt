@@ -266,18 +266,23 @@ fun ScanScreen(
                         DetectedWordItem(
                             result = result,
                             added = result.word in uiState.addedWords,
-                            onAdd = {
-                                navController.navigate(
-                                    Screen.DictionaryVerify.createRoute(
-                                        word = result.word,
-                                        pos = result.pos,
-                                        definition = result.definition,
-                                        source = "scan",
-                                    )
-                                )
-                            },
+                            onAdd = { vm.addWordToCollection(result.word) },
                             onDismiss = { vm.dismissWord(result.word) },
                         )
+                    }
+
+                    item {
+                        Spacer(Modifier.height(16.dp))
+                        Button(
+                            onClick = { navController.navigate(Screen.Collection.route) {
+                                popUpTo(Screen.Scan.route) { inclusive = false }
+                            } },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = MaterialTheme.shapes.extraLarge,
+                            colors = ButtonDefaults.buttonColors(containerColor = BrandGreenLight)
+                        ) {
+                            Text(stringResource(R.string.scan_collection_complete))
+                        }
                     }
                 }
             }

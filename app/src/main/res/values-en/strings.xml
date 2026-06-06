@@ -129,6 +129,7 @@
     <string name="scan_detected_words">Detected Words (%1$d)</string>
     <string name="scan_listening">Listening…</string>
     <string name="scan_elapsed">%1$ds  /  max 30s</string>
+    <string name="scan_collection_complete">Collection Complete!</string>
     <string name="action_done">Done</string>
 
     <!-- WordCard Screen -->

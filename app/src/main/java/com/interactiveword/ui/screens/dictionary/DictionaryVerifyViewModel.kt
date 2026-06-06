@@ -11,8 +11,16 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.interactiveword.R
 import com.interactiveword.data.api.RetrofitClient
 import com.interactiveword.data.repository.WordRepository
+import com.interactiveword.ui.components.AppNotification
+import com.interactiveword.ui.components.NotiType
+import com.interactiveword.ui.components.XpManager
+import com.interactiveword.ui.theme.BrandGreenLight
+import com.interactiveword.util.WordCardPointManager
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MenuBook
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -219,12 +227,26 @@ class DictionaryVerifyViewModel(
         viewModelScope.launch {
             try {
                 _uiState.value = _uiState.value.copy(isSaving = true, errorMessage = null)
-                repo.createWord(
+                val newCard = repo.createWord(
                     _uiState.value.word,
                     source = "dictionary",
                     pos = _uiState.value.pos,
                     definition = initialDefinition,
                 )
+
+                // 💡 신규 추가된 단어 ID를 미확인 목록에 등록
+                WordCardPointManager.addUnseenWords(getApplication(), listOf(newCard.id))
+
+                // 알림 추가
+                XpManager.emitNotification(
+                    AppNotification(
+                        type = NotiType.NEW_WORD,
+                        message = getApplication<Application>().getString(R.string.noti_new_word_added, _uiState.value.word),
+                        color = BrandGreenLight,
+                        icon = Icons.Default.MenuBook
+                    )
+                )
+
                 _uiState.value = _uiState.value.copy(
                     isSaving = false,
                     saveCompleted = true,
