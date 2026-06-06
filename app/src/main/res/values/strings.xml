@@ -247,6 +247,8 @@
     <string name="pronunciation_label_intonation">억양</string>
     <string name="pronunciation_label_speed">속도</string>
     <string name="pronunciation_label_total">총점</string>
+    <string name="pronunciation_label_penalty">동일 단어 미인식 페널티</string>
+    <string name="penalty_none">없음</string>
     <string name="action_confirm">확인</string>
     <string name="pos_noun">명사</string>
     <string name="pos_verb">동사</string>

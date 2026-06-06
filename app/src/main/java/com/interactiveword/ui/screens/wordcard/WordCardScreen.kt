@@ -493,6 +493,7 @@ fun WordCardScreen(
                                 pitch = saved.pitch,
                                 timing = saved.timing,
                                 total = saved.score,
+                                penaltyFactor = saved.penaltyFactor,
                             )
                             Spacer(Modifier.height(8.dp))
                             Text(
@@ -547,6 +548,7 @@ fun WordCardScreen(
                                 pitch = details.pitch,
                                 timing = details.timing,
                                 total = result.score,
+                                penaltyFactor = result.penaltyFactor,
                             )
                             Spacer(Modifier.height(8.dp))
                             Text(
@@ -644,8 +646,9 @@ private fun PronunciationScoreChart(
     pitch: Float,
     timing: Float,
     total: Float,
+    penaltyFactor: Float = 1.0f,
 ) {
-    val items = listOf(
+    val items = mutableListOf(
         stringResource(R.string.pronunciation_label_total) to total,
         stringResource(R.string.pronunciation_label_pronunciation) to pronunciation,
         stringResource(R.string.pronunciation_label_formants) to formant,
@@ -659,6 +662,20 @@ private fun PronunciationScoreChart(
             style = MaterialTheme.typography.titleSmall,
             color = BrandGreenLight,
         )
+        
+        val penaltyText = if (penaltyFactor >= 1.0f) {
+            stringResource(R.string.penalty_none)
+        } else {
+            String.format("%.2f", penaltyFactor)
+        }
+
+        Text(
+            text = stringResource(R.string.pronunciation_label_penalty) + " = $penaltyText",
+            style = MaterialTheme.typography.labelSmall,
+            color = if (penaltyFactor >= 1.0f) DarkMutedText else androidx.compose.ui.graphics.Color.Red,
+            modifier = Modifier.padding(top = 4.dp)
+        )
+
         Spacer(Modifier.height(8.dp))
 
         items.forEach { (label, score) ->

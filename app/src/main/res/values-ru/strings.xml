@@ -261,6 +261,8 @@
     <string name="pronunciation_label_intonation">Интонация</string>
     <string name="pronunciation_label_speed">Скорость</string>
     <string name="pronunciation_label_total">Итог</string>
+    <string name="pronunciation_label_penalty">Штраф за нераспознавание</string>
+    <string name="penalty_none">Нет</string>
     <string name="wordcard_translation_listen">Послушать перевод</string>
     <string name="wordcard_english_meaning_format">Значение: %1$s</string>
     <string name="wordcard_point_format">%1$d / 100 pt</string>

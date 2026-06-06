@@ -46,6 +46,7 @@ data class SavedPronunciationResult(
     val timing: Float,
     val isIntensityGood: Boolean,
     val recordedAt: String?,
+    val penaltyFactor: Float = 1.0f,
 )
 
 class WordCardViewModel(
@@ -320,6 +321,7 @@ class WordCardViewModel(
             put("timing", details?.timing ?: 0f)
             put("isIntensityGood", details?.isIntensityGood ?: true)
             put("recordedAt", now)
+            put("penaltyFactor", result.penaltyFactor)
         }
 
         context.getSharedPreferences("pronunciation_result_cache", Context.MODE_PRIVATE)
@@ -347,6 +349,7 @@ class WordCardViewModel(
                 timing = json.optDouble("timing", 0.0).toFloat(),
                 isIntensityGood = json.optBoolean("isIntensityGood", true),
                 recordedAt = json.optString("recordedAt").takeIf { it.isNotBlank() },
+                penaltyFactor = json.optDouble("penaltyFactor", 1.0).toFloat(),
             )
         } catch (_: Exception) {
             null

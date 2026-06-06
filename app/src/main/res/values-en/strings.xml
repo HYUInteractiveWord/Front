@@ -263,6 +263,8 @@
     <string name="pronunciation_label_intonation">Intonation</string>
     <string name="pronunciation_label_speed">Speed</string>
     <string name="pronunciation_label_total">Total</string>
+    <string name="pronunciation_label_penalty">Recognition Penalty</string>
+    <string name="penalty_none">None</string>
     <string name="wordcard_translation_listen">Listen to translation</string>
     <string name="wordcard_english_meaning_format">Meaning: %1$s</string>
     <string name="wordcard_point_format">%1$d / 100 pt</string>
