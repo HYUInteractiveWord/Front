@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.interactiveword.R
 import com.interactiveword.data.api.RetrofitClient
+import com.interactiveword.data.local.LanguageManager
 import com.interactiveword.data.repository.WordRepository
 import com.interactiveword.ui.components.AppNotification
 import com.interactiveword.ui.components.NotiType
@@ -228,6 +229,7 @@ class DictionaryVerifyViewModel(
 
         viewModelScope.launch {
             try {
+                val localizedContext = LanguageManager.applyLocale(getApplication<Application>())
                 _uiState.value = _uiState.value.copy(isSaving = true, errorMessage = null)
                 val newCard = repo.createWord(
                     _uiState.value.word,
@@ -246,7 +248,7 @@ class DictionaryVerifyViewModel(
                     XpManager.emitNotification(
                         AppNotification(
                             type = NotiType.XP,
-                            message = getApplication<Application>().getString(R.string.noti_duplicate_bonus, _uiState.value.word),
+                            message = localizedContext.getString(R.string.noti_duplicate_bonus, _uiState.value.word),
                             color = BrandGreenLight,
                             icon = Icons.Default.MenuBook
                         )
@@ -255,7 +257,7 @@ class DictionaryVerifyViewModel(
                     XpManager.emitNotification(
                         AppNotification(
                             type = NotiType.NEW_WORD,
-                            message = getApplication<Application>().getString(R.string.noti_new_word_added, _uiState.value.word),
+                            message = localizedContext.getString(R.string.noti_new_word_added, _uiState.value.word),
                             color = BrandGreenLight,
                             icon = Icons.Default.MenuBook
                         )

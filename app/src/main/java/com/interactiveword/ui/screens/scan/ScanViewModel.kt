@@ -31,6 +31,7 @@ import com.interactiveword.ui.components.XpManager
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MenuBook
 import com.interactiveword.R
+import com.interactiveword.data.local.LanguageManager
 import com.interactiveword.ui.theme.BrandGreenLight
 import com.interactiveword.util.WordCardPointManager
 import retrofit2.HttpException
@@ -362,6 +363,7 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
 
         viewModelScope.launch {
             try {
+                val localizedContext = LanguageManager.applyLocale(context)
                 // 💡 백엔드에서 중복 시에도 201(또는 200)과 함께 기존/업데이트된 객체를 리턴함
                 val newCard = wordRepo.createWord(
                     word = word,
@@ -381,7 +383,7 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
                     XpManager.emitNotification(
                         AppNotification(
                             type = NotiType.XP,
-                            message = context.getString(R.string.noti_duplicate_bonus, word),
+                            message = localizedContext.getString(R.string.noti_duplicate_bonus, word),
                             color = BrandGreenLight,
                             icon = Icons.Default.MenuBook
                         )
@@ -390,7 +392,7 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
                     XpManager.emitNotification(
                         AppNotification(
                             type = NotiType.NEW_WORD,
-                            message = context.getString(R.string.noti_new_word_added, word),
+                            message = localizedContext.getString(R.string.noti_new_word_added, word),
                             color = BrandGreenLight,
                             icon = Icons.Default.MenuBook
                         )

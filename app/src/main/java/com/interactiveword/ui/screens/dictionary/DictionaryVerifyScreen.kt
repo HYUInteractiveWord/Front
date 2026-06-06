@@ -41,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -249,7 +250,7 @@ fun DictionaryVerifyScreen(
                 Button(
                     onClick = { vm.saveToCollection() },
                     enabled = uiState.hasRecordedOnce && !uiState.isSaving,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1.3f),
                     shape = MaterialTheme.shapes.large,
                     colors = ButtonDefaults.buttonColors(containerColor = BrandGreenLight),
                 ) {
@@ -260,7 +261,11 @@ fun DictionaryVerifyScreen(
                             strokeWidth = 2.dp,
                         )
                     } else {
-                        Text(stringResource(R.string.action_add_to_collection))
+                        Text(
+                            text = stringResource(R.string.action_add_to_collection),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
                     }
                 }
             }
