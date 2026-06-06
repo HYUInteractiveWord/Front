@@ -98,12 +98,12 @@ fun WordCardItem(
 
     val borderWidth = when {
         displayPoint >= 100 -> 3.dp
-        displayPoint >= 85 -> 2.dp
-        displayPoint >= 65 -> 1.5.dp
+        displayPoint >= 80 -> 2.dp
+        displayPoint >= 60 -> 1.5.dp
         else -> 1.dp
     }
     
-    val borderAlpha = if (displayPoint >= 85) glowAlpha else 1f
+    val borderAlpha = if (displayPoint >= 80) glowAlpha else 1f
 
     Box(modifier = Modifier.fillMaxWidth().scale(entranceScale.value)) {
         Card(
@@ -113,7 +113,7 @@ fun WordCardItem(
             shape = MaterialTheme.shapes.large,
             colors = CardDefaults.cardColors(containerColor = containerColor),
             border = BorderStroke(borderWidth, effect.borderColor.copy(alpha = borderAlpha)),
-            elevation = CardDefaults.cardElevation(defaultElevation = if (displayPoint >= 85) 6.dp else 2.dp)
+            elevation = CardDefaults.cardElevation(defaultElevation = if (displayPoint >= 80) 6.dp else 2.dp)
         ) {
             Column(modifier = Modifier.padding(if (compact) 12.dp else 16.dp)) {
                 Row(
