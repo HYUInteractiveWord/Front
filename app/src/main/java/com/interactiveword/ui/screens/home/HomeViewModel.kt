@@ -19,6 +19,7 @@ import com.interactiveword.data.repository.WordRepository
 import com.interactiveword.ui.components.AppNotification
 import com.interactiveword.ui.components.NotiType
 import com.interactiveword.ui.components.XpManager
+import com.interactiveword.util.RankManager
 import com.interactiveword.ui.theme.BrandAmberLight
 import com.interactiveword.ui.theme.BrandGreenLight
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -64,11 +65,14 @@ class HomeViewModel @JvmOverloads constructor(
                 // 변경 감지 및 알림
                 if (oldUser != null) {
                     // 1. 랭크 업 감지
-                    if (user.rank != oldUser.rank) {
+                    val oldRank = RankManager.getCurrentBand(oldUser.xp).rank
+                    val newRank = RankManager.getCurrentBand(user.xp).rank
+                    
+                    if (newRank != oldRank) {
                         XpManager.emitNotification(
                             AppNotification(
                                 type = NotiType.RANK_UP,
-                                message = context.getString(R.string.noti_rank_up, rankLabel(user.rank)),
+                                message = context.getString(R.string.noti_rank_up, RankManager.getRankLabel(newRank)),
                                 color = Color(0xFFFFA000), // Gold
                                 icon = Icons.Default.EmojiEvents
                             )
@@ -117,22 +121,6 @@ class HomeViewModel @JvmOverloads constructor(
                 )
             }
         }
-    }
-
-    private fun rankLabel(rank: String): String = when (rank.lowercase()) {
-        "bronze"   -> "브론즈"
-        "silver"   -> "실버"
-        "gold"     -> "골드"
-        "platinum" -> "플래티넘"
-        "sapphire" -> "사파이어"
-        "ruby"     -> "루비"
-        "emerald"  -> "에메랄드"
-        "amethyst" -> "자수정"
-        "pearl"    -> "진주"
-        "obsidian" -> "흑요석"
-        "diamond"  -> "다이아몬드"
-        "master"   -> "마스터"
-        else -> rank
     }
 
     fun claimMission(missionId: Int) {

@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.interactiveword.util.RankManager
 import com.interactiveword.data.model.User
 import com.interactiveword.ui.theme.BrandAmberLight
 import com.interactiveword.ui.theme.BrandGreenLight
@@ -31,10 +32,11 @@ fun UserHeader(user: User, modifier: Modifier = Modifier) {
             ) {
                 Column {
                     Text(user.username, style = MaterialTheme.typography.titleMedium)
+                    val currentBand = RankManager.getCurrentBand(user.xp)
                     Text(
-                        text  = "Lv.${user.xp / 100 + 1} · ${user.rank}",
+                        text  = "Lv.${user.xp / 500 + 1} · ${RankManager.getRankLabel(currentBand.rank)}",
                         style = MaterialTheme.typography.bodySmall,
-                        color = DarkMutedText,
+                        color = RankManager.getRankColor(currentBand.rank),
                     )
                 }
                 // 연속 학습 스트릭
@@ -65,6 +67,7 @@ fun UserHeader(user: User, modifier: Modifier = Modifier) {
             Spacer(Modifier.height(12.dp))
 
             // XP 바
+            val currentLevelXp = user.xp % 500
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -72,14 +75,14 @@ fun UserHeader(user: User, modifier: Modifier = Modifier) {
             ) {
                 Text("XP", style = MaterialTheme.typography.bodySmall, color = DarkMutedText)
                 Text(
-                    "${user.xp} / ${(user.xp / 500 + 1) * 500}",
+                    "$currentLevelXp / 500",
                     style = MaterialTheme.typography.bodySmall,
                     color = DarkMutedText,
                 )
             }
             Spacer(Modifier.height(4.dp))
             LinearProgressIndicator(
-                progress  = { (user.xp % 500) / 500f },
+                progress  = { currentLevelXp / 500f },
                 modifier  = Modifier.fillMaxWidth().height(6.dp),
                 color     = BrandGreenLight,
                 trackColor = DarkOutline,

@@ -34,6 +34,12 @@
     <string name="rank_silver">Серебро</string>
     <string name="rank_gold">Золото</string>
     <string name="rank_platinum">Платина</string>
+    <string name="rank_sapphire">Сапфир</string>
+    <string name="rank_ruby">Рубин</string>
+    <string name="rank_emerald">Изумруд</string>
+    <string name="rank_amethyst">Аметист</string>
+    <string name="rank_pearl">Жемчуг</string>
+    <string name="rank_obsidian">Обсидиан</string>
     <string name="rank_diamond">Бриллиант</string>
     <string name="rank_master">Мастер</string>
 

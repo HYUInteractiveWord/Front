@@ -38,6 +38,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.interactiveword.util.RankManager
 import com.interactiveword.R
 import com.interactiveword.data.api.RetrofitClient
 import com.interactiveword.data.local.TokenDataStore
@@ -326,12 +327,6 @@ private data class ProfileRewardAsset(
     @DrawableRes val drawableRes: Int,
 )
 
-private data class RankBand(
-    val rank: String,
-    val minXp: Int,
-    val maxXpExclusive: Int?,
-)
-
 private val profileAvatarAssets = listOf(
     ProfileRewardAsset("avatar_newbie", R.string.profile_asset_avatar_newbie, R.drawable.avatar_newbie),
     ProfileRewardAsset("avatar_reading_bear", R.string.profile_asset_avatar_reading_bear, R.drawable.avatar_reading_bear),
@@ -352,19 +347,6 @@ private val profileBackgroundAssets = listOf(
     ProfileRewardAsset("bg_cyberpunk", R.string.profile_asset_bg_cyberpunk, R.drawable.bg_cyberpunk),
     ProfileRewardAsset("bg_goldenlake", R.string.profile_asset_bg_goldenlake, R.drawable.bg_goldenlake),
     ProfileRewardAsset("bg_halloween", R.string.profile_asset_bg_halloween, R.drawable.bg_halloween),
-)
-
-private val rankBands = listOf(
-    RankBand("Bronze",    0,     500),
-    RankBand("Silver",    500,   1500),
-    RankBand("Gold",      1500,  3000),
-    RankBand("Sapphire",  3000,  6000),
-    RankBand("Ruby",      6000,  10000),
-    RankBand("Emerald",   10000, 15000),
-    RankBand("Amethyst",  15000, 21000),
-    RankBand("Pearl",     21000, 28000),
-    RankBand("Obsidian",  28000, 36000),
-    RankBand("Diamond",   36000, null),
 )
 
 // ==========================================
@@ -402,11 +384,9 @@ fun HomeProfileDashboardCard(
     val selectedBackground = profileBackgroundAssets.firstOrNull { it.id == selectedBackgroundId } ?: profileBackgroundAssets.first()
 
     // 2. 경험치 및 스탯 계산
-    val currentBand = rankBands.firstOrNull { band ->
-        user.xp >= band.minXp && (band.maxXpExclusive == null || user.xp < band.maxXpExclusive)
-    } ?: rankBands.last()
+    val currentBand = RankManager.getCurrentBand(user.xp)
+    val nextBand = RankManager.getNextBand(user.xp)
 
-    val nextBand = rankBands.getOrNull(rankBands.indexOf(currentBand) + 1)
     val progress = if (currentBand.maxXpExclusive == null) 1f else {
         val range = (currentBand.maxXpExclusive - currentBand.minXp).coerceAtLeast(1)
         ((user.xp - currentBand.minXp).toFloat() / range).coerceIn(0f, 1f)
@@ -469,7 +449,12 @@ fun HomeProfileDashboardCard(
                     )
                     Column {
                         Text(text = user.username, style = MaterialTheme.typography.titleLarge, color = Color.White)
-                        Text(text = rankLabel(user.rank), style = MaterialTheme.typography.titleMedium, color = BrandAmberLight)
+                        val currentBand = RankManager.getCurrentBand(user.xp)
+                        Text(
+                            text = RankManager.getRankLabel(currentBand.rank),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = RankManager.getRankColor(currentBand.rank)
+                        )
                         Text(
                             text = stringResource(R.string.profile_reward_ticket_owned, remainingTickets),
                             style = MaterialTheme.typography.bodySmall,
@@ -799,22 +784,6 @@ private fun RewardAssetTile(
             )
         }
     }
-}
-
-private fun rankLabel(rank: String): String = when (rank.lowercase()) {
-    "bronze"   -> "브론즈"
-    "silver"   -> "실버"
-    "gold"     -> "골드"
-    "platinum" -> "플래티넘"
-    "sapphire" -> "사파이어"
-    "ruby"     -> "루비"
-    "emerald"  -> "에메랄드"
-    "amethyst" -> "자수정"
-    "pearl"    -> "진주"
-    "obsidian" -> "흑요석"
-    "diamond"  -> "다이아몬드"
-    "master"   -> "마스터"
-    else -> rank
 }
 
 private fun missionIcon(missionType: String): ImageVector {

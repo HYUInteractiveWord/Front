@@ -31,7 +31,13 @@
     <string name="rank_silver">실버</string>
     <string name="rank_gold">골드</string>
     <string name="rank_platinum">플래티넘</string>
-    <string name="rank_diamond">다이아</string>
+    <string name="rank_sapphire">사파이어</string>
+    <string name="rank_ruby">루비</string>
+    <string name="rank_emerald">에메랄드</string>
+    <string name="rank_amethyst">자수정</string>
+    <string name="rank_pearl">진주</string>
+    <string name="rank_obsidian">흑요석</string>
+    <string name="rank_diamond">다이아몬드</string>
     <string name="rank_master">마스터</string>
 
     <string name="home_today_missions">오늘의 미션</string>

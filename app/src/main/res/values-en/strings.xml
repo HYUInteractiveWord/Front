@@ -34,6 +34,12 @@
     <string name="rank_silver">Silver</string>
     <string name="rank_gold">Gold</string>
     <string name="rank_platinum">Platinum</string>
+    <string name="rank_sapphire">Sapphire</string>
+    <string name="rank_ruby">Ruby</string>
+    <string name="rank_emerald">Emerald</string>
+    <string name="rank_amethyst">Amethyst</string>
+    <string name="rank_pearl">Pearl</string>
+    <string name="rank_obsidian">Obsidian</string>
     <string name="rank_diamond">Diamond</string>
     <string name="rank_master">Master</string>
 
