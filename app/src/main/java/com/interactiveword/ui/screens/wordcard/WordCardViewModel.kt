@@ -267,7 +267,7 @@ class WordCardViewModel(
                 val refreshedCard = repo.getWord(card.id)
 
                 // 💡 MASTER 달성 알림 (기존 점수가 100 미만이었다가 100이 된 경우)
-                if (refreshedCard.wordPoint >= 97 && (card.wordPoint < 97)) {
+                if (refreshedCard.wordPoint >= 100 && (card.wordPoint < 100)) {
                     XpManager.emitNotification(
                         AppNotification(
                             type = NotiType.MASTER_ACHIEVED,
