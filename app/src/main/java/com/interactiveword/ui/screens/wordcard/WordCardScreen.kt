@@ -663,7 +663,7 @@ private fun PronunciationScoreChart(
             color = BrandGreenLight,
         )
         
-        val penaltyText = if (penaltyFactor >= 1.0f) {
+        val penaltyText = if (penaltyFactor <= 0.0f) {
             stringResource(R.string.penalty_none)
         } else {
             String.format("%.2f", penaltyFactor)
@@ -672,7 +672,7 @@ private fun PronunciationScoreChart(
         Text(
             text = stringResource(R.string.pronunciation_label_penalty) + " = $penaltyText",
             style = MaterialTheme.typography.labelSmall,
-            color = if (penaltyFactor >= 1.0f) DarkMutedText else androidx.compose.ui.graphics.Color.Red,
+            color = if (penaltyFactor <= 0.0f) DarkMutedText else androidx.compose.ui.graphics.Color.Red,
             modifier = Modifier.padding(top = 4.dp)
         )
 

@@ -186,7 +186,7 @@ data class PronunciationResponse(
     @SerializedName("word_card_level") val wordCardLevel: Int,
     @SerializedName("word_point") val wordPoint: Int = 0,
     @SerializedName("effect_level") val effectLevel: Int = 0,
-    @SerializedName("penalty_factor") val penaltyFactor: Float = 1.0f,
+    @SerializedName("penalty_factor") val penaltyFactor: Float = 0.0f,
 
     val graphs: Map<String, String>? = null,
     val details: PronunciationDetails? = null,
