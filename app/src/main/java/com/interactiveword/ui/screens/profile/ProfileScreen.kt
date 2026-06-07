@@ -15,6 +15,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -24,6 +28,8 @@ import androidx.navigation.NavController
 import com.interactiveword.R
 import com.interactiveword.ui.navigation.Screen
 import com.interactiveword.ui.components.MissionCardItem
+import com.interactiveword.ui.components.TutorialPrefs
+import com.interactiveword.ui.components.TutorialStepDialog
 import com.interactiveword.ui.theme.BrandGreenLight
 import com.interactiveword.ui.theme.DarkOutline
 import com.interactiveword.ui.theme.DarkMutedText
@@ -35,8 +41,16 @@ fun ProfileScreen(
     vm: ProfileViewModel = viewModel(),
 ) {
     val uiState by vm.uiState.collectAsState()
+    val context = LocalContext.current
+    var showMissionTutorial by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) { vm.refresh() }
+    LaunchedEffect(Unit) {
+        vm.refresh()
+
+        if (TutorialPrefs.shouldShow(context, TutorialPrefs.KEY_MISSION)) {
+            showMissionTutorial = true
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -50,6 +64,19 @@ fun ProfileScreen(
         },
         containerColor = MaterialTheme.colorScheme.background,
     ) { padding ->
+        if (showMissionTutorial) {
+            TutorialStepDialog(
+                imageRes = R.drawable.tutorial_mission_ru,
+                title = stringResource(R.string.tutorial_mission_title),
+                body = stringResource(R.string.tutorial_mission_body),
+                confirmText = stringResource(R.string.action_confirm),
+                onConfirm = {
+                    TutorialPrefs.markShown(context, TutorialPrefs.KEY_MISSION)
+                    showMissionTutorial = false
+                },
+            )
+        }
+
         LazyColumn(
             contentPadding = PaddingValues(
                 start  = 16.dp,

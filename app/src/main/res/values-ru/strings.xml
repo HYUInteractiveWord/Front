@@ -316,4 +316,19 @@
     <string name="noti_word_best_score_achieved">🎉 Новый рекорд! (%1$d баллов)</string>
     <string name="noti_word_master_achieved">🎉 Поздравляем! Вы достигли уровня MASTER для слова \'%1$s\'!</string>
     <string name="profile_example_quiz_title">Пример запроса на предложения</string>
+
+    <string name="tutorial_home_title">Главная страница</string>
+    <string name="tutorial_home_body">Здесь можно проверить XP, ранг, количество собранных слов, миссии и настройки профиля.</string>
+
+    <string name="tutorial_scan_title">Сканер слов</string>
+    <string name="tutorial_scan_body">Используйте микрофон или медиа-сканер, чтобы находить корейские слова в звуке и видео.</string>
+
+    <string name="tutorial_dictionary_title">Поиск в словаре</string>
+    <string name="tutorial_dictionary_body">Проверьте найденные слова и нажмите +, чтобы добавить нужное слово в словник.</string>
+
+    <string name="tutorial_word_card_title">Карточка слова</string>
+    <string name="tutorial_word_card_body">В карточке слова можно проверить значение, перевод, примеры, озвучку и оценку произношения.</string>
+
+    <string name="tutorial_mission_title">Миссии и тесты</string>
+    <string name="tutorial_mission_body">Выполняйте миссии и тесты слов, чтобы получать XP и повышать ранг.</string>
 </resources>
