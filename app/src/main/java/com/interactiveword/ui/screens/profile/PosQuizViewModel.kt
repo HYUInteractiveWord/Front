@@ -3,63 +3,12 @@ package com.interactiveword.ui.screens.profile
 import android.content.Context
 import android.media.MediaPlayer
 import android.speech.tts.TextToSpeech
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MenuBook
-import androidx.compose.material.icons.filled.VolumeUp
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import com.interactiveword.R
 import com.interactiveword.data.api.RetrofitClient
 import com.interactiveword.data.model.WordCard
 import com.interactiveword.data.model.WordQuizItemResultRequest
 import com.interactiveword.data.repository.WordRepository
-import com.interactiveword.ui.navigation.Screen
-import com.interactiveword.ui.theme.BrandGreenLight
-import com.interactiveword.ui.theme.DarkOutline
-import com.interactiveword.ui.theme.ErrorRed
 import com.interactiveword.ui.components.XpManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -67,11 +16,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
+import java.util.Locale
 import kotlin.math.min
-
-// ==========================================
-// ViewModel & State
-// ==========================================
 
 private const val POS_QUIZ_LIMIT = 5
 
@@ -85,7 +31,7 @@ enum class PosQuizEmptyReason {
 data class PosQuizQuestion(
     val wordId: Int,
     val word: String,
-    val definition: String, // 타겟 언어 뜻으로 채워집니다
+    val definition: String,
     val correctPos: String,
     val wordAudioPath: String?,
     val definitionAudioPath: String?,
@@ -117,7 +63,17 @@ class PosQuizViewModel(
 ) : ViewModel() {
 
     companion object {
-        private val ALL_POS = listOf("명사", "대명사", "수사", "동사", "형용사", "관형사", "부사", "조사", "감탄사")
+        private val ALL_POS = listOf(
+            "명사",
+            "대명사",
+            "수사",
+            "동사",
+            "형용사",
+            "관형사",
+            "부사",
+            "조사",
+            "감탄사",
+        )
     }
 
     private val _uiState = MutableStateFlow(PosQuizUiState())
@@ -136,6 +92,7 @@ class PosQuizViewModel(
         if (state.isAnswerChecked) return
 
         val isCorrect = answer == currentQuestion.correctPos
+
         _uiState.value = state.copy(
             selectedAnswer = answer,
             isAnswerChecked = true,
@@ -156,6 +113,7 @@ class PosQuizViewModel(
             selectedAnswer = null,
             isAnswerChecked = false,
         )
+
         _uiState.value = nextState
 
         if (nextState.isFinished) {
@@ -187,7 +145,6 @@ class PosQuizViewModel(
                     submitErrorMessage = null,
                 )
 
-                // 💡 XP 획득 전역 이벤트 발생
                 if (response.quizXpGained > 0) {
                     XpManager.emitXpGain(response.quizXpGained)
                 }
@@ -207,13 +164,16 @@ class PosQuizViewModel(
         val correctCount = _uiState.value.correctCount
         val total = _uiState.value.totalQuestions
         if (total == 0) return 0
+
         val baseXp = correctCount * 10
         val bonusXp = if (total >= 3 && correctCount == total) 10 else 0
+
         return baseXp + bonusXp
     }
 
     fun playTts(audioPath: String?) {
         if (audioPath.isNullOrBlank()) return
+
         val url = RetrofitClient.resolveStaticUrl(audioPath) ?: return
 
         try {
@@ -235,12 +195,13 @@ class PosQuizViewModel(
                 prepareAsync()
             }
         } catch (e: Exception) {
-            // 재생 오류 무시
+            // TTS 재생 실패는 퀴즈 진행을 막지 않는다.
         }
     }
 
     fun speakText(context: Context, text: String) {
         if (text.isBlank()) return
+
         if (tts == null) {
             tts = TextToSpeech(context) { status ->
                 if (status == TextToSpeech.SUCCESS) {
@@ -255,66 +216,52 @@ class PosQuizViewModel(
     override fun onCleared() {
         mediaPlayer?.release()
         mediaPlayer = null
+
         tts?.stop()
         tts?.shutdown()
         tts = null
+
         super.onCleared()
     }
 
     private fun loadQuestions() {
         viewModelScope.launch {
             _uiState.value = PosQuizUiState(isLoading = true)
+
             try {
                 val words = wordRepo.getMyWords()
+                val validQuestions = buildQuestions(words)
 
-                // 1. 유효한 질문 필터링 (타겟 언어 뜻 우선 적용)
-                val validQuestions = words.mapNotNull { card ->
-                    val definition = card.definition?.trim().orEmpty()
-                    val displayDef = card.definitionTranslated?.trim()
-                        ?: card.definitionEnglish?.trim()
-                        ?: definition
-
-                    val normalizedPos = normalizePos(card.pos)
-                    if (displayDef.isBlank() || normalizedPos == null) return@mapNotNull null
-
-                    PosQuizQuestion(
-                        wordId = card.id,
-                        word = card.koreanWord,
-                        definition = displayDef,
-                        correctPos = normalizedPos,
-                        wordAudioPath = card.ttsAudioPath,
-                        definitionAudioPath = card.defTransAudioPath
-                    )
-                }
-
-                // 2. 4개 미만 진입 보호 로직
                 if (validQuestions.size < 4) {
                     _uiState.value = PosQuizUiState(
                         isLoading = false,
                         errorMessage = "품사 퀴즈를 시작하려면\n최소 4개 이상의 단어가 필요해요.\n(현재 ${validQuestions.size}개)",
-                        emptyReason = PosQuizEmptyReason.NO_WORDS,
+                        emptyReason = if (words.isEmpty()) {
+                            PosQuizEmptyReason.NO_WORDS
+                        } else {
+                            PosQuizEmptyReason.NO_POS_DATA
+                        },
                     )
                     return@launch
                 }
 
-                val shuffledQuestions = validQuestions.shuffled().take(min(POS_QUIZ_LIMIT, validQuestions.size))
+                val shuffledQuestions = validQuestions
+                    .shuffled()
+                    .take(min(POS_QUIZ_LIMIT, validQuestions.size))
 
-                // 사용자 단어장에 존재하는 모든 품사 추출
-                val existingPosList = validQuestions.map { it.correctPos }.distinct()
+                val existingPosList = validQuestions
+                    .map { it.correctPos }
+                    .distinct()
 
-                // 각 질문에 대해 랜덤 보기 생성
                 val questionsWithOptions = shuffledQuestions.map { question ->
-                    // 1. 정답 포함
                     val questionOptions = mutableSetOf(question.correctPos)
 
-                    // 2. 단어장에 있는 다른 품사들 중 랜덤 추가 (최대 4개까지)
                     val otherExistingPos = (existingPosList - question.correctPos).shuffled()
                     for (pos in otherExistingPos) {
                         if (questionOptions.size >= 4) break
                         questionOptions.add(pos)
                     }
 
-                    // 3. 4개가 안 되면 전체 품사 중 랜덤 추가
                     if (questionOptions.size < 4) {
                         val remainingAllPos = (ALL_POS - questionOptions).shuffled()
                         for (pos in remainingAllPos) {
@@ -338,6 +285,7 @@ class PosQuizViewModel(
                             401 -> "로그인 정보가 만료되어 단어를 불러오지 못했습니다. 다시 로그인해주세요."
                             else -> "서버 응답 오류(${e.code()})로 품사 테스트를 시작할 수 없어요."
                         }
+
                         is IOException -> "서버에 연결하지 못했습니다. 네트워크 또는 서버 상태를 확인해주세요."
                         else -> "품사 테스트 문제를 불러오지 못했습니다."
                     },
@@ -347,37 +295,73 @@ class PosQuizViewModel(
         }
     }
 
+    private fun buildQuestions(words: List<WordCard>): List<PosQuizQuestion> {
+        val language = currentLanguage()
+
+        return words.mapNotNull { card ->
+            val definition = localizedDefinition(card, language)
+            val normalizedPos = normalizePos(card.pos)
+
+            if (definition.isBlank() || normalizedPos == null) {
+                return@mapNotNull null
+            }
+
+            PosQuizQuestion(
+                wordId = card.id,
+                word = card.koreanWord,
+                definition = definition,
+                correctPos = normalizedPos,
+                wordAudioPath = card.ttsAudioPath,
+                definitionAudioPath = card.defTransAudioPath,
+            )
+        }
+    }
+
+    private fun localizedDefinition(card: WordCard, language: String): String {
+        return when (language) {
+            "ru" -> listOf(
+                card.definitionTranslated,
+                card.definitionEnglish,
+                card.definition,
+            ).firstClean()
+
+            "en" -> listOf(
+                card.definitionEnglish,
+                card.definitionTranslated,
+                card.definition,
+            ).firstClean()
+
+            else -> listOf(
+                card.definition,
+                card.definitionTranslated,
+                card.definitionEnglish,
+            ).firstClean()
+        }
+    }
+
+    private fun currentLanguage(): String {
+        return Locale.getDefault().language.lowercase(Locale.ROOT)
+    }
+
     private fun normalizePos(raw: String?): String? {
         val pos = raw?.trim().orEmpty()
         if (pos.isBlank()) return null
+
         return when {
-            "명사" in pos -> "명사"
-            "대명사" in pos -> "대명사"
-            "수사" in pos -> "수사"
-            "동사" in pos -> "동사"
-            "형용사" in pos -> "형용사"
-            "관형사" in pos -> "관형사"
-            "부사" in pos -> "부사"
-            "조사" in pos -> "조사"
-            "감탄사" in pos -> "감탄사"
+            "대명사" in pos || pos.equals("pronoun", ignoreCase = true) -> "대명사"
+            "수사" in pos || pos.equals("numeral", ignoreCase = true) -> "수사"
+            "동사" in pos || pos.equals("verb", ignoreCase = true) -> "동사"
+            "형용사" in pos || pos.equals("adjective", ignoreCase = true) -> "형용사"
+            "관형사" in pos || pos.equals("determiner", ignoreCase = true) -> "관형사"
+            "부사" in pos || pos.equals("adverb", ignoreCase = true) -> "부사"
+            "조사" in pos || pos.equals("particle", ignoreCase = true) -> "조사"
+            "감탄사" in pos || pos.equals("interjection", ignoreCase = true) -> "감탄사"
+            "명사" in pos || pos.equals("noun", ignoreCase = true) -> "명사"
             else -> null
         }
     }
-}
 
-@Composable
-private fun getPosString(pos: String?): String {
-    if (pos == null) return ""
-    return when {
-        pos.contains("명사") -> stringResource(R.string.pos_noun)
-        pos.contains("대명사") -> stringResource(R.string.pos_pronoun)
-        pos.contains("수사") -> stringResource(R.string.pos_numeral)
-        pos.contains("동사") -> stringResource(R.string.pos_verb)
-        pos.contains("형용사") -> stringResource(R.string.pos_adjective)
-        pos.contains("관형사") -> stringResource(R.string.pos_determiner)
-        pos.contains("부사") -> stringResource(R.string.pos_adverb)
-        pos.contains("조사") -> stringResource(R.string.pos_particle)
-        pos.contains("감탄사") -> stringResource(R.string.pos_interjection)
-        else -> pos
+    private fun List<String?>.firstClean(): String {
+        return firstOrNull { !it.isNullOrBlank() }?.trim().orEmpty()
     }
 }

@@ -227,14 +227,14 @@
     <string name="profile_reward_tap_to_unlock">Нажмите, чтобы открыть</string>
     <string name="profile_asset_avatar_newbie">Новичок</string>
     <string name="profile_asset_avatar_reading_bear">Читающий медведь</string>
-    <string name="profile_asset_avatar_crown_bear">Ме드ведь с короной</string>
+    <string name="profile_asset_avatar_crown_bear">Медведь с короной</string>
     <string name="profile_asset_avatar_writing_rabbit">Пишущий кролик</string>
     <string name="profile_asset_avatar_headset_cat">Кот в наушниках</string>
     <string name="profile_asset_avatar_parrot">Говорящий попугай</string>
     <string name="profile_asset_avatar_explorer">Исследователь</string>
     <string name="profile_asset_avatar_ghost">Призрак</string>
     <string name="profile_asset_avatar_holy_fox">Священная лиса</string>
-    <string name="profile_asset_avatar_cyberpunk_robot">Кибер-ро봇</string>
+    <string name="profile_asset_avatar_cyberpunk_robot">Кибер-робот</string>
     <string name="profile_asset_bg_library">Библиотека</string>
     <string name="profile_asset_bg_goldenlake">Золотое озеро</string>
     <string name="profile_asset_bg_forest">Лесная долина</string>
@@ -281,39 +281,60 @@
     <string name="pos_numeral">Числительное</string>
     <string name="pos_verb">Глагол</string>
     <string name="pos_adjective">Прилагательное</string>
-    <string name="pos_determiner">Атрибутив</string>
+    <string name="pos_determiner">Определительное слово</string>
     <string name="pos_adverb">Наречие</string>
     <string name="pos_particle">Частица</string>
     <string name="pos_interjection">Междометие</string>
 
-    <string name="lang_change_title">Сменить язык</string>
-    <string name="lang_change_warning">Предупреждение: Смена языка приведет к удалению всех карточек слов. Продолжить?</string>
-    <string name="lang_change_confirm">Сменить и удалить</string>
+    <string name="lang_change_title">Изменить язык обучения</string>
+    <string name="lang_change_warning">Предупреждение: при изменении языка все сохранённые карточки слов будут удалены. Продолжить?</string>
+    <string name="lang_change_confirm">Изменить и удалить</string>
     <string name="lang_change_cancel">Отмена</string>
 
     <string name="delete_account_title">Удалить аккаунт</string>
-    <string name="delete_account_msg">Удаление аккаунта приведет к необратимой потере опыта, ранга и карточек. Продолжить?</string>
+    <string name="delete_account_msg">Удаление аккаунта приведёт к безвозвратной потере опыта, ранга и карточек слов. Продолжить?</string>
     <string name="delete_account_confirm">Удалить</string>
     <string name="delete_account_cancel">Отмена</string>
 
     <string name="settings_section_title">Настройки пользователя</string>
-    <string name="settings_lang_change">Сменить язык</string>
-    <string name="settings_lang_sub">Сброс всех слов</string>
+    <string name="settings_lang_change">Изменить язык обучения</string>
+    <string name="settings_lang_sub">Сброс всех карточек слов</string>
     <string name="settings_delete_account">Удалить аккаунт</string>
-    <string name="settings_delete_sub">Данные не восстановить</string>
+    <string name="settings_delete_sub">Данные нельзя восстановить</string>
 
     <string name="error_word_empty">Слово не введено.</string>
-    <string name="error_word_slot_limit">Предел слотов для слов достигнут. Выполните миссии, чтобы разблокировать больше.</string>
-    <string name="error_word_already_exists">Слово уже есть в вашем словнике.</string>
+    <string name="error_word_slot_limit">Достигнут лимит слов. Выполните миссии, чтобы открыть больше слотов.</string>
+    <string name="error_word_already_exists">Это слово уже есть в вашем словаре.</string>
     <string name="error_unknown">Произошла неизвестная ошибка.</string>
 
     <!-- Notifications -->
     <string name="noti_rank_up">Повышение ранга! %1$s</string>
-    <string name="noti_word_slot_increase">Слоты слов увеличены! (%1$d слотов)</string>
+    <string name="noti_word_slot_increase">Слоты слов увеличены! (%1$d слов)</string>
     <string name="noti_ticket_acquired">Получен билет кастомизации!</string>
     <string name="noti_new_word_added">Новое слово добавлено: %1$s</string>
-    <string name="noti_duplicate_bonus">Бонус за повторный сбор \'%1$s\'!</string>
-    <string name="noti_word_best_score_achieved">🎉 Новый рекорд! (%1$d баллов)</string>
-    <string name="noti_word_master_achieved">🎉 Поздравляем! Вы достигли уровня MASTER для слова \'%1$s\'!</string>
-    <string name="profile_example_quiz_title">Пример запроса на предложения</string>
+    <string name="noti_duplicate_bonus">Бонус за повторный сбор: %1$s</string>
+    <string name="noti_word_best_score_achieved">Новый рекорд! (%1$d баллов)</string>
+    <string name="noti_word_master_achieved">Поздравляем! Слово %1$s достигло уровня MASTER!</string>
+    <string name="profile_example_quiz_title">Пример задания на предложение</string>
+    <string name="tutorial_button">Как пользоваться</string>
+    <string name="tutorial_dialog_title">Как пользоваться</string>
+    <string name="tutorial_step_counter">%1$d / %2$d</string>
+    <string name="tutorial_prev">Назад</string>
+    <string name="tutorial_next">Далее</string>
+    <string name="tutorial_close">Закрыть</string>
+
+    <string name="tutorial_home_title">Главная страница</string>
+    <string name="tutorial_home_body">Здесь можно проверить XP, ранг, количество собранных слов, миссии и настройки профиля.</string>
+
+    <string name="tutorial_scan_title">Сканер слов</string>
+    <string name="tutorial_scan_body">Используйте микрофон или медиа-сканер, чтобы находить корейские слова в звуке и видео.</string>
+
+    <string name="tutorial_dictionary_title">Поиск в словаре</string>
+    <string name="tutorial_dictionary_body">Проверьте найденные слова и нажмите +, чтобы добавить нужное слово в словник.</string>
+
+    <string name="tutorial_word_card_title">Карточка слова</string>
+    <string name="tutorial_word_card_body">В карточке слова можно проверить значение, перевод, примеры, озвучку и оценку произношения.</string>
+
+    <string name="tutorial_mission_title">Миссии и тесты</string>
+    <string name="tutorial_mission_body">Выполняйте миссии и тесты слов, чтобы получать XP и повышать ранг.</string>
 </resources>
