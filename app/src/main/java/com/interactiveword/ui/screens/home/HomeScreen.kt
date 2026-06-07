@@ -14,12 +14,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.ConfirmationNumber
-import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.TrackChanges
+import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -43,9 +45,7 @@ import com.interactiveword.util.RankManager
 import com.interactiveword.R
 import com.interactiveword.data.api.RetrofitClient
 import com.interactiveword.data.local.TokenDataStore
-import com.interactiveword.data.model.Mission
 import com.interactiveword.data.model.User
-import com.interactiveword.ui.components.MissionCardItem
 import com.interactiveword.ui.components.WordCardItem
 import com.interactiveword.ui.components.TutorialPrefs
 import com.interactiveword.ui.components.TutorialStepDialog
@@ -56,12 +56,9 @@ import com.interactiveword.ui.theme.DarkMutedText
 import com.interactiveword.ui.theme.DarkOutline
 import kotlinx.coroutines.launch
 import android.app.Activity
-import androidx.compose.material.icons.filled.Language
-import androidx.compose.material.icons.filled.DeleteForever
 import com.interactiveword.data.local.LanguageManager
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -78,7 +75,7 @@ fun HomeScreen(
     var showLanguageDialog by remember { mutableStateOf(false) }
     var showDeleteAccountDialog by remember { mutableStateOf(false) }
     var showHomeTutorial by remember { mutableStateOf(false) }
-    var newSelectedLanguage by remember { mutableStateOf<String>(LanguageManager.getSavedLanguage(context)) }
+    var newSelectedLanguage by remember { mutableStateOf(LanguageManager.getSavedLanguage(context)) }
 
     LaunchedEffect(uiState.user?.id) {
         val userId = uiState.user?.id ?: return@LaunchedEffect
@@ -230,7 +227,7 @@ fun HomeScreen(
                 confirmButton = {
                     TextButton(onClick = {
                         showDeleteAccountDialog = false
-                        vm.deleteAccount() {
+                        vm.deleteAccount {
                             scope.launch {
                                 TokenDataStore(context).clearToken()
                                 RetrofitClient.authToken = null
@@ -427,8 +424,8 @@ fun HomeProfileDashboardCard(
     val selectedBackground = profileBackgroundAssets.firstOrNull { it.id == selectedBackgroundId } ?: profileBackgroundAssets.first()
 
     // 2. 경험치 및 스탯 계산
-    val currentBand = com.interactiveword.util.RankManager.getCurrentBand(user.xp)
-    val nextBand = com.interactiveword.util.RankManager.getNextBand(user.xp)
+    val currentBand = RankManager.getCurrentBand(user.xp)
+    val nextBand = RankManager.getNextBand(user.xp)
 
     val progress = if (currentBand.maxXpExclusive == null) 1f else {
         val range = (currentBand.maxXpExclusive - currentBand.minXp).coerceAtLeast(1)
@@ -489,11 +486,11 @@ fun HomeProfileDashboardCard(
                     )
                     Column {
                         Text(text = user.username, style = MaterialTheme.typography.titleLarge, color = Color.White)
-                        val currentBand = RankManager.getCurrentBand(user.xp)
+                        val currentBandForLabel = RankManager.getCurrentBand(user.xp)
                         Text(
-                            text = RankManager.getRankLabel(currentBand.rank),
+                            text = RankManager.getRankLabel(currentBandForLabel.rank),
                             style = MaterialTheme.typography.titleMedium,
-                            color = RankManager.getRankColor(currentBand.rank)
+                            color = RankManager.getRankColor(currentBandForLabel.rank)
                         )
                         Text(
                             text = stringResource(R.string.profile_reward_ticket_owned, remainingTickets),
@@ -535,19 +532,19 @@ fun HomeProfileDashboardCard(
             ) {
                 ProfileStatItem(
                     label = stringResource(R.string.home_stat_words),
-                    value = "${wordCount}",
-                    icon = Icons.Filled.MenuBook,
+                    value = wordCount.toString(),
+                    icon = Icons.AutoMirrored.Filled.MenuBook,
                     modifier = Modifier.weight(1f),
                 )
                 ProfileStatItem(
                     label = stringResource(R.string.home_stat_cleared_missions),
-                    value = "${clearedMissionsCount}",
+                    value = clearedMissionsCount.toString(),
                     icon = Icons.Filled.TrackChanges,
                     modifier = Modifier.weight(1f),
                 )
                 ProfileStatItem(
                     label = stringResource(R.string.home_stat_word_slots),
-                    value = "${user.maxWordSlots}",
+                    value = user.maxWordSlots.toString(),
                     icon = Icons.Filled.Bolt,
                     modifier = Modifier.weight(1f),
                 )
@@ -851,16 +848,6 @@ private fun RewardAssetTile(
                 },
             )
         }
-    }
-}
-
-private fun missionIcon(missionType: String): ImageVector {
-    return when (missionType) {
-        "daily_pronunciation" -> Icons.Filled.Mic
-        "daily_scan"          -> Icons.Filled.TrackChanges
-        "daily_word_quiz"     -> Icons.Filled.MenuBook
-        "daily_collect_noun"  -> Icons.Filled.MenuBook
-        else -> Icons.Filled.TrackChanges
     }
 }
 

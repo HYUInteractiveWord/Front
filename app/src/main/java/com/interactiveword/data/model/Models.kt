@@ -10,6 +10,7 @@ data class User(
     val rank: String,
     @SerializedName("max_word_slots") val maxWordSlots: Int,
     @SerializedName("preferred_language") val preferredLanguage: String = "en",
+    @SerializedName("cleared_missions") val clearedMissions: Int = 0,
 )
 
 data class WordCard(
@@ -84,6 +85,7 @@ data class WordQuizUserSummary(
     val xp: Int,
     val rank: String,
     @SerializedName("max_word_slots") val maxWordSlots: Int,
+    @SerializedName("cleared_missions") val clearedMissions: Int = 0,
 )
 
 data class WordQuizMissionSummary(

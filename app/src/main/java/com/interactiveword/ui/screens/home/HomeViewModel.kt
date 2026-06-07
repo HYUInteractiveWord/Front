@@ -8,22 +8,17 @@ import androidx.compose.material.icons.filled.ConfirmationNumber
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.interactiveword.R
 import com.interactiveword.data.api.RetrofitClient
-import com.interactiveword.data.model.Mission
 import com.interactiveword.data.model.User
 import com.interactiveword.data.model.WordCard
-import com.interactiveword.data.repository.MissionRepository
 import com.interactiveword.data.repository.UserRepository
 import com.interactiveword.data.repository.WordRepository
 import com.interactiveword.ui.components.AppNotification
 import com.interactiveword.ui.components.NotiType
 import com.interactiveword.ui.components.XpManager
 import com.interactiveword.util.RankManager
-import com.interactiveword.ui.theme.BrandAmberLight
-import com.interactiveword.ui.theme.BrandGreenLight
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,12 +26,9 @@ import kotlinx.coroutines.launch
 
 data class HomeUiState(
     val user: User? = null,
-    val dailyMissions: List<Mission> = emptyList(),
-    val allMissions: List<Mission> = emptyList(),
     val recentWords: List<WordCard> = emptyList(),
     val wordCount: Int = 0,
     val clearedMissionsCount: Int = 0,
-    val isCaptureServiceRunning: Boolean = false,
     val isLoading: Boolean = false,
     val error: String? = null,
 )
@@ -45,7 +37,6 @@ class HomeViewModel @JvmOverloads constructor(
     application: Application,
     private val userRepo: UserRepository = UserRepository(),
     private val wordRepo: WordRepository = WordRepository(),
-    private val missionRepo: MissionRepository = MissionRepository(),
 ) : AndroidViewModel(application) {
 
     private val context = getApplication<Application>()
@@ -66,9 +57,6 @@ class HomeViewModel @JvmOverloads constructor(
             try {
                 val user = userRepo.getMe()
                 val words = wordRepo.getMyWords()
-                val missions = missionRepo.getDailyMissions()
-                val allMissions = missionRepo.getAllMissions()
-                val clearedCount = allMissions.count { it.isCompleted }
 
                 // 변경 감지 및 알림
                 if (oldUser != null) {
@@ -121,9 +109,7 @@ class HomeViewModel @JvmOverloads constructor(
                     user = user,
                     recentWords = words.takeLast(4).reversed(),
                     wordCount = words.size,
-                    clearedMissionsCount = clearedCount,
-                    dailyMissions = missions,
-                    allMissions = allMissions,
+                    clearedMissionsCount = user.clearedMissions,
                     isLoading = false,
                     error = null,
                 )
@@ -134,33 +120,6 @@ class HomeViewModel @JvmOverloads constructor(
                 )
             }
         }
-    }
-
-    fun claimMission(missionId: Int) {
-        viewModelScope.launch {
-            try {
-                val mission = missionRepo.completeMission(missionId)
-                
-                // 💡 XP 획득 애니메이션 발동
-                XpManager.emitXpGain(mission.xpReward)
-                
-                // 💡 UI 상태의 클리어 카운트를 즉시 1 증가시킴 (네트워크 반영 전 가시성 확보)
-                _uiState.value = _uiState.value.copy(
-                    clearedMissionsCount = _uiState.value.clearedMissionsCount + 1
-                )
-                
-                // 데이터 갱신 (서버 최신 상태 동기화)
-                loadData()
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(error = e.message)
-            }
-        }
-    }
-
-    fun toggleCaptureService() {
-        _uiState.value = _uiState.value.copy(
-            isCaptureServiceRunning = !_uiState.value.isCaptureServiceRunning,
-        )
     }
 
     fun changeLanguage(newLanguage: String, onSuccess: () -> Unit) {
