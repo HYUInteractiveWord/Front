@@ -8,6 +8,7 @@ import android.media.MediaPlayer
 import android.net.Uri
 import android.widget.VideoView
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
@@ -94,17 +95,11 @@ fun ScanScreen(
         onDispose { vm.stopRecording() }
     }
 
-    // 💡 파일 피커: 영상/오디오 선택 시 트리머 다이얼로그 띄움
+    // 💡 파일 피커: 영상 선택 시 트리머 다이얼로그 띄움 (갤러리 연결)
     val mediaPickerLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.OpenDocument()
+        ActivityResultContracts.PickVisualMedia()
     ) { uri ->
         uri?.let {
-            runCatching {
-                context.contentResolver.takePersistableUriPermission(
-                    it,
-                    Intent.FLAG_GRANT_READ_URI_PERMISSION,
-                )
-            }
             trimmingUri = it
         }
     }
@@ -200,14 +195,15 @@ fun ScanScreen(
                                 onClick = { onMicClick() },
                             )
 
-                            // 💡 미디어 버튼 클릭 시 기존 플레이스홀더 서비스 대신 파일 피커 런처 실행
                             ScanTypeButton(
                                 modifier = Modifier.weight(1f),
                                 label = stringResource(R.string.scan_media),
                                 subLabel = stringResource(R.string.scan_media_sub),
                                 icon = Icons.Filled.OndemandVideo,
                                 color = BrandAmberLight,
-                                onClick = { mediaPickerLauncher.launch(arrayOf("video/*", "audio/*")) },
+                                onClick = { mediaPickerLauncher.launch(
+                                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.VideoOnly)
+                                ) },
                             )
                         }
                     } else {
@@ -228,7 +224,9 @@ fun ScanScreen(
                             }
 
                             OutlinedButton(
-                                onClick = { mediaPickerLauncher.launch(arrayOf("video/*", "audio/*")) },
+                                onClick = { mediaPickerLauncher.launch(
+                                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.VideoOnly)
+                                ) },
                                 modifier = Modifier.weight(1f),
                                 shape = MaterialTheme.shapes.extraLarge,
                             ) {
@@ -539,7 +537,7 @@ fun MediaTrimmerDialog(
                         onClick = onDismiss,
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("취소")
+                        Text(stringResource(R.string.action_cancel))
                     }
                     Button(
                         onClick = {

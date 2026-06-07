@@ -281,6 +281,7 @@
     <string name="wordcard_english_meaning_format">Meaning: %1$s</string>
     <string name="wordcard_point_format">%1$d / 100 pt</string>
     <string name="action_confirm">Confirm</string>
+    <string name="action_cancel">Cancel</string>
     <string name="pos_noun">Noun</string>
     <string name="pos_pronoun">Pronoun</string>
     <string name="pos_numeral">Numeral</string>

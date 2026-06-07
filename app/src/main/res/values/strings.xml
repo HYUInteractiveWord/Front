@@ -262,6 +262,7 @@
     <string name="pronunciation_label_penalty">동일 단어 미인식 페널티</string>
     <string name="penalty_none">없음</string>
     <string name="action_confirm">확인</string>
+    <string name="action_cancel">취소</string>
     <string name="pos_noun">명사</string>
     <string name="pos_pronoun">대명사</string>
     <string name="pos_numeral">수사</string>
