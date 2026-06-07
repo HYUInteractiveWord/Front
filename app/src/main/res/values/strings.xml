@@ -300,6 +300,8 @@
     <string name="settings_lang_sub">단어장 초기화 포함</string>
     <string name="settings_delete_account">계정 영구 삭제</string>
     <string name="settings_delete_sub">경험치 및 랭크 복구 불가</string>
+    <string name="settings_reset_tutorial">튜토리얼 다시보기</string>
+    <string name="settings_reset_tutorial_sub">모든 안내 팝업을 다시 활성화합니다</string>
 
     <string name="error_word_empty">단어가 입력되지 않았습니다.</string>
     <string name="error_word_slot_limit">단어 슬롯이 가득 찼습니다. 미션을 완료하여 슬롯을 늘려보세요.</string>

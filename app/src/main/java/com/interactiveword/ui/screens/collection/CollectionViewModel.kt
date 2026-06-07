@@ -20,7 +20,8 @@ data class CollectionUiState(
     val words: List<WordCard> = emptyList(),
     val maxSlots: Int = 20,
     val isLoading: Boolean = false,
-    val sortOrder: SortOrder = SortOrder.NEWEST
+    val sortOrder: SortOrder = SortOrder.NEWEST,
+    val userId: Int? = null,
 )
 
 class CollectionViewModel(
@@ -48,7 +49,8 @@ class CollectionViewModel(
                 _uiState.value = _uiState.value.copy(
                     words = sortedWords,
                     maxSlots = user.maxWordSlots,
-                    isLoading = false
+                    isLoading = false,
+                    userId = user.id
                 )
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(isLoading = false)

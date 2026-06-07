@@ -44,11 +44,13 @@ fun ProfileScreen(
     val context = LocalContext.current
     var showMissionTutorial by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(uiState.user?.id) {
         vm.refresh()
 
-        if (TutorialPrefs.shouldShow(context, TutorialPrefs.KEY_MISSION)) {
-            showMissionTutorial = true
+        uiState.user?.id?.let { userId ->
+            if (TutorialPrefs.shouldShow(context, userId, TutorialPrefs.KEY_MISSION)) {
+                showMissionTutorial = true
+            }
         }
     }
 
@@ -70,7 +72,9 @@ fun ProfileScreen(
                 body = stringResource(R.string.tutorial_mission_body),
                 confirmText = stringResource(R.string.action_confirm),
                 onConfirm = {
-                    TutorialPrefs.markShown(context, TutorialPrefs.KEY_MISSION)
+                    uiState.user?.id?.let { userId ->
+                        TutorialPrefs.markShown(context, userId, TutorialPrefs.KEY_MISSION)
+                    }
                     showMissionTutorial = false
                 },
             )

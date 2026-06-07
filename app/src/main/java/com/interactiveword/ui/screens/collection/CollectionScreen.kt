@@ -42,9 +42,11 @@ fun CollectionScreen(
     val context = LocalContext.current
     var showWordCardTutorial by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        if (TutorialPrefs.shouldShow(context, TutorialPrefs.KEY_WORD_CARD)) {
-            showWordCardTutorial = true
+    LaunchedEffect(uiState.userId) {
+        uiState.userId?.let { userId ->
+            if (TutorialPrefs.shouldShow(context, userId, TutorialPrefs.KEY_WORD_CARD)) {
+                showWordCardTutorial = true
+            }
         }
     }
 
@@ -99,7 +101,9 @@ fun CollectionScreen(
                 body = stringResource(R.string.tutorial_word_card_body),
                 confirmText = stringResource(R.string.action_confirm),
                 onConfirm = {
-                    TutorialPrefs.markShown(context, TutorialPrefs.KEY_WORD_CARD)
+                    uiState.userId?.let { userId ->
+                        TutorialPrefs.markShown(context, userId, TutorialPrefs.KEY_WORD_CARD)
+                    }
                     showWordCardTutorial = false
                 },
             )

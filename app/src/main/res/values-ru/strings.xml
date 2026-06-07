@@ -318,6 +318,8 @@
     <string name="settings_lang_sub">Сброс всех слов</string>
     <string name="settings_delete_account">Удалить аккаунт</string>
     <string name="settings_delete_sub">Данные не восстановить</string>
+    <string name="settings_reset_tutorial">Сбросить обучение</string>
+    <string name="settings_reset_tutorial_sub">Снова включить все обучающие окна</string>
 
     <string name="error_word_empty">Слово не введено.</string>
     <string name="error_word_slot_limit">Предел слотов для слов достигнут. Выполните миссии, чтобы разблокировать больше.</string>

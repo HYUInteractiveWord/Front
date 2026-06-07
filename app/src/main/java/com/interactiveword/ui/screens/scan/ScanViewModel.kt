@@ -59,6 +59,7 @@ data class ScanUiState(
     val loadingWords: Set<String> = emptySet(),
     val isLoading: Boolean = false,
     val error: String? = null,
+    val userId: Int? = null,
 )
 
 class ScanViewModel(app: Application) : AndroidViewModel(app) {
@@ -66,6 +67,7 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
 
     private val scanRepo = ScanRepository()
     private val wordRepo = WordRepository()
+    private val userRepo = com.interactiveword.data.repository.UserRepository()
 
     private val _uiState = MutableStateFlow(ScanUiState())
     val uiState: StateFlow<ScanUiState> = _uiState.asStateFlow()
@@ -76,6 +78,19 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
     companion object {
         private const val SAMPLE_RATE = 16000
         private const val MAX_REC_SECONDS = 10
+    }
+
+    init {
+        loadUser()
+    }
+
+    private fun loadUser() {
+        viewModelScope.launch {
+            try {
+                val user = userRepo.getMe()
+                _uiState.value = _uiState.value.copy(userId = user.id)
+            } catch (_: Exception) {}
+        }
     }
 
     // ── [1] 마이크 스캔 ─────────────────────────────────────────────────────

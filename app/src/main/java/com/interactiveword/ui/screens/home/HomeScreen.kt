@@ -79,8 +79,9 @@ fun HomeScreen(
     var showHomeTutorial by remember { mutableStateOf(false) }
     var newSelectedLanguage by remember { mutableStateOf<String>(LanguageManager.getSavedLanguage(context)) }
 
-    LaunchedEffect(Unit) {
-        if (TutorialPrefs.shouldShow(context, TutorialPrefs.KEY_HOME)) {
+    LaunchedEffect(uiState.user?.id) {
+        val userId = uiState.user?.id ?: return@LaunchedEffect
+        if (TutorialPrefs.shouldShow(context, userId, TutorialPrefs.KEY_HOME)) {
             showHomeTutorial = true
         }
     }
@@ -148,7 +149,9 @@ fun HomeScreen(
                 body = stringResource(R.string.tutorial_home_body),
                 confirmText = stringResource(R.string.action_confirm),
                 onConfirm = {
-                    TutorialPrefs.markShown(context, TutorialPrefs.KEY_HOME)
+                    uiState.user?.id?.let { userId ->
+                        TutorialPrefs.markShown(context, userId, TutorialPrefs.KEY_HOME)
+                    }
                     showHomeTutorial = false
                 },
             )
@@ -322,6 +325,20 @@ fun HomeScreen(
                         modifier = Modifier.clickable {
                             newSelectedLanguage = LanguageManager.getSavedLanguage(context)
                             showLanguageDialog = true
+                        },
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent)
+                    )
+                    HorizontalDivider(color = DarkOutline)
+                    ListItem(
+                        headlineContent = { Text(stringResource(R.string.settings_reset_tutorial)) },
+                        supportingContent = { Text(stringResource(R.string.settings_reset_tutorial_sub)) },
+                        leadingContent = { Icon(Icons.Filled.AutoAwesome, contentDescription = null, tint = BrandAmberLight) },
+                        modifier = Modifier.clickable {
+                            uiState.user?.id?.let { userId ->
+                                TutorialPrefs.resetAllForUser(context, userId)
+                                // 현재 화면 튜토리얼도 바로 다시 띄움
+                                showHomeTutorial = true
+                            }
                         },
                         colors = ListItemDefaults.colors(containerColor = Color.Transparent)
                     )

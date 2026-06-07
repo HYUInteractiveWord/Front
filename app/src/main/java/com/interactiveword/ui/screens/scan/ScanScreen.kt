@@ -74,9 +74,11 @@ fun ScanScreen(
     val context = LocalContext.current
     var showScanTutorial by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        if (TutorialPrefs.shouldShow(context, TutorialPrefs.KEY_SCAN)) {
-            showScanTutorial = true
+    LaunchedEffect(uiState.userId) {
+        uiState.userId?.let { userId ->
+            if (TutorialPrefs.shouldShow(context, userId, TutorialPrefs.KEY_SCAN)) {
+                showScanTutorial = true
+            }
         }
     }
 
@@ -143,7 +145,9 @@ fun ScanScreen(
                 body = stringResource(R.string.tutorial_scan_body),
                 confirmText = stringResource(R.string.action_confirm),
                 onConfirm = {
-                    TutorialPrefs.markShown(context, TutorialPrefs.KEY_SCAN)
+                    uiState.userId?.let { userId ->
+                        TutorialPrefs.markShown(context, userId, TutorialPrefs.KEY_SCAN)
+                    }
                     showScanTutorial = false
                 },
             )

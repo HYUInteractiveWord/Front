@@ -30,18 +30,30 @@ object TutorialPrefs {
     const val KEY_WORD_CARD = "word_card"
     const val KEY_MISSION = "mission"
 
-    fun shouldShow(context: Context, key: String): Boolean {
+    private fun userKey(userId: Int, key: String) = "u${userId}_$key"
+
+    fun shouldShow(context: Context, userId: Int, key: String): Boolean {
         return !context
             .getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-            .getBoolean(key, false)
+            .getBoolean(userKey(userId, key), false)
     }
 
-    fun markShown(context: Context, key: String) {
+    fun markShown(context: Context, userId: Int, key: String) {
         context
             .getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
             .edit()
-            .putBoolean(key, true)
+            .putBoolean(userKey(userId, key), true)
             .apply()
+    }
+
+    fun resetAllForUser(context: Context, userId: Int) {
+        val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+        val editor = prefs.edit()
+        val prefix = "u${userId}_"
+        prefs.all.keys.filter { it.startsWith(prefix) }.forEach {
+            editor.remove(it)
+        }
+        editor.apply()
     }
 
     fun resetAll(context: Context) {

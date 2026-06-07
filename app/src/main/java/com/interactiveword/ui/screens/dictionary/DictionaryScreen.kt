@@ -42,9 +42,11 @@ fun DictionaryScreen(
     val context = LocalContext.current
     var showDictionaryTutorial by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        if (TutorialPrefs.shouldShow(context, TutorialPrefs.KEY_DICTIONARY)) {
-            showDictionaryTutorial = true
+    LaunchedEffect(uiState.userId) {
+        uiState.userId?.let { userId ->
+            if (TutorialPrefs.shouldShow(context, userId, TutorialPrefs.KEY_DICTIONARY)) {
+                showDictionaryTutorial = true
+            }
         }
     }
 
@@ -66,7 +68,9 @@ fun DictionaryScreen(
                 body = stringResource(R.string.tutorial_dictionary_body),
                 confirmText = stringResource(R.string.action_confirm),
                 onConfirm = {
-                    TutorialPrefs.markShown(context, TutorialPrefs.KEY_DICTIONARY)
+                    uiState.userId?.let { userId ->
+                        TutorialPrefs.markShown(context, userId, TutorialPrefs.KEY_DICTIONARY)
+                    }
                     showDictionaryTutorial = false
                 },
             )

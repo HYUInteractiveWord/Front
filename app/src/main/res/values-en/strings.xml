@@ -319,6 +319,8 @@
     <string name="settings_lang_sub">Includes word card reset</string>
     <string name="settings_delete_account">Delete Account</string>
     <string name="settings_delete_sub">Cannot recover data</string>
+    <string name="settings_reset_tutorial">Reset Tutorial</string>
+    <string name="settings_reset_tutorial_sub">Re-enable all guide popups</string>
 
     <string name="error_word_empty">Word is empty.</string>
     <string name="error_word_slot_limit">Word slot limit reached. Complete missions to unlock more.</string>

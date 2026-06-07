@@ -35,6 +35,7 @@ data class DictionaryUiState(
     val addedWords: Set<String> = emptySet(),
     val errorMessage: String? = null,
     val isSlotFull: Boolean = false,
+    val userId: Int? = null,
 )
 
 class DictionaryViewModel @JvmOverloads constructor(
@@ -46,6 +47,19 @@ class DictionaryViewModel @JvmOverloads constructor(
 
     private val _uiState = MutableStateFlow(DictionaryUiState())
     val uiState: StateFlow<DictionaryUiState> = _uiState
+
+    init {
+        loadUser()
+    }
+
+    private fun loadUser() {
+        viewModelScope.launch {
+            try {
+                val user = userRepo.getMe()
+                _uiState.value = _uiState.value.copy(userId = user.id)
+            } catch (_: Exception) {}
+        }
+    }
 
     fun onQueryChange(q: String) {
         _uiState.value = _uiState.value.copy(
