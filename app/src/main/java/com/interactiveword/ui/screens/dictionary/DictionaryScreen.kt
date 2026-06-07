@@ -12,11 +12,18 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import com.interactiveword.ui.components.TutorialPrefs
+import com.interactiveword.ui.components.TutorialStepDialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.interactiveword.R
@@ -32,6 +39,14 @@ fun DictionaryScreen(
     vm: DictionaryViewModel = viewModel(),
 ) {
     val uiState by vm.uiState.collectAsState()
+    val context = LocalContext.current
+    var showDictionaryTutorial by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        if (TutorialPrefs.shouldShow(context, TutorialPrefs.KEY_DICTIONARY)) {
+            showDictionaryTutorial = true
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -44,6 +59,19 @@ fun DictionaryScreen(
         },
         containerColor = MaterialTheme.colorScheme.background,
     ) { padding ->
+        if (showDictionaryTutorial) {
+            TutorialStepDialog(
+                imageRes = R.drawable.tutorial_scan_result_ru,
+                title = stringResource(R.string.tutorial_dictionary_title),
+                body = stringResource(R.string.tutorial_dictionary_body),
+                confirmText = stringResource(R.string.action_confirm),
+                onConfirm = {
+                    TutorialPrefs.markShown(context, TutorialPrefs.KEY_DICTIONARY)
+                    showDictionaryTutorial = false
+                },
+            )
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()

@@ -35,6 +35,8 @@ import androidx.navigation.NavController
 import com.interactiveword.CaptureIntentHolder
 import com.interactiveword.R
 import com.interactiveword.ui.navigation.Screen
+import com.interactiveword.ui.components.TutorialPrefs
+import com.interactiveword.ui.components.TutorialStepDialog
 import com.interactiveword.ui.theme.BrandAmberLight
 import com.interactiveword.ui.theme.BrandGreenLight
 import com.interactiveword.ui.theme.DarkMutedText
@@ -51,6 +53,7 @@ fun ScanScreen(
     val context = LocalContext.current
 
     var pendingCaptureRequest by remember { mutableStateOf<CaptureIntentHolder.CaptureRequest?>(null) }
+var showScanTutorial by remember { mutableStateOf(false) }
 
     val micPermLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -71,6 +74,12 @@ fun ScanScreen(
 
     DisposableEffect(Unit) {
         onDispose { vm.stopRecording() }
+    }
+
+    LaunchedEffect(Unit) {
+        if (TutorialPrefs.shouldShow(context, TutorialPrefs.KEY_SCAN)) {
+            showScanTutorial = true
+        }
     }
 
     val mediaPickerLauncher = rememberLauncherForActivityResult(
@@ -111,6 +120,18 @@ fun ScanScreen(
         },
         containerColor = MaterialTheme.colorScheme.background,
     ) { padding ->
+        if (showScanTutorial) {
+            TutorialStepDialog(
+                imageRes = R.drawable.tutorial_scan_ru,
+                title = stringResource(R.string.tutorial_scan_title),
+                body = stringResource(R.string.tutorial_scan_body),
+                confirmText = stringResource(R.string.action_confirm),
+                onConfirm = {
+                    TutorialPrefs.markShown(context, TutorialPrefs.KEY_SCAN)
+                    showScanTutorial = false
+                },
+            )
+        }
         Column(
             modifier = Modifier
                 .fillMaxSize()

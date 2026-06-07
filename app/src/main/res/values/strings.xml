@@ -297,4 +297,25 @@
     <string name="noti_duplicate_bonus">%1$s 중복 수집 보너스!</string>
     <string name="noti_word_best_score_achieved">최고 점수 경신! (%1$d점)</string>
     <string name="noti_word_master_achieved">축하합니다! %1$s 단어 MASTER 달성!</string>
+    <string name="tutorial_button">사용 방법</string>
+    <string name="tutorial_dialog_title">사용 방법</string>
+    <string name="tutorial_step_counter">%1$d / %2$d</string>
+    <string name="tutorial_prev">이전</string>
+    <string name="tutorial_next">다음</string>
+    <string name="tutorial_close">닫기</string>
+
+    <string name="tutorial_home_title">홈 화면</string>
+    <string name="tutorial_home_body">XP, 랭크, 수집한 단어 수, 미션 진행도와 프로필 꾸미기를 확인할 수 있습니다.</string>
+
+    <string name="tutorial_scan_title">단어 스캔</string>
+    <string name="tutorial_scan_body">마이크 또는 미디어 스캔으로 주변 소리와 영상에서 한국어 단어를 찾을 수 있습니다.</string>
+
+    <string name="tutorial_dictionary_title">사전 검색</string>
+    <string name="tutorial_dictionary_body">검색한 단어를 확인하고, + 버튼을 눌러 필요한 단어를 단어장에 추가할 수 있습니다.</string>
+
+    <string name="tutorial_word_card_title">단어카드</string>
+    <string name="tutorial_word_card_body">단어의 뜻, 번역, 예문, 발음 듣기와 발음 평가 기능을 확인할 수 있습니다.</string>
+
+    <string name="tutorial_mission_title">미션과 테스트</string>
+    <string name="tutorial_mission_body">미션과 단어 테스트를 완료하면 XP를 얻고 랭크를 올릴 수 있습니다.</string>
 </resources>
