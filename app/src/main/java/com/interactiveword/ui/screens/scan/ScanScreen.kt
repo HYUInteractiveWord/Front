@@ -50,6 +50,8 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.interactiveword.R
+import com.interactiveword.ui.components.TutorialPrefs
+import com.interactiveword.ui.components.TutorialStepDialog
 import com.interactiveword.ui.navigation.Screen
 import com.interactiveword.ui.theme.BrandAmberLight
 import com.interactiveword.ui.theme.BrandGreenLight
@@ -70,6 +72,13 @@ fun ScanScreen(
 ) {
     val uiState by vm.uiState.collectAsState()
     val context = LocalContext.current
+    var showScanTutorial by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        if (TutorialPrefs.shouldShow(context, TutorialPrefs.KEY_SCAN)) {
+            showScanTutorial = true
+        }
+    }
 
     // 💡 미디어 트리밍을 위한 상태 변수
     var trimmingUri by remember { mutableStateOf<Uri?>(null) }
@@ -127,6 +136,19 @@ fun ScanScreen(
         },
         containerColor = MaterialTheme.colorScheme.background,
     ) { padding ->
+        if (showScanTutorial) {
+            TutorialStepDialog(
+                imageRes = R.drawable.tutorial_scan_ru,
+                title = stringResource(R.string.tutorial_scan_title),
+                body = stringResource(R.string.tutorial_scan_body),
+                confirmText = stringResource(R.string.action_confirm),
+                onConfirm = {
+                    TutorialPrefs.markShown(context, TutorialPrefs.KEY_SCAN)
+                    showScanTutorial = false
+                },
+            )
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()

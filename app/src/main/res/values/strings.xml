@@ -128,6 +128,18 @@
     <string name="scan_collection_complete">수집 완료!</string>
     <string name="action_done">완료</string>
 
+    <!-- Tutorials -->
+    <string name="tutorial_home_title">환영합니다!</string>
+    <string name="tutorial_home_body">내 프로필을 꾸미고, 오늘의 미션을 확인해보세요. 하단의 탭을 눌러 스캔이나 사전 검색을 시작할 수 있습니다.</string>
+    <string name="tutorial_dictionary_title">사전 검색 활용하기</string>
+    <string name="tutorial_dictionary_body">궁금한 단어를 검색하고 + 버튼을 눌러 내 단어장에 추가해보세요! 발음 확인 후 수집할 수 있습니다.</string>
+    <string name="tutorial_scan_title">단어 스캔 시작하기</string>
+    <string name="tutorial_scan_body">주변 소리나 영상 미디어에서 한국어 단어를 자동으로 찾아줍니다. 마이크나 갤러리 영상을 선택해보세요.</string>
+    <string name="tutorial_word_card_title">내 단어장 관리</string>
+    <string name="tutorial_word_card_body">수집한 단어의 뜻, 번역, 예문을 확인하고 TTS로 정확한 발음을 들어보세요. 직접 발음하며 연습할 수도 있습니다.</string>
+    <string name="tutorial_mission_title">미션과 테스트</string>
+    <string name="tutorial_mission_body">매일 새로운 미션을 수행하고 퀴즈를 풀어보세요. 획득한 XP로 랭크를 올리고 새로운 프로필 아이템을 해금할 수 있습니다.</string>
+
     <string name="wordcard_title">단어 카드</string>
     <string name="wordcard_back">뒤로</string> <string name="wordcard_listen">발음 듣기</string>
     <string name="wordcard_translation_listen">번역 뜻 듣기</string> <string name="wordcard_english_meaning_format">Meaning: %1$s</string> <string name="wordcard_point_format">%1$d / 100 pt</string> <string name="wordcard_percentage_format">%1$d%%</string> <string name="wordcard_category">분류: %1$s</string>

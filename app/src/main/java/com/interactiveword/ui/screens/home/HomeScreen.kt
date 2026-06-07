@@ -46,6 +46,8 @@ import com.interactiveword.data.model.Mission
 import com.interactiveword.data.model.User
 import com.interactiveword.ui.components.MissionCardItem
 import com.interactiveword.ui.components.WordCardItem
+import com.interactiveword.ui.components.TutorialPrefs
+import com.interactiveword.ui.components.TutorialStepDialog
 import com.interactiveword.ui.navigation.Screen
 import com.interactiveword.ui.theme.BrandAmberLight
 import com.interactiveword.ui.theme.BrandGreenLight
@@ -74,7 +76,15 @@ fun HomeScreen(
     var showLogoutDialog by remember { mutableStateOf(false) }
     var showLanguageDialog by remember { mutableStateOf(false) }
     var showDeleteAccountDialog by remember { mutableStateOf(false) }
+    var showHomeTutorial by remember { mutableStateOf(false) }
     var newSelectedLanguage by remember { mutableStateOf<String>(LanguageManager.getSavedLanguage(context)) }
+
+    LaunchedEffect(Unit) {
+        if (TutorialPrefs.shouldShow(context, TutorialPrefs.KEY_HOME)) {
+            showHomeTutorial = true
+        }
+    }
+
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
@@ -130,6 +140,19 @@ fun HomeScreen(
         },
         containerColor = MaterialTheme.colorScheme.background,
     ) { padding ->
+
+        if (showHomeTutorial) {
+            TutorialStepDialog(
+                imageRes = R.drawable.tutorial_home_ru,
+                title = stringResource(R.string.tutorial_home_title),
+                body = stringResource(R.string.tutorial_home_body),
+                confirmText = stringResource(R.string.action_confirm),
+                onConfirm = {
+                    TutorialPrefs.markShown(context, TutorialPrefs.KEY_HOME)
+                    showHomeTutorial = false
+                },
+            )
+        }
 
         if (showLogoutDialog) {
             AlertDialog(

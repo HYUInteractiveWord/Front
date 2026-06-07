@@ -136,6 +136,18 @@
     <string name="scan_collection_complete">Collection Complete!</string>
     <string name="action_done">Done</string>
 
+    <!-- Tutorials -->
+    <string name="tutorial_home_title">Welcome!</string>
+    <string name="tutorial_home_body">Customize your profile and check today\'s missions. Tap the tabs at the bottom to start scanning or searching the dictionary.</string>
+    <string name="tutorial_dictionary_title">Using Dictionary Search</string>
+    <string name="tutorial_dictionary_body">Search for words you\'re curious about and tap the + button to add them to your collection! You can collect them after verifying your pronunciation.</string>
+    <string name="tutorial_scan_title">Starting Word Scan</string>
+    <string name="tutorial_scan_body">Automatically finds Korean words from surrounding sounds or video media. Try selecting the microphone or a gallery video.</string>
+    <string name="tutorial_word_card_title">Manage My Collection</string>
+    <string name="tutorial_word_card_body">Check the meaning, translation, and examples of collected words, and hear correct pronunciation via TTS. You can also practice by pronouncing them yourself.</string>
+    <string name="tutorial_mission_title">Missions and Quizzes</string>
+    <string name="tutorial_mission_body">Complete new missions every day and solve quizzes. Level up your rank with earned XP and unlock new profile items.</string>
+
     <!-- WordCard Screen -->
     <string name="wordcard_title">Word Card</string>
     <string name="wordcard_back">Back</string>
@@ -317,6 +329,7 @@
     <string name="noti_rank_up">Rank Up! %1$s</string>
     <string name="noti_word_slot_increase">Word Slot Increased! (%1$d slots)</string>
     <string name="noti_ticket_acquired">Customization Ticket Acquired!</string>
+    <string name="noti_new_word_added">New word collected: %1$s</string>
     <string name="noti_duplicate_bonus">\'%1$s\' Duplicate Collection Bonus!</string>
     <string name="noti_word_best_score_achieved">🎉 New Best Score! (%1$d pts)</string>
     <string name="noti_word_master_achieved">🎉 Congratulations! Mastered the word \'%1$s\'!</string>

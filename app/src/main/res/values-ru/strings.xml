@@ -135,6 +135,18 @@
     <string name="scan_collection_complete">Сбор завершен!</string>
     <string name="action_done">Готово</string>
 
+    <!-- Tutorials -->
+    <string name="tutorial_home_title">Добро пожаловать!</string>
+    <string name="tutorial_home_body">Настройте свой профиль и проверьте сегодняшние миссии. Нажмите на вкладки внизу, чтобы начать сканирование или поиск в словаре.</string>
+    <string name="tutorial_dictionary_title">Использование поиска в словаре</string>
+    <string name="tutorial_dictionary_body">Ищите незнакомые слова и нажимайте кнопку +, чтобы добавить их в свой словник! Вы можете собрать их после проверки произношения.</string>
+    <string name="tutorial_scan_title">Начало сканирования слов</string>
+    <string name="tutorial_scan_body">Автоматически находит корейские слова в окружающих звуках или видео. Попробуйте выбрать микрофон или видео из галереи.</string>
+    <string name="tutorial_word_card_title">Управление коллекцией</string>
+    <string name="tutorial_word_card_body">Проверяйте значение, перевод и примеры соб란ных слов, а также слушайте правильное произношение через TTS. Вы также можете практиковаться, произнося их самостоятельно.</string>
+    <string name="tutorial_mission_title">Миссии и тесты</string>
+    <string name="tutorial_mission_body">Выполняйте новые миссии каждый день и проходите тесты. Повышайте свой ранг с помощью заработанного XP и открывайте новые предметы профиля.</string>
+
     <!-- WordCard Screen -->
     <string name="wordcard_title">Карточка слова</string>
     <string name="wordcard_back">Назад</string>
