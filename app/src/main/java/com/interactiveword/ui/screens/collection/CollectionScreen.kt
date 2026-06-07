@@ -15,6 +15,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.interactiveword.R
+import com.interactiveword.ui.components.TutorialPrefs
+import com.interactiveword.ui.components.TutorialStepDialog
 import com.interactiveword.ui.components.WordCardItem
 import com.interactiveword.ui.navigation.Screen
 import com.interactiveword.ui.theme.BrandGreenLight
@@ -43,6 +45,13 @@ fun CollectionScreen(
         }
     }
     val context = LocalContext.current
+    var showWordCardTutorial by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        if (TutorialPrefs.shouldShow(context, TutorialPrefs.KEY_WORD_CARD)) {
+            showWordCardTutorial = true
+        }
+    }
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -82,6 +91,18 @@ fun CollectionScreen(
         },
         containerColor = MaterialTheme.colorScheme.background,
     ) { padding ->
+        if (showWordCardTutorial) {
+            TutorialStepDialog(
+                imageRes = R.drawable.tutorial_word_card_ru,
+                title = stringResource(R.string.tutorial_word_card_title),
+                body = stringResource(R.string.tutorial_word_card_body),
+                confirmText = stringResource(R.string.action_confirm),
+                onConfirm = {
+                    TutorialPrefs.markShown(context, TutorialPrefs.KEY_WORD_CARD)
+                    showWordCardTutorial = false
+                },
+            )
+        }
         if (uiState.words.isEmpty()) {
             Box(
                 modifier = Modifier
