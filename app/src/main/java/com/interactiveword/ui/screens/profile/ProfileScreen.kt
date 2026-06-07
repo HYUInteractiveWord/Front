@@ -89,7 +89,7 @@ fun ProfileScreen(
             ),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            // 미션 상태 메시지
+            // 미션 상태 메시지 (서버 에러 등)
             if (uiState.missionStatusMessage != null) {
                 item {
                     StatusMessageCard(
@@ -99,43 +99,7 @@ fun ProfileScreen(
                 }
             }
 
-            // 1. 일일 미션 섹션
-            item {
-                Text(stringResource(R.string.profile_today_missions), style = MaterialTheme.typography.titleMedium)
-            }
-            
-            item {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    uiState.dailyMissions.forEach { mission ->
-                        key(mission.id) {
-                            AnimatedContent(
-                                targetState = mission,
-                                transitionSpec = {
-                                    (slideInHorizontally { it } + fadeIn()).togetherWith(
-                                        slideOutHorizontally { -it } + fadeOut()
-                                    )
-                                },
-                                label = "singleDailyMissionAnimation"
-                            ) { targetMission ->
-                                val icon = when (targetMission.missionType) {
-                                    "daily_pronunciation" -> Icons.Filled.Mic
-                                    "daily_scan"         -> Icons.Filled.QrCodeScanner
-                                    "daily_example_quiz", "daily_example_quiz_kr", "daily_example_quiz_trans" -> Icons.Filled.AutoStories
-                                    else                 -> Icons.Filled.MenuBook
-                                }
-                                MissionCardItem(
-                                    mission = targetMission,
-                                    icon    = icon,
-                                    onClaim = { vm.claimMission(it) }
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-
-            // 2. 퀴즈 진입 섹션
-            item { Spacer(Modifier.height(8.dp)) }
+            // 1. 퀴즈 진입 섹션 (상단으로 이동)
             item {
                 PosQuizEntryCard(
                     onStartClick = { navController.navigate(Screen.PosQuiz.route) }
@@ -152,19 +116,22 @@ fun ProfileScreen(
                 )
             }
 
-            // 3. 전체 미션 섹션
-            if (uiState.allMissions.isNotEmpty()) {
+            item { Spacer(Modifier.height(8.dp)) }
+
+            // 2. 통합 미션 섹션 (하단으로 이동)
+            val allCombinedMissions = (uiState.dailyMissions + uiState.allMissions).distinctBy { it.id }
+            
+            if (allCombinedMissions.isNotEmpty()) {
                 item {
-                    Spacer(Modifier.height(16.dp))
                     Text(
-                        text = stringResource(R.string.profile_all_missions),
-                        style = MaterialTheme.typography.titleMedium,
+                        text = stringResource(R.string.nav_missions), // "미션" 또는 "Missions"
+                        style = MaterialTheme.typography.titleMedium
                     )
                 }
                 
                 item {
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        uiState.allMissions.forEach { mission ->
+                        allCombinedMissions.forEach { mission ->
                             key(mission.id) {
                                 AnimatedContent(
                                     targetState = mission,
@@ -173,17 +140,17 @@ fun ProfileScreen(
                                             slideOutHorizontally { -it } + fadeOut()
                                         )
                                     },
-                                    label = "singleAllMissionAnimation"
+                                    label = "singleMissionAnimation"
                                 ) { targetMission ->
                                     val icon = when (targetMission.missionType) {
                                         "daily_pronunciation" -> Icons.Filled.Mic
-                                        "daily_scan" -> Icons.Filled.QrCodeScanner
+                                        "daily_scan"         -> Icons.Filled.QrCodeScanner
                                         "daily_example_quiz", "daily_example_quiz_kr", "daily_example_quiz_trans" -> Icons.Filled.AutoStories
-                                        else -> Icons.Filled.MenuBook
+                                        else                 -> Icons.Filled.MenuBook
                                     }
                                     MissionCardItem(
                                         mission = targetMission,
-                                        icon = icon,
+                                        icon    = icon,
                                         onClaim = { vm.claimMission(it) }
                                     )
                                 }
