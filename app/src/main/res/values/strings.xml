@@ -273,6 +273,14 @@
     <string name="pronunciation_label_final">최종 점수</string>
     <string name="pronunciation_label_penalty">동일 단어 미인식 페널티</string>
     <string name="penalty_none">없음</string>
+    <!-- Word Card Ranks -->
+    <string name="word_rank_master">MASTER</string>
+    <string name="word_rank_expert">숙련</string>
+    <string name="word_rank_growing">성장 중</string>
+    <string name="word_rank_practicing">연습 중</string>
+    <string name="word_rank_basic">기초 단계</string>
+    <string name="word_rank_new">새 단어</string>
+
     <string name="action_confirm">확인</string>
     <string name="action_cancel">취소</string>
     <string name="pos_noun">명사</string>

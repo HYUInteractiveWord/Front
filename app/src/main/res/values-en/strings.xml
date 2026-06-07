@@ -292,6 +292,14 @@
     <string name="wordcard_translation_listen">Listen to translation</string>
     <string name="wordcard_english_meaning_format">Meaning: %1$s</string>
     <string name="wordcard_point_format">%1$d / 100 pt</string>
+    <!-- Word Card Ranks -->
+    <string name="word_rank_master">MASTER</string>
+    <string name="word_rank_expert">Expert</string>
+    <string name="word_rank_growing">Growing</string>
+    <string name="word_rank_practicing">Practicing</string>
+    <string name="word_rank_basic">Basic</string>
+    <string name="word_rank_new">New Word</string>
+
     <string name="action_confirm">Confirm</string>
     <string name="action_cancel">Cancel</string>
     <string name="pos_noun">Noun</string>

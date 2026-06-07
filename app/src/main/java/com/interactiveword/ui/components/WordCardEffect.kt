@@ -10,11 +10,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.interactiveword.R
 import com.interactiveword.ui.theme.DarkOutline
 
 data class WordCardEffectStyle(
-    val label: String,
+    val labelRes: Int,
     val borderColor: Color,
     val progressColor: Color,
     val containerColor: Color?,
@@ -26,7 +28,7 @@ fun wordCardEffectStyle(wordPoint: Int): WordCardEffectStyle {
 
     return when {
         point >= 100 -> WordCardEffectStyle(
-            label = "MASTER",
+            labelRes = R.string.word_rank_master,
             borderColor = Color(0xFFFFC107),      // 금색
             progressColor = Color(0xFFFFC107),    // 금색
             containerColor = null,                
@@ -34,7 +36,7 @@ fun wordCardEffectStyle(wordPoint: Int): WordCardEffectStyle {
         )
 
         point >= 80 -> WordCardEffectStyle(
-            label = "숙련",
+            labelRes = R.string.word_rank_expert,
             borderColor = Color(0xFF9B7EDE),      // 보라색
             progressColor = Color(0xFF9B7EDE),
             containerColor = null,
@@ -42,7 +44,7 @@ fun wordCardEffectStyle(wordPoint: Int): WordCardEffectStyle {
         )
 
         point >= 60 -> WordCardEffectStyle(
-            label = "성장 중",
+            labelRes = R.string.word_rank_growing,
             borderColor = Color(0xFF5B8DEF),      // 파란색
             progressColor = Color(0xFF5B8DEF),
             containerColor = null,
@@ -50,7 +52,7 @@ fun wordCardEffectStyle(wordPoint: Int): WordCardEffectStyle {
         )
 
         point >= 40 -> WordCardEffectStyle(
-            label = "연습 중",
+            labelRes = R.string.word_rank_practicing,
             borderColor = Color(0xFFC0C0C0),      // 은색
             progressColor = Color(0xFFC0C0C0),
             containerColor = null,
@@ -58,7 +60,7 @@ fun wordCardEffectStyle(wordPoint: Int): WordCardEffectStyle {
         )
 
         point >= 20 -> WordCardEffectStyle(
-            label = "기초 단계",
+            labelRes = R.string.word_rank_basic,
             borderColor = Color(0xFF4CAF50),      // 초록색
             progressColor = Color(0xFF4CAF50),
             containerColor = null,
@@ -66,7 +68,7 @@ fun wordCardEffectStyle(wordPoint: Int): WordCardEffectStyle {
         )
 
         else -> WordCardEffectStyle(
-            label = "새 단어",
+            labelRes = R.string.word_rank_new,
             borderColor = DarkOutline,
             progressColor = Color(0xFF8B8B8B),
             containerColor = null,
@@ -105,12 +107,12 @@ fun WordCardEffectBadge(
             if (style.showSparkle) {
                 Text("✦", style = MaterialTheme.typography.labelMedium)
                 Spacer(Modifier.width(4.dp))
-                Text("MASTER", style = MaterialTheme.typography.labelMedium)
+                Text(stringResource(style.labelRes), style = MaterialTheme.typography.labelMedium)
                 Spacer(Modifier.width(4.dp))
                 Text("✦", style = MaterialTheme.typography.labelMedium)
             } else {
                 Text(
-                    text = style.label,
+                    text = stringResource(style.labelRes),
                     style = MaterialTheme.typography.labelMedium,
                 )
             }

@@ -291,6 +291,14 @@
     <string name="wordcard_translation_listen">Послушать перевод</string>
     <string name="wordcard_english_meaning_format">Значение: %1$s</string>
     <string name="wordcard_point_format">%1$d / 100 pt</string>
+    <!-- Word Card Ranks -->
+    <string name="word_rank_master">MASTER</string>
+    <string name="word_rank_expert">Профи</string>
+    <string name="word_rank_growing">Рост</string>
+    <string name="word_rank_practicing">Практика</string>
+    <string name="word_rank_basic">База</string>
+    <string name="word_rank_new">Новое</string>
+
     <string name="action_confirm">Подтвердить</string>
     <string name="action_cancel">Отмена</string>
     <string name="pos_noun">Существительное</string>
