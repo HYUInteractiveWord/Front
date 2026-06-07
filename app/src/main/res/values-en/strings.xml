@@ -231,7 +231,8 @@
     <string name="mission_daily_collect_noun">Collect Nouns</string>
 
     <!-- Profile rewards -->
-    <string name="profile_reward_title">Customize Profile</string>
+    <string name="mission_collect_noun">Collect Noun</string>
+    <string name="mission_ready_to_claim">Done! Tap for reward</string>
     <string name="profile_reward_desc">Unlock one avatar or background of your choice for every 500 XP.</string>
     <string name="profile_reward_remaining_tickets">Remaining unlocks: %1$d</string>
     <string name="profile_reward_avatar_section">Avatar</string>

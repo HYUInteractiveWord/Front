@@ -97,15 +97,19 @@ fun MissionCardItem(
 
             Column(modifier = Modifier.weight(1f)) {
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
+                    verticalAlignment = Alignment.Top, // 💡 상단 정렬로 변경
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text(
                         text  = missionDisplayName(mission.missionType),
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = if (isReadyToClaim) FontWeight.Bold else FontWeight.Normal
+                        fontWeight = if (isReadyToClaim) FontWeight.Bold else FontWeight.Normal,
+                        modifier = Modifier.weight(1f), // 💡 텍스트가 공간을 다 차지하도록
+                        maxLines = 2 // 💡 최대 2줄 허용
                     )
+                    Spacer(Modifier.width(8.dp))
+                    
                     if (mission.isCompleted) {
                         Icon(
                             Icons.Filled.CheckCircle,
@@ -115,7 +119,7 @@ fun MissionCardItem(
                         )
                     } else if (isReadyToClaim) {
                         Text(
-                            text  = "CLAIM XP!",
+                            text  = "CLAIM!", // 💡 텍스트 단축
                             style = MaterialTheme.typography.labelLarge,
                             color = BrandGreenLight,
                             fontWeight = FontWeight.ExtraBold
@@ -129,17 +133,17 @@ fun MissionCardItem(
                     }
                 }
 
-                Spacer(Modifier.height(6.dp))
+                Spacer(Modifier.height(8.dp))
                 LinearProgressIndicator(
                     progress  = { progressValue.coerceIn(0f, 1f) },
-                    modifier  = Modifier.fillMaxWidth().height(8.dp),
-                    color     = if (isReadyToClaim) BrandGreenLight else BrandGreenLight,
+                    modifier  = Modifier.fillMaxWidth().height(6.dp), // 💡 높이 약간 조절
+                    color     = BrandGreenLight,
                     trackColor = DarkOutline,
                     strokeCap = androidx.compose.ui.graphics.StrokeCap.Round
                 )
-                Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(6.dp))
                 Text(
-                    text  = if (isReadyToClaim) "완료! 탭하여 보상 받기" else "${mission.progress}/${mission.target}",
+                    text  = if (isReadyToClaim) stringResource(R.string.mission_ready_to_claim) else "${mission.progress}/${mission.target}",
                     style = MaterialTheme.typography.bodySmall,
                     color = if (isReadyToClaim) BrandGreenLight else DarkMutedText,
                     fontWeight = if (isReadyToClaim) FontWeight.Bold else FontWeight.Normal

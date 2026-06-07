@@ -1,6 +1,7 @@
 package com.interactiveword.ui.screens.home
 
 import android.app.Application
+import android.media.MediaPlayer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.ConfirmationNumber
@@ -10,6 +11,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.interactiveword.R
+import com.interactiveword.data.api.RetrofitClient
 import com.interactiveword.data.model.Mission
 import com.interactiveword.data.model.User
 import com.interactiveword.data.model.WordCard
@@ -48,6 +50,8 @@ class HomeViewModel @JvmOverloads constructor(
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
+    private var mediaPlayer: MediaPlayer? = null
+
     init {
         loadData()
     }
@@ -64,6 +68,7 @@ class HomeViewModel @JvmOverloads constructor(
 
                 // 변경 감지 및 알림
                 if (oldUser != null) {
+                    val localizedContext = com.interactiveword.data.local.LanguageManager.applyLocale(context)
                     // 1. 랭크 업 감지
                     val oldRank = RankManager.getCurrentBand(oldUser.xp).rank
                     val newRank = RankManager.getCurrentBand(user.xp).rank
@@ -73,7 +78,7 @@ class HomeViewModel @JvmOverloads constructor(
                             AppNotification(
                                 type = NotiType.RANK_UP,
                                 messageRes = R.string.noti_rank_up,
-                                messageArgs = listOf(RankManager.getRankLabel(context, newRank)),
+                                messageArgs = listOf(RankManager.getRankLabel(localizedContext, newRank)),
                                 color = Color(0xFFFFA000), // Gold
                                 icon = Icons.Default.EmojiEvents
                             )
@@ -170,5 +175,29 @@ class HomeViewModel @JvmOverloads constructor(
                 _uiState.value = _uiState.value.copy(isLoading = false, error = e.message)
             }
         }
+    }
+
+    fun playTts(path: String?) {
+        val url = RetrofitClient.resolveStaticUrl(path) ?: return
+        try {
+            mediaPlayer?.release()
+            mediaPlayer = MediaPlayer().apply {
+                setDataSource(url)
+                setOnPreparedListener { it.start() }
+                setOnCompletionListener {
+                    it.release()
+                    mediaPlayer = null
+                }
+                prepareAsync()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    override fun onCleared() {
+        mediaPlayer?.release()
+        mediaPlayer = null
+        super.onCleared()
     }
 }

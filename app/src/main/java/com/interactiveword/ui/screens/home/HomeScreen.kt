@@ -276,6 +276,8 @@ fun HomeScreen(
                     WordCardItem(
                         card = card,
                         compact = true,
+                        onPlayTts = { vm.playTts(it.ttsAudioPath) },
+                        onPlayTransTts = { vm.playTts(it.defTransAudioPath) },
                         onClick = { navController.navigate(Screen.WordCard.createRoute(card.id)) },
                     )
                 }

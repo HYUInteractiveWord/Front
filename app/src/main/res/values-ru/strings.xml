@@ -230,7 +230,8 @@
     <string name="mission_daily_collect_noun">Сбор существительных</string>
 
     <!-- Profile rewards -->
-    <string name="profile_reward_title">Настройка профиля</string>
+    <string name="mission_collect_noun">Сбор сущ.</string>
+    <string name="mission_ready_to_claim">Готово! Нажмите для XP</string>
     <string name="profile_reward_desc">За каждые 500 XP можно разблокировать один аватар или фон на выбор.</string>
     <string name="profile_reward_remaining_tickets">Доступно разблокировок: %1$d</string>
     <string name="profile_reward_avatar_section">Аватар</string>

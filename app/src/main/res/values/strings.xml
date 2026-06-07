@@ -221,6 +221,9 @@
     <string name="mission_daily_example_quiz">예문 테스트</string>
     <string name="mission_daily_collect_noun">명사 단어 수집</string>
 
+    <string name="mission_collect_noun">명사 수집</string>
+    <string name="mission_ready_to_claim">완료! 탭하여 보상 받기</string>
+
     <string name="profile_reward_title">프로필 꾸미기</string>
     <string name="profile_reward_desc">500 XP마다 원하는 아바타 또는 배경을 하나씩 해금할 수 있어요.</string>
     <string name="profile_reward_remaining_tickets">남은 해금권: %1$d개</string>
