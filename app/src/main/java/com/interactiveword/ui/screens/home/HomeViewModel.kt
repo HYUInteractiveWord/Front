@@ -144,7 +144,12 @@ class HomeViewModel @JvmOverloads constructor(
                 // 💡 XP 획득 애니메이션 발동
                 XpManager.emitXpGain(mission.xpReward)
                 
-                // 데이터 갱신
+                // 💡 UI 상태의 클리어 카운트를 즉시 1 증가시킴 (네트워크 반영 전 가시성 확보)
+                _uiState.value = _uiState.value.copy(
+                    clearedMissionsCount = _uiState.value.clearedMissionsCount + 1
+                )
+                
+                // 데이터 갱신 (서버 최신 상태 동기화)
                 loadData()
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(error = e.message)
