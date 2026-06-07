@@ -10,7 +10,7 @@ val defaultFontFamily = FontFamily.SansSerif
 
 fun getAppTypography(languageCode: String): Typography {
     val isRu = languageCode == "ru"
-    val diff = if (isRu) 3 else 0 // 러시아어는 폰트 크기를 더 줄임 (기존 2 -> 3)
+    val diff = if (isRu) 2 else 0 // 러시아어는 폰트 크기를 약간 줄임 (기존 3 -> 2로 1폰트 키움)
 
     return Typography(
         headlineLarge = TextStyle(
