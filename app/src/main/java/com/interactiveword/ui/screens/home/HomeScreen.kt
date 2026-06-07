@@ -261,7 +261,7 @@ fun HomeScreen(
                     HomeProfileDashboardCard(
                         user = user,
                         wordCount = uiState.wordCount,
-                        dailyMissions = uiState.dailyMissions,
+                        clearedMissionsCount = uiState.clearedMissionsCount,
                     )
                 }
             }
@@ -400,7 +400,7 @@ private val profileBackgroundAssets = listOf(
 fun HomeProfileDashboardCard(
     user: User,
     wordCount: Int,
-    dailyMissions: List<Mission>,
+    clearedMissionsCount: Int,
 ) {
     val context = LocalContext.current
     val userKey = user.id.toString()
@@ -427,8 +427,8 @@ fun HomeProfileDashboardCard(
     val selectedBackground = profileBackgroundAssets.firstOrNull { it.id == selectedBackgroundId } ?: profileBackgroundAssets.first()
 
     // 2. 경험치 및 스탯 계산
-    val currentBand = RankManager.getCurrentBand(user.xp)
-    val nextBand = RankManager.getNextBand(user.xp)
+    val currentBand = com.interactiveword.util.RankManager.getCurrentBand(user.xp)
+    val nextBand = com.interactiveword.util.RankManager.getNextBand(user.xp)
 
     val progress = if (currentBand.maxXpExclusive == null) 1f else {
         val range = (currentBand.maxXpExclusive - currentBand.minXp).coerceAtLeast(1)
@@ -440,9 +440,6 @@ fun HomeProfileDashboardCard(
     } else {
         stringResource(R.string.profile_xp_to_next_rank, currentBand.maxXpExclusive - user.xp)
     }
-
-    val completedDaily = dailyMissions.count { it.isCompleted || it.progress >= it.target }
-    val totalDaily = dailyMissions.size.coerceAtLeast(1)
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -538,19 +535,19 @@ fun HomeProfileDashboardCard(
             ) {
                 ProfileStatItem(
                     label = stringResource(R.string.home_stat_words),
-                    value = "${wordCount}개",
+                    value = "${wordCount}",
                     icon = Icons.Filled.MenuBook,
                     modifier = Modifier.weight(1f),
                 )
                 ProfileStatItem(
-                    label = stringResource(R.string.home_stat_today_mission),
-                    value = "$completedDaily/$totalDaily",
+                    label = stringResource(R.string.home_stat_cleared_missions),
+                    value = "${clearedMissionsCount}",
                     icon = Icons.Filled.TrackChanges,
                     modifier = Modifier.weight(1f),
                 )
                 ProfileStatItem(
                     label = stringResource(R.string.home_stat_word_slots),
-                    value = "${user.maxWordSlots}개",
+                    value = "${user.maxWordSlots}",
                     icon = Icons.Filled.Bolt,
                     modifier = Modifier.weight(1f),
                 )

@@ -32,8 +32,10 @@ import kotlinx.coroutines.launch
 data class HomeUiState(
     val user: User? = null,
     val dailyMissions: List<Mission> = emptyList(),
+    val allMissions: List<Mission> = emptyList(),
     val recentWords: List<WordCard> = emptyList(),
     val wordCount: Int = 0,
+    val clearedMissionsCount: Int = 0,
     val isCaptureServiceRunning: Boolean = false,
     val isLoading: Boolean = false,
     val error: String? = null,
@@ -65,6 +67,8 @@ class HomeViewModel @JvmOverloads constructor(
                 val user = userRepo.getMe()
                 val words = wordRepo.getMyWords()
                 val missions = missionRepo.getDailyMissions()
+                val allMissions = missionRepo.getAllMissions()
+                val clearedCount = allMissions.count { it.isCompleted }
 
                 // 변경 감지 및 알림
                 if (oldUser != null) {
@@ -117,7 +121,9 @@ class HomeViewModel @JvmOverloads constructor(
                     user = user,
                     recentWords = words.takeLast(4).reversed(),
                     wordCount = words.size,
+                    clearedMissionsCount = clearedCount,
                     dailyMissions = missions,
+                    allMissions = allMissions,
                     isLoading = false,
                     error = null,
                 )

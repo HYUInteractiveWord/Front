@@ -55,7 +55,7 @@
     <string name="home_top_rank">Top Rank</string>
     <string name="home_xp_to_next_rank">%1$d XP to next rank</string>
     <string name="home_stat_words">Words</string>
-    <string name="home_stat_today_mission">Today\'s Mission</string>
+    <string name="home_stat_cleared_missions">Cleared Missions</string>
     <string name="home_stat_word_slots">Word Slots</string>
     <string name="home_capture_service">Capture Service</string>
     <string name="home_logout">Sign Out</string>
