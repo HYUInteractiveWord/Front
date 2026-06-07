@@ -55,7 +55,7 @@
     <string name="home_top_rank">Максимальный ранг</string>
     <string name="home_xp_to_next_rank">%1$d XP до следующего ранга</string>
     <string name="home_stat_words">Собрано</string>
-    <string name="home_stat_cleared_missions">Задания</string>
+    <string name="home_stat_best_pronunciation">Лучшее</string>
     <string name="home_stat_word_slots">Слоты слов</string>
     <string name="home_capture_service">Служба захвата</string>
     <string name="home_logout">Выйти</string>

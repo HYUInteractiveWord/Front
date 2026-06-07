@@ -41,6 +41,8 @@ fun LoginScreen(navController: NavHostController) {
     var isRegisterMode by rememberSaveable { mutableStateOf(false) }
     var selectedLanguage by rememberSaveable { mutableStateOf(LanguageManager.getSavedLanguage(context)) }
 
+    val isInputValid = username.isNotBlank() && password.isNotBlank()
+
     fun changeLanguage(lang: String) {
         selectedLanguage = lang
         LanguageManager.saveLanguage(context, lang)
@@ -131,9 +133,11 @@ fun LoginScreen(navController: NavHostController) {
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = androidx.compose.foundation.text.KeyboardActions(onDone = {
-                    if (isRegisterMode) vm.register(username, null, password, selectedLanguage)
-                    else vm.login(username, password)
-                    keyboardController?.hide()
+                    if (isInputValid) {
+                        if (isRegisterMode) vm.register(username, null, password, selectedLanguage)
+                        else vm.login(username, password)
+                        keyboardController?.hide()
+                    }
                 })
             )
 
@@ -153,7 +157,7 @@ fun LoginScreen(navController: NavHostController) {
                     else vm.login(username, password)
                     keyboardController?.hide()
                 },
-                enabled = uiState !is LoginUiState.Loading,
+                enabled = uiState !is LoginUiState.Loading && isInputValid,
                 modifier = Modifier.fillMaxWidth().height(52.dp),
             ) {
                 if (uiState is LoginUiState.Loading) {
@@ -181,7 +185,7 @@ fun LoginScreen(navController: NavHostController) {
                     onClick = {
                         vm.demoLogin(username, null, password, selectedLanguage)
                     },
-                    enabled = uiState !is LoginUiState.Loading
+                    enabled = uiState !is LoginUiState.Loading && isInputValid
                 ) {
                     Text(
                         text = "DEMO Register",

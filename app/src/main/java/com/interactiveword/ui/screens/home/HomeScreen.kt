@@ -258,7 +258,8 @@ fun HomeScreen(
                     HomeProfileDashboardCard(
                         user = user,
                         wordCount = uiState.wordCount,
-                        clearedMissionsCount = uiState.clearedMissionsCount,
+                        bestWord = uiState.bestPronunciationWord,
+                        bestScore = uiState.bestPronunciationScore,
                     )
                 }
             }
@@ -397,7 +398,8 @@ private val profileBackgroundAssets = listOf(
 fun HomeProfileDashboardCard(
     user: User,
     wordCount: Int,
-    clearedMissionsCount: Int,
+    bestWord: String?,
+    bestScore: Int,
 ) {
     val context = LocalContext.current
     val userKey = user.id.toString()
@@ -537,8 +539,8 @@ fun HomeProfileDashboardCard(
                     modifier = Modifier.weight(1f),
                 )
                 ProfileStatItem(
-                    label = stringResource(R.string.home_stat_cleared_missions),
-                    value = clearedMissionsCount.toString(),
+                    label = stringResource(R.string.home_stat_best_pronunciation),
+                    value = if (bestWord != null) "$bestWord\n$bestScore%" else "-",
                     icon = Icons.Filled.TrackChanges,
                     modifier = Modifier.weight(1f),
                 )
@@ -652,8 +654,8 @@ private fun ProfileStatItem(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(112.dp)
-                .padding(horizontal = 8.dp, vertical = 12.dp),
+                .height(130.dp)
+                .padding(horizontal = 4.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {

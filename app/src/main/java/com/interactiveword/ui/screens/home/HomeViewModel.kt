@@ -28,7 +28,8 @@ data class HomeUiState(
     val user: User? = null,
     val recentWords: List<WordCard> = emptyList(),
     val wordCount: Int = 0,
-    val clearedMissionsCount: Int = 0,
+    val bestPronunciationWord: String? = null,
+    val bestPronunciationScore: Int = 0,
     val isLoading: Boolean = false,
     val error: String? = null,
 )
@@ -105,11 +106,14 @@ class HomeViewModel @JvmOverloads constructor(
                     }
                 }
 
+                val bestCard = words.filter { it.bestScore > 0 }.maxByOrNull { it.bestScore }
+
                 _uiState.value = _uiState.value.copy(
                     user = user,
                     recentWords = words.takeLast(4).reversed(),
                     wordCount = words.size,
-                    clearedMissionsCount = user.clearedMissions,
+                    bestPronunciationWord = bestCard?.koreanWord,
+                    bestPronunciationScore = bestCard?.bestScore?.toInt() ?: 0,
                     isLoading = false,
                     error = null,
                 )

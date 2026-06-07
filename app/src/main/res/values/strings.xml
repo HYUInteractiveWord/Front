@@ -51,7 +51,7 @@
     <string name="home_top_rank">최고 등급</string>
     <string name="home_xp_to_next_rank">다음 등급까지 %1$d XP</string>
     <string name="home_stat_words">수집 단어</string>
-    <string name="home_stat_cleared_missions">클리어 미션</string>
+    <string name="home_stat_best_pronunciation">최고 점수</string>
     <string name="home_stat_word_slots">단어 슬롯</string>
     <string name="home_capture_service">알림 캡처 서비스</string>
     <string name="home_logout">로그아웃</string>
