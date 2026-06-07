@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">나만의 단어장</string>
+    <string name="app_name">InteractiveWord</string>
     <string name="notification_channel_capture">Захват аудио</string>
-    <string name="notification_title_capture">말해봐 - Ожидание захвата</string>
+    <string name="notification_title_capture">InteractiveWord - Ожидание захвата</string>
     <string name="notification_text_capture">Нажмите, чтобы захватить корейские слова</string>
     <string name="notification_action_capture">Начать захват</string>
     <string name="notification_action_stop">Остановить</string>
@@ -34,6 +34,12 @@
     <string name="rank_silver">Серебро</string>
     <string name="rank_gold">Золото</string>
     <string name="rank_platinum">Платина</string>
+    <string name="rank_sapphire">Сапфир</string>
+    <string name="rank_ruby">Рубин</string>
+    <string name="rank_emerald">Изумруд</string>
+    <string name="rank_amethyst">Аметист</string>
+    <string name="rank_pearl">Жемчуг</string>
+    <string name="rank_obsidian">Обсидиан</string>
     <string name="rank_diamond">Бриллиант</string>
     <string name="rank_master">Мастер</string>
 
@@ -71,6 +77,7 @@
     <string name="profile_pos_quiz_sub">Угадайте часть речи слова</string>
     <string name="profile_vocab_quiz_title">Тест на запоминание слов</string>
     <string name="profile_vocab_quiz_sub">Проверьте знания собранных слов</string>
+    <string name="profile_example_quiz_sub">Проверьте свои навыки на примере собранных слов.</string>
     <string name="profile_failed_to_load">Не удалось загрузить профиль</string>
     <string name="profile_daily_mission_status">Статус ежедневных миссий</string>
     <string name="action_start_test">Начать тест</string>
@@ -81,9 +88,12 @@
     <string name="collection_word_count">%1$d слов</string>
     <string name="collection_slots">Слоты: %1$d / %2$d</string>
 
+    <string name="collection_sort_newest">По дате</string>
+    <string name="collection_sort_score">По очкам</string>
+
     <!-- Dictionary Screen -->
     <string name="dictionary_title">Словарь</string>
-    <string name="dictionary_search_hint">Поиск корейского слова…</string>
+    <string name="dictionary_search_hint">Поиск слов по смыслу…</string>
     <string name="action_search">Поиск</string>
     <string name="dictionary_search_failed">Ошибка поиска: %1$s</string>
     <string name="dictionary_result_count">Результатов: %1$d</string>
@@ -118,6 +128,7 @@
     <string name="scan_detected_words">Обнаружено слов: %1$d</string>
     <string name="scan_listening">Слушаю…</string>
     <string name="scan_elapsed">%1$dс  /  макс. 30с</string>
+    <string name="scan_collection_complete">Сбор завершен!</string>
     <string name="action_done">Готово</string>
 
     <!-- WordCard Screen -->
@@ -187,20 +198,24 @@
     <string name="posquiz_type_label">Угадать часть речи</string>
     <string name="posquiz_local_note">Счет</string>
     <string name="posquiz_cannot_start">Не удаётся начать тест частей речи</string>
-    <string name="pos_noun">Существительное</string>
-    <string name="pos_verb">Глагол</string>
-    <string name="pos_adjective">Прилагательное</string>
-    <string name="pos_adverb">Наречие</string>
+
+    <string name="examplequiz_title">Тест на примеры</string>
+    <string name="examplequiz_kr_to_trans">Выбрать перевод</string>
+    <string name="examplequiz_trans_to_kr">Выбрать корейский</string>
+    <string name="examplequiz_kr_prompt">Выберите правильный перевод для этого предложения</string>
+    <string name="examplequiz_trans_prompt">Выберите правильный корейский для этого предложения</string>
+    <string name="examplequiz_no_words">Слов с примерами не найдено.\nПожалуйста, сначала добавьте слова!</string>
 
     <!-- Mission display names -->
     <string name="mission_daily_pronunciation">Ежедневное произношение</string>
     <string name="mission_daily_scan">Сканирование слов</string>
     <string name="mission_daily_word_quiz">Тест слов</string>
+    <string name="mission_daily_example_quiz">Тест на примеры</string>
     <string name="mission_daily_collect_noun">Сбор существительных</string>
 
     <!-- Profile rewards -->
     <string name="profile_reward_title">Настройка профиля</string>
-    <string name="profile_reward_desc">За каждые 1500 XP можно разблокировать один аватар или фон на выбор.</string>
+    <string name="profile_reward_desc">За каждые 500 XP можно разблокировать один аватар или фон на выбор.</string>
     <string name="profile_reward_remaining_tickets">Доступно разблокировок: %1$d</string>
     <string name="profile_reward_avatar_section">Аватар</string>
     <string name="profile_reward_background_section">Фон</string>
@@ -226,7 +241,7 @@
     <string name="profile_asset_bg_campfire">Костёр</string>
     <string name="profile_asset_bg_cyberpunk">Киберпанк</string>
     <string name="profile_asset_bg_halloween">Хэллоуин</string>
-    <string name="profile_reward_unlock_hint">За каждые 1500 XP можно разблокировать один аватар или фон на выбор.</string>
+    <string name="profile_reward_unlock_hint">За каждые 500 XP можно разблокировать один аватар или фон на выбор.</string>
     <string name="profile_reward_stat_words">Собрано слов</string>
     <string name="profile_reward_stat_rank">Текущий ранг</string>
     <string name="profile_reward_stat_xp">Всего XP</string>
@@ -254,8 +269,51 @@
     <string name="pronunciation_label_intonation">Интонация</string>
     <string name="pronunciation_label_speed">Скорость</string>
     <string name="pronunciation_label_total">Итог</string>
+    <string name="pronunciation_label_final">Итоговый балл</string>
+    <string name="pronunciation_label_penalty">Штраф за нераспознавание</string>
+    <string name="penalty_none">Нет</string>
     <string name="wordcard_translation_listen">Послушать перевод</string>
     <string name="wordcard_english_meaning_format">Значение: %1$s</string>
     <string name="wordcard_point_format">%1$d / 100 pt</string>
     <string name="action_confirm">Подтвердить</string>
+    <string name="pos_noun">Существительное</string>
+    <string name="pos_pronoun">Местоимение</string>
+    <string name="pos_numeral">Числительное</string>
+    <string name="pos_verb">Глагол</string>
+    <string name="pos_adjective">Прилагательное</string>
+    <string name="pos_determiner">Определительное слово</string>
+    <string name="pos_adverb">Наречие</string>
+    <string name="pos_particle">Частица</string>
+    <string name="pos_interjection">Междометие</string>
+
+    <string name="lang_change_title">Изменить язык обучения</string>
+    <string name="lang_change_warning">Предупреждение: при изменении языка все сохранённые карточки слов будут удалены. Продолжить?</string>
+    <string name="lang_change_confirm">Изменить и удалить</string>
+    <string name="lang_change_cancel">Отмена</string>
+
+    <string name="delete_account_title">Удалить аккаунт</string>
+    <string name="delete_account_msg">Удаление аккаунта приведёт к безвозвратной потере опыта, ранга и карточек слов. Продолжить?</string>
+    <string name="delete_account_confirm">Удалить</string>
+    <string name="delete_account_cancel">Отмена</string>
+
+    <string name="settings_section_title">Настройки пользователя</string>
+    <string name="settings_lang_change">Изменить язык обучения</string>
+    <string name="settings_lang_sub">Сброс всех карточек слов</string>
+    <string name="settings_delete_account">Удалить аккаунт</string>
+    <string name="settings_delete_sub">Данные нельзя восстановить</string>
+
+    <string name="error_word_empty">Слово не введено.</string>
+    <string name="error_word_slot_limit">Достигнут лимит слов. Выполните миссии, чтобы открыть больше слотов.</string>
+    <string name="error_word_already_exists">Это слово уже есть в вашем словаре.</string>
+    <string name="error_unknown">Произошла неизвестная ошибка.</string>
+
+    <!-- Notifications -->
+    <string name="noti_rank_up">Повышение ранга! %1$s</string>
+    <string name="noti_word_slot_increase">Слоты слов увеличены! (%1$d слов)</string>
+    <string name="noti_ticket_acquired">Получен билет кастомизации!</string>
+    <string name="noti_new_word_added">Новое слово добавлено: %1$s</string>
+    <string name="noti_duplicate_bonus">Бонус за повторный сбор: %1$s</string>
+    <string name="noti_word_best_score_achieved">Новый рекорд! (%1$d баллов)</string>
+    <string name="noti_word_master_achieved">Поздравляем! Слово %1$s достигло уровня MASTER!</string>
+    <string name="profile_example_quiz_title">Пример задания на предложение</string>
 </resources>

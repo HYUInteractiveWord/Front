@@ -1,17 +1,30 @@
 package com.interactiveword.ui.screens.dictionary
 
+import android.Manifest
 import android.app.Application
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaPlayer
 import android.media.MediaRecorder
+import androidx.annotation.RequiresPermission
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.interactiveword.R
 import com.interactiveword.data.api.RetrofitClient
+import com.interactiveword.data.local.LanguageManager
 import com.interactiveword.data.repository.WordRepository
+import com.interactiveword.ui.components.AppNotification
+import com.interactiveword.ui.components.NotiType
+import com.interactiveword.ui.components.XpManager
+import com.interactiveword.ui.theme.BrandGreenLight
+import com.interactiveword.util.WordCardPointManager
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MenuBook
 import kotlinx.coroutines.Dispatchers
+import retrofit2.HttpException
+import org.json.JSONObject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -216,21 +229,56 @@ class DictionaryVerifyViewModel(
 
         viewModelScope.launch {
             try {
+                val localizedContext = LanguageManager.applyLocale(getApplication<Application>())
                 _uiState.value = _uiState.value.copy(isSaving = true, errorMessage = null)
-                repo.createWord(
+                val newCard = repo.createWord(
                     _uiState.value.word,
                     source = "dictionary",
                     pos = _uiState.value.pos,
                     definition = initialDefinition,
                 )
+
+                // 💡 신규 추가된 단어 ID를 미확인 목록에 등록
+                WordCardPointManager.addUnseenWords(getApplication(), listOf(newCard.id))
+
+                // 중복 보너스 여부 판단 (wordPoint가 이미 있다면 중복 누적 상황)
+                val isBonusTriggered = newCard.wordPoint > 0
+
+                if (isBonusTriggered) {
+                    XpManager.emitNotification(
+                        AppNotification(
+                            type = NotiType.XP,
+                            message = localizedContext.getString(R.string.noti_duplicate_bonus, _uiState.value.word),
+                            color = BrandGreenLight,
+                            icon = Icons.Default.MenuBook
+                        )
+                    )
+                } else {
+                    XpManager.emitNotification(
+                        AppNotification(
+                            type = NotiType.NEW_WORD,
+                            message = localizedContext.getString(R.string.noti_new_word_added, _uiState.value.word),
+                            color = BrandGreenLight,
+                            icon = Icons.Default.MenuBook
+                        )
+                    )
+                }
+
                 _uiState.value = _uiState.value.copy(
                     isSaving = false,
                     saveCompleted = true,
                 )
             } catch (e: Exception) {
+                val errorMessage = parseErrorMessage(e)
+                val localizedError = when {
+                    errorMessage.contains("Word is empty", ignoreCase = true) -> getApplication<Application>().getString(R.string.error_word_empty)
+                    errorMessage.contains("Word slot limit reached", ignoreCase = true) -> getApplication<Application>().getString(R.string.error_word_slot_limit)
+                    else -> getApplication<Application>().getString(R.string.error_unknown) + ": $errorMessage"
+                }
+
                 _uiState.value = _uiState.value.copy(
                     isSaving = false,
-                    errorMessage = e.message ?: "단어장 추가에 실패했습니다.",
+                    errorMessage = localizedError,
                 )
             }
         }
@@ -240,6 +288,25 @@ class DictionaryVerifyViewModel(
         _uiState.value = _uiState.value.copy(saveCompleted = false)
     }
 
+    private fun parseErrorMessage(e: Exception): String {
+        return if (e is HttpException) {
+            try {
+                val errorBody = e.response()?.errorBody()?.string()
+                if (errorBody != null) {
+                    val json = JSONObject(errorBody)
+                    json.optString("detail", e.message())
+                } else {
+                    e.message()
+                }
+            } catch (ex: Exception) {
+                e.message()
+            }
+        } else {
+            e.message ?: "Unknown error"
+        }
+    }
+
+    @RequiresPermission(Manifest.permission.RECORD_AUDIO)
     private fun recordMicAudio(): ByteArray {
         val channelConfig = AudioFormat.CHANNEL_IN_MONO
         val audioFormat = AudioFormat.ENCODING_PCM_16BIT

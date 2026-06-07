@@ -17,6 +17,9 @@
     <!-- 알림 (Android 13+) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <!-- 진동 -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+
     <!-- AudioCaptureService foreground type -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
 

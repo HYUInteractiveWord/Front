@@ -33,6 +33,11 @@ interface ApiService {
     @GET("api/auth/me")
     suspend fun getMe(): User
 
+    @PATCH("api/auth/delete")
+    suspend fun updateMe(@Body body: Map<String, String>): User
+
+    @DELETE("api/auth/delete")
+    suspend fun deleteAccount(): Map<String, String>
     // ── Dictionary ─────────────────────────────────────────────────────────
     @GET("api/dictionary/search")
     suspend fun searchDictionary(@Query("word") word: String): DictionarySearchResponse
@@ -99,4 +104,6 @@ interface ApiService {
     @POST("api/missions/{id}/complete")
     suspend fun completeMission(@Path("id") id: Int): Mission
 
+    @POST("api/auth/demo")
+    suspend fun demoLogin(@Body body: RegisterRequest): User
 }

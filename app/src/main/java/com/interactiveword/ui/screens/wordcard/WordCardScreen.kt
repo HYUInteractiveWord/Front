@@ -6,6 +6,9 @@ import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -20,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,6 +32,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.interactiveword.ui.components.WordCardEffectBadge
@@ -35,6 +41,7 @@ import com.interactiveword.ui.components.wordCardEffectStyle
 import com.interactiveword.ui.theme.BrandGreenLight
 import com.interactiveword.ui.theme.DarkMutedText
 import com.interactiveword.ui.theme.DarkOutline
+import com.interactiveword.util.WordCardPointManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,6 +64,16 @@ fun WordCardScreen(
     LaunchedEffect(wordId) {
         vm.loadCard(wordId, context)
     }
+
+    // 💡 화면 재입장 시 최신 점수 반영을 위해 Resume 시점에 리프레시
+    val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    LaunchedEffect(lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.RESUMED) {
+            vm.refreshCard(wordId)
+        }
+    }
+
+    val scrollState = rememberScrollState()
 
     Scaffold(
         topBar = {
@@ -84,19 +101,33 @@ fun WordCardScreen(
             return@Scaffold
         }
 
-        val displayPoint = if (card.wordPoint > 0) {
-            card.wordPoint
-        } else {
-            card.bestScore.toInt().coerceIn(0, 100)
-        }
+        val displayPoint = card.wordPoint.coerceIn(0, 100)
+        val unseenIncrease = WordCardPointManager.getUnseenPointIncrease(context, card)
+        val startPoints = (displayPoint - unseenIncrease).coerceAtLeast(0)
 
         val effect = wordCardEffectStyle(displayPoint)
         val containerColor = effect.containerColor ?: MaterialTheme.colorScheme.surface
 
+        // 애니메이션 포인트 상태 관리
+        val animatedPoints = remember(card.id) { Animatable(startPoints.toFloat()) }
+        
+        LaunchedEffect(displayPoint) {
+            // 💡 loadCard나 refreshCard로 인해 displayPoint가 변경되면 애니메이션 실행
+            animatedPoints.animateTo(
+                targetValue = displayPoint.toFloat(),
+                animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing)
+            )
+            // 확인 완료 처리
+            WordCardPointManager.markAsSeen(context, card)
+        }
+        
+        val currentDisplayPoint = animatedPoints.value.toInt()
+        val currentEffect = wordCardEffectStyle(currentDisplayPoint)
+
         val borderWidth = when {
-            displayPoint >= 100 -> 3.dp
-            displayPoint >= 76  -> 2.dp
-            displayPoint >= 26  -> 1.5.dp
+            currentDisplayPoint >= 100 -> 3.dp
+            currentDisplayPoint >= 80  -> 2.dp
+            currentDisplayPoint >= 60  -> 1.5.dp
             else -> 1.dp
         }
 
@@ -105,12 +136,12 @@ fun WordCardScreen(
                 .fillMaxSize()
                 .padding(padding)
                 .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(scrollState),
         ) {
             Card(
                 shape = MaterialTheme.shapes.large,
                 colors = CardDefaults.cardColors(containerColor = containerColor),
-                border = BorderStroke(borderWidth, effect.borderColor),
+                border = BorderStroke(borderWidth, currentEffect.borderColor),
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Column(modifier = Modifier.padding(20.dp)) {
@@ -122,17 +153,8 @@ fun WordCardScreen(
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(card.koreanWord, style = MaterialTheme.typography.headlineMedium)
                                 Spacer(Modifier.width(8.dp))
-                                WordCardEffectBadge(effect)
+                                WordCardEffectBadge(currentEffect)
                             }
-                        }
-
-                        if (!card.pronunciation.isNullOrBlank()) {
-                            Text(
-                                text = "[ ${card.pronunciation} ]",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = DarkMutedText,
-                                modifier = Modifier.padding(end = 8.dp)
-                            )
                         }
 
                         IconButton(onClick = { vm.playTts() }) {
@@ -153,7 +175,7 @@ fun WordCardScreen(
                             modifier = Modifier
                                 .width(4.dp)
                                 .fillMaxHeight()
-                                .background(effect.borderColor, shape = MaterialTheme.shapes.small),
+                                .background(currentEffect.borderColor, shape = MaterialTheme.shapes.small),
                         )
                         Spacer(Modifier.width(12.dp))
 
@@ -229,22 +251,22 @@ fun WordCardScreen(
                                 color = DarkMutedText,
                             )
                             Text(
-                                text = stringResource(R.string.wordcard_point_format, displayPoint),
+                                text = stringResource(R.string.wordcard_point_format, currentDisplayPoint),
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = effect.borderColor,
+                                color = currentEffect.borderColor,
                             )
                         }
 
                         Spacer(Modifier.height(8.dp))
 
                         LinearProgressIndicator(
-                            progress = { displayPoint.coerceIn(0, 100) / 100f },
+                            progress = { currentDisplayPoint / 100f },
                             modifier = Modifier.fillMaxWidth().height(6.dp),
-                            color = effect.progressColor,
+                            color = currentEffect.progressColor,
                             trackColor = DarkOutline,
                         )
 
-                        if (displayPoint >= 100) {
+                        if (currentDisplayPoint >= 100) {
                             Spacer(Modifier.height(12.dp))
                             Card(
                                 shape = MaterialTheme.shapes.medium,
@@ -313,7 +335,36 @@ fun WordCardScreen(
                 }
             }
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(24.dp))
+
+            // 💡 발음 연습 버튼을 예문 위로 이동
+            Button(
+                onClick = {
+                    if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) ==
+                        PackageManager.PERMISSION_GRANTED
+                    ) {
+                        vm.togglePronunciationPractice(context)
+                    } else {
+                        micPermLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                    }
+                },
+                modifier = Modifier.fillMaxWidth().height(52.dp),
+                shape = MaterialTheme.shapes.extraLarge,
+                colors = ButtonDefaults.buttonColors(containerColor = BrandGreenLight),
+            ) {
+                Icon(Icons.Filled.Mic, null, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    when {
+                        uiState.isSubmittingPronunciation -> stringResource(R.string.pronunciation_evaluating)
+                        uiState.isRecording -> stringResource(R.string.wordcard_stop_recording_and_evaluate)
+                        else -> stringResource(R.string.wordcard_start_pronunciation)
+                    },
+                    style = MaterialTheme.typography.titleMedium,
+                )
+            }
+
+            Spacer(Modifier.height(24.dp))
 
             Text(stringResource(R.string.wordcard_learning_examples), style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.height(8.dp))
@@ -399,9 +450,10 @@ fun WordCardScreen(
                 }
             }
 
+            // 💡 평가 결과는 다시 예문 아래로 이동하고, 결과가 나오면 자동 스크롤
             if (uiState.pronunciationResult == null) {
                 uiState.savedPronunciationResult?.let { saved ->
-                    Spacer(Modifier.height(12.dp))
+                    Spacer(Modifier.height(16.dp))
                     Card(
                         shape = MaterialTheme.shapes.large,
                         colors = CardDefaults.cardColors(
@@ -436,11 +488,13 @@ fun WordCardScreen(
 
                             Spacer(Modifier.height(12.dp))
                             PronunciationScoreChart(
+                                finalScore = saved.score,
+                                totalScore = saved.total,
                                 pronunciation = saved.pronunciation,
                                 formant = saved.formant,
                                 pitch = saved.pitch,
                                 timing = saved.timing,
-                                total = saved.score,
+                                penaltyFactor = saved.penaltyFactor,
                             )
                             Spacer(Modifier.height(8.dp))
                             Text(
@@ -458,7 +512,11 @@ fun WordCardScreen(
             }
 
             uiState.pronunciationResult?.let { result ->
-                Spacer(Modifier.height(12.dp))
+                LaunchedEffect(result) {
+                    scrollState.animateScrollTo(scrollState.maxValue)
+                    vm.refreshCard(wordId)
+                }
+                Spacer(Modifier.height(16.dp))
                 Card(
                     shape = MaterialTheme.shapes.large,
                     colors = CardDefaults.cardColors(
@@ -486,11 +544,13 @@ fun WordCardScreen(
                         result.details?.let { details ->
                             Spacer(Modifier.height(12.dp))
                             PronunciationScoreChart(
+                                finalScore = result.score,
+                                totalScore = details.total,
                                 pronunciation = details.pronunciation,
                                 formant = details.formant,
                                 pitch = details.pitch,
                                 timing = details.timing,
-                                total = result.score,
+                                penaltyFactor = result.penaltyFactor,
                             )
                             Spacer(Modifier.height(8.dp))
                             Text(
@@ -506,34 +566,6 @@ fun WordCardScreen(
                     }
                 }
             }
-
-            Spacer(Modifier.height(16.dp))
-
-            Button(
-                onClick = {
-                    if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) ==
-                        PackageManager.PERMISSION_GRANTED
-                    ) {
-                        vm.togglePronunciationPractice(context)
-                    } else {
-                        micPermLauncher.launch(Manifest.permission.RECORD_AUDIO)
-                    }
-                },
-                modifier = Modifier.fillMaxWidth().height(52.dp),
-                shape = MaterialTheme.shapes.extraLarge,
-                colors = ButtonDefaults.buttonColors(containerColor = BrandGreenLight),
-            ) {
-                Icon(Icons.Filled.Mic, null, modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    when {
-                        uiState.isSubmittingPronunciation -> stringResource(R.string.pronunciation_evaluating)
-                        uiState.isRecording -> stringResource(R.string.wordcard_stop_recording_and_evaluate)
-                        else -> stringResource(R.string.wordcard_start_pronunciation)
-                    },
-                    style = MaterialTheme.typography.titleMedium,
-                )
-            }
         }
     }
 }
@@ -544,9 +576,14 @@ private fun getPosString(pos: String?): String {
     if (pos == null) return ""
     return when {
         pos.contains("명사") -> stringResource(R.string.pos_noun)
+        pos.contains("대명사") -> stringResource(R.string.pos_pronoun)
+        pos.contains("수사") -> stringResource(R.string.pos_numeral)
         pos.contains("동사") -> stringResource(R.string.pos_verb)
         pos.contains("형용사") -> stringResource(R.string.pos_adjective)
+        pos.contains("관형사") -> stringResource(R.string.pos_determiner)
         pos.contains("부사") -> stringResource(R.string.pos_adverb)
+        pos.contains("조사") -> stringResource(R.string.pos_particle)
+        pos.contains("감탄사") -> stringResource(R.string.pos_interjection)
         else -> pos // 매칭 안 되면 원래 글자 그대로
     }
 }
@@ -611,18 +648,20 @@ private fun exampleTransTtsPath(example: Any): String? {
 @SuppressLint("DefaultLocale")
 @Composable
 private fun PronunciationScoreChart(
+    finalScore: Float,
+    totalScore: Float,
     pronunciation: Float,
     formant: Float,
     pitch: Float,
     timing: Float,
-    total: Float,
+    penaltyFactor: Float = 0.0f,
 ) {
     val items = listOf(
+        stringResource(R.string.pronunciation_label_total) to totalScore,
         stringResource(R.string.pronunciation_label_pronunciation) to pronunciation,
         stringResource(R.string.pronunciation_label_formants) to formant,
         stringResource(R.string.pronunciation_label_intonation) to pitch,
         stringResource(R.string.pronunciation_label_speed) to timing,
-        stringResource(R.string.pronunciation_label_total) to total,
     )
 
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -631,6 +670,20 @@ private fun PronunciationScoreChart(
             style = MaterialTheme.typography.titleSmall,
             color = BrandGreenLight,
         )
+        
+        val penaltyText = if (penaltyFactor >= 1.0f) {
+            stringResource(R.string.penalty_none)
+        } else {
+            String.format("%.2f", penaltyFactor)
+        }
+
+        Text(
+            text = stringResource(R.string.pronunciation_label_penalty) + " = $penaltyText",
+            style = MaterialTheme.typography.labelSmall,
+            color = if (penaltyFactor >= 1.0f) DarkMutedText else androidx.compose.ui.graphics.Color.Red,
+            modifier = Modifier.padding(top = 4.dp)
+        )
+
         Spacer(Modifier.height(8.dp))
 
         items.forEach { (label, score) ->
@@ -644,10 +697,12 @@ private fun PronunciationScoreChart(
                     text = label,
                     style = MaterialTheme.typography.bodySmall,
                     color = DarkMutedText,
-                    modifier = Modifier.width(52.dp),
+                    modifier = Modifier.width(64.dp),
                 )
 
                 val clamped = score.coerceIn(0f, 100f)
+                val isTotalScore = label == stringResource(R.string.pronunciation_label_total)
+
                 Box(
                     modifier = Modifier
                         .weight(1f)
@@ -658,7 +713,10 @@ private fun PronunciationScoreChart(
                         modifier = Modifier
                             .fillMaxHeight()
                             .fillMaxWidth(clamped / 100f)
-                            .background(BrandGreenLight, shape = MaterialTheme.shapes.small),
+                            .background(
+                                color = if (isTotalScore) Color(0xFFF97316) else BrandGreenLight,
+                                shape = MaterialTheme.shapes.small
+                            ),
                     )
                 }
 

@@ -9,6 +9,7 @@ import com.interactiveword.data.api.RetrofitClient
 import com.interactiveword.data.model.WordCard
 import com.interactiveword.data.model.WordQuizItemResultRequest
 import com.interactiveword.data.repository.WordRepository
+import com.interactiveword.ui.components.XpManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -34,6 +35,7 @@ data class PosQuizQuestion(
     val correctPos: String,
     val wordAudioPath: String?,
     val definitionAudioPath: String?,
+    val options: List<String> = emptyList(),
 )
 
 data class PosQuizUiState(
@@ -61,7 +63,17 @@ class PosQuizViewModel(
 ) : ViewModel() {
 
     companion object {
-        val options = listOf("명사", "동사", "형용사", "부사")
+        private val ALL_POS = listOf(
+            "명사",
+            "대명사",
+            "수사",
+            "동사",
+            "형용사",
+            "관형사",
+            "부사",
+            "조사",
+            "감탄사",
+        )
     }
 
     private val _uiState = MutableStateFlow(PosQuizUiState())
@@ -132,6 +144,10 @@ class PosQuizViewModel(
                     submitResultMessage = "획득 XP +${response.quizXpGained}$missionText",
                     submitErrorMessage = null,
                 )
+
+                if (response.quizXpGained > 0) {
+                    XpManager.emitXpGain(response.quizXpGained)
+                }
             } catch (e: Throwable) {
                 _uiState.value = _uiState.value.copy(
                     submitErrorMessage = "퀴즈 결과를 서버에 반영하지 못했습니다.",
@@ -229,11 +245,37 @@ class PosQuizViewModel(
                     return@launch
                 }
 
+                val shuffledQuestions = validQuestions
+                    .shuffled()
+                    .take(min(POS_QUIZ_LIMIT, validQuestions.size))
+
+                val existingPosList = validQuestions
+                    .map { it.correctPos }
+                    .distinct()
+
+                val questionsWithOptions = shuffledQuestions.map { question ->
+                    val questionOptions = mutableSetOf(question.correctPos)
+
+                    val otherExistingPos = (existingPosList - question.correctPos).shuffled()
+                    for (pos in otherExistingPos) {
+                        if (questionOptions.size >= 4) break
+                        questionOptions.add(pos)
+                    }
+
+                    if (questionOptions.size < 4) {
+                        val remainingAllPos = (ALL_POS - questionOptions).shuffled()
+                        for (pos in remainingAllPos) {
+                            if (questionOptions.size >= 4) break
+                            questionOptions.add(pos)
+                        }
+                    }
+
+                    question.copy(options = questionOptions.toList().shuffled())
+                }
+
                 _uiState.value = PosQuizUiState(
                     isLoading = false,
-                    questions = validQuestions
-                        .shuffled()
-                        .take(min(POS_QUIZ_LIMIT, validQuestions.size)),
+                    questions = questionsWithOptions,
                 )
             } catch (e: Throwable) {
                 _uiState.value = PosQuizUiState(
@@ -306,10 +348,15 @@ class PosQuizViewModel(
         if (pos.isBlank()) return null
 
         return when {
-            "명사" in pos -> "명사"
-            "동사" in pos -> "동사"
-            "형용사" in pos -> "형용사"
-            "부사" in pos -> "부사"
+            "대명사" in pos || pos.equals("pronoun", ignoreCase = true) -> "대명사"
+            "수사" in pos || pos.equals("numeral", ignoreCase = true) -> "수사"
+            "동사" in pos || pos.equals("verb", ignoreCase = true) -> "동사"
+            "형용사" in pos || pos.equals("adjective", ignoreCase = true) -> "형용사"
+            "관형사" in pos || pos.equals("determiner", ignoreCase = true) -> "관형사"
+            "부사" in pos || pos.equals("adverb", ignoreCase = true) -> "부사"
+            "조사" in pos || pos.equals("particle", ignoreCase = true) -> "조사"
+            "감탄사" in pos || pos.equals("interjection", ignoreCase = true) -> "감탄사"
+            "명사" in pos || pos.equals("noun", ignoreCase = true) -> "명사"
             else -> null
         }
     }

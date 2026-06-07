@@ -119,6 +119,7 @@ fun PosQuizScreen(
                     defAudioPath = question.definitionAudioPath,
                     selectedAnswer = uiState.selectedAnswer,
                     isAnswerChecked = uiState.isAnswerChecked,
+                    options = question.options,
                     onAnswerClick = vm::selectAnswer,
                     onNextClick = vm::goToNextQuestion,
                     onPlayAudio = vm::playTts,
@@ -141,6 +142,7 @@ private fun QuizQuestionState(
     defAudioPath: String?,
     selectedAnswer: String?,
     isAnswerChecked: Boolean,
+    options: List<String>,
     onAnswerClick: (String) -> Unit,
     onNextClick: () -> Unit,
     onPlayAudio: (String?) -> Unit,
@@ -260,8 +262,7 @@ private fun QuizQuestionState(
                 }
             }
         }
-
-        items(PosQuizViewModel.options) { option ->
+        items(options) { option ->
             val colors = optionCardColors(
                 option = option,
                 correctPos = correctPos,
@@ -269,7 +270,6 @@ private fun QuizQuestionState(
                 pendingAnswer = pendingAnswer,
                 isAnswerChecked = isAnswerChecked,
             )
-
             OutlinedButton(
                 onClick = {
                     if (!isAnswerChecked) {
@@ -507,13 +507,18 @@ private fun EmptyQuizState(
 
 @Composable
 private fun localizedPosLabel(pos: String?): String {
-    if (pos == null) return ""
+    if (pos.isNullOrBlank()) return ""
 
     return when {
         pos.contains("명사") -> stringResource(R.string.pos_noun)
+        pos.contains("대명사") -> stringResource(R.string.pos_pronoun)
+        pos.contains("수사") -> stringResource(R.string.pos_numeral)
         pos.contains("동사") -> stringResource(R.string.pos_verb)
         pos.contains("형용사") -> stringResource(R.string.pos_adjective)
+        pos.contains("관형사") -> stringResource(R.string.pos_determiner)
         pos.contains("부사") -> stringResource(R.string.pos_adverb)
+        pos.contains("조사") -> stringResource(R.string.pos_particle)
+        pos.contains("감탄사") -> stringResource(R.string.pos_interjection)
         else -> pos
     }
 }

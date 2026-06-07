@@ -18,6 +18,12 @@ import kotlinx.coroutines.delay
 import java.io.File
 import org.json.JSONObject
 import com.interactiveword.R
+import com.interactiveword.ui.components.XpManager
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.ui.graphics.Color
+import com.interactiveword.ui.components.AppNotification
+import com.interactiveword.ui.components.NotiType
 
 data class WordCardUiState(
     val card: WordCard? = null,
@@ -34,12 +40,14 @@ data class WordCardUiState(
 data class SavedPronunciationResult(
     val score: Float,
     val xpGained: Int,
+    val total: Float,
     val pronunciation: Float,
     val formant: Float,
     val pitch: Float,
     val timing: Float,
     val isIntensityGood: Boolean,
     val recordedAt: String?,
+    val penaltyFactor: Float = 1.0f,
 )
 
 class WordCardViewModel(
@@ -76,6 +84,15 @@ class WordCardViewModel(
                     errorMessage = e.message
                 )
             }
+        }
+    }
+
+    fun refreshCard(wordId: Int) {
+        viewModelScope.launch {
+            try {
+                val refreshedCard = repo.getWord(wordId)
+                _uiState.value = _uiState.value.copy(card = refreshedCard)
+            } catch (_: Exception) {}
         }
     }
 
@@ -230,7 +247,37 @@ class WordCardViewModel(
 
                 saveLatestPronunciationResult(context, card.id, result)
 
+                // 💡 XP 획득 전역 이벤트 발생
+                if (result.xpGained > 0) {
+                    XpManager.emitXpGain(result.xpGained)
+                }
+
+                // 💡 최고 점수 경신 알림 (결과 응답의 isNewBest가 true인 경우)
+                if (result.isNewBest) {
+                    XpManager.emitNotification(
+                        AppNotification(
+                            type = NotiType.BEST_SCORE,
+                            message = context.getString(R.string.noti_word_best_score_achieved, result.score.toInt()),
+                            color = Color(0xFFFFC107), // Amber/Gold
+                            icon = Icons.Default.EmojiEvents
+                        )
+                    )
+                }
+
                 val refreshedCard = repo.getWord(card.id)
+
+                // 💡 MASTER 달성 알림 (기존 점수가 100 미만이었다가 100이 된 경우)
+                if (refreshedCard.wordPoint >= 100 && (card.wordPoint < 100)) {
+                    XpManager.emitNotification(
+                        AppNotification(
+                            type = NotiType.MASTER_ACHIEVED,
+                            message = context.getString(R.string.noti_word_master_achieved, card.koreanWord),
+                            color = Color(0xFFFFC107), // Amber/Gold
+                            icon = Icons.Default.EmojiEvents
+                        )
+                    )
+                }
+
                 val latestHistory = try {
                     repo.getPronunciationHistory(card.id).firstOrNull()
                 } catch (_: Exception) {
@@ -269,12 +316,14 @@ class WordCardViewModel(
         val json = JSONObject().apply {
             put("score", result.score)
             put("xpGained", result.xpGained)
+            put("total", details?.total ?: 0f)
             put("pronunciation", details?.pronunciation ?: 0f)
             put("formant", details?.formant ?: 0f)
             put("pitch", details?.pitch ?: 0f)
             put("timing", details?.timing ?: 0f)
             put("isIntensityGood", details?.isIntensityGood ?: true)
             put("recordedAt", now)
+            put("penaltyFactor", result.penaltyFactor)
         }
 
         context.getSharedPreferences("pronunciation_result_cache", Context.MODE_PRIVATE)
@@ -296,12 +345,14 @@ class WordCardViewModel(
             SavedPronunciationResult(
                 score = json.optDouble("score", 0.0).toFloat(),
                 xpGained = json.optInt("xpGained", 0),
+                total = json.optDouble("total", 0.0).toFloat(),
                 pronunciation = json.optDouble("pronunciation", 0.0).toFloat(),
                 formant = json.optDouble("formant", 0.0).toFloat(),
                 pitch = json.optDouble("pitch", 0.0).toFloat(),
                 timing = json.optDouble("timing", 0.0).toFloat(),
                 isIntensityGood = json.optBoolean("isIntensityGood", true),
                 recordedAt = json.optString("recordedAt").takeIf { it.isNotBlank() },
+                penaltyFactor = json.optDouble("penaltyFactor", 1.0).toFloat(),
             )
         } catch (_: Exception) {
             null

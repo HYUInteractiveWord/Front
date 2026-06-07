@@ -1,5 +1,6 @@
 package com.interactiveword.ui.screens.scan
 
+import android.Manifest
 import android.app.Application
 import android.content.Intent
 import android.media.AudioFormat
@@ -7,10 +8,10 @@ import android.media.AudioRecord
 import android.media.MediaCodec
 import android.media.MediaExtractor
 import android.media.MediaFormat
-import android.media.MediaMetadataRetriever
 import android.media.MediaRecorder
 import android.net.Uri
 import android.os.Build
+import androidx.annotation.RequiresPermission
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.interactiveword.data.repository.ScanRepository
@@ -24,6 +25,17 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.interactiveword.ui.components.AppNotification
+import com.interactiveword.ui.components.NotiType
+import com.interactiveword.ui.components.XpManager
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MenuBook
+import com.interactiveword.R
+import com.interactiveword.data.local.LanguageManager
+import com.interactiveword.ui.theme.BrandGreenLight
+import com.interactiveword.util.WordCardPointManager
+import retrofit2.HttpException
+import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -42,11 +54,13 @@ data class ScanUiState(
     val elapsedSeconds: Int = 0,
     val detectedWords: List<ScanWordResult> = emptyList(),
     val addedWords: Set<String> = emptySet(),
+    val loadingWords: Set<String> = emptySet(),
     val isLoading: Boolean = false,
     val error: String? = null,
 )
 
 class ScanViewModel(app: Application) : AndroidViewModel(app) {
+    private val context = getApplication<Application>()
 
     private val scanRepo = ScanRepository()
     private val wordRepo = WordRepository()
@@ -107,6 +121,7 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
 
     fun stopRecording() { recordingActive = false }
 
+    @RequiresPermission(Manifest.permission.RECORD_AUDIO)
     private fun recordMicAudio(): ByteArray {
         val channelConfig = AudioFormat.CHANNEL_IN_MONO
         val audioFormat  = AudioFormat.ENCODING_PCM_16BIT
@@ -305,7 +320,7 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
     // ── 공통 ────────────────────────────────────────────────────────────────
 
     private fun writePcmToWav(pcm: ByteArray): File {
-        val file     = File(getApplication<Application>().cacheDir, "scan.wav")
+        val file     = File(getApplication<Application>().cacheDir, "scan_${System.currentTimeMillis()}.wav")
         val byteRate = SAMPLE_RATE * 2
         FileOutputStream(file).use { out ->
             fun wi(v: Int) = ByteArray(4) { i -> ((v shr (i * 8)) and 0xFF).toByte() }.let(out::write)
@@ -334,21 +349,92 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun addWordToCollection(word: String) {
+    fun dismissWord(word: String) {
+        _uiState.value = _uiState.value.copy(
+            detectedWords = _uiState.value.detectedWords.filter { it.word != word }
+        )
+    }
+
+    fun addWordToCollection(word: String, pos: String?, definition: String?) {
+        val state = _uiState.value
+        if (word in state.addedWords || word in state.loadingWords) return
+
+        _uiState.value = state.copy(loadingWords = state.loadingWords + word)
+
         viewModelScope.launch {
             try {
-                wordRepo.createWord(word, source = "scan")
-                _uiState.value = _uiState.value.copy(addedWords = _uiState.value.addedWords + word)
+                val localizedContext = LanguageManager.applyLocale(context)
+                // 💡 백엔드에서 중복 시에도 201(또는 200)과 함께 기존/업데이트된 객체를 리턴함
+                val newCard = wordRepo.createWord(
+                    word = word,
+                    source = "dictionary",
+                    pos = pos,
+                    definition = definition
+                )
+                
+                // 💡 신규 추가된 단어 ID를 미확인 목록에 등록 (포인트가 올랐으므로 애니메이션 대상)
+                WordCardPointManager.addUnseenWords(context, listOf(newCard.id))
+
+                // 중복 여부 판단 (이미 wordPoint가 0보다 크거나 하면 중복 보너스 상황일 가능성 높음)
+                // 하지만 백엔드 로직상 points+5가 되었으므로 이를 UI에 알림
+                val isBonusTriggered = newCard.wordPoint > 0 // 새 단어면 보통 0일 것이므로
+
+                if (isBonusTriggered) {
+                    XpManager.emitNotification(
+                        AppNotification(
+                            type = NotiType.XP,
+                            message = localizedContext.getString(R.string.noti_duplicate_bonus, word),
+                            color = BrandGreenLight,
+                            icon = Icons.Default.MenuBook
+                        )
+                    )
+                } else {
+                    XpManager.emitNotification(
+                        AppNotification(
+                            type = NotiType.NEW_WORD,
+                            message = localizedContext.getString(R.string.noti_new_word_added, word),
+                            color = BrandGreenLight,
+                            icon = Icons.Default.MenuBook
+                        )
+                    )
+                }
+
+                _uiState.value = _uiState.value.copy(
+                    addedWords = _uiState.value.addedWords + word,
+                    loadingWords = _uiState.value.loadingWords - word
+                )
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(error = e.message)
+                val errorMessage = parseErrorMessage(e)
+                val localizedError = when {
+                    errorMessage.contains("Word is empty", ignoreCase = true) -> context.getString(R.string.error_word_empty)
+                    errorMessage.contains("Word slot limit reached", ignoreCase = true) -> context.getString(R.string.error_word_slot_limit)
+                    else -> context.getString(R.string.error_unknown) + ": $errorMessage"
+                }
+
+                _uiState.value = _uiState.value.copy(
+                    error = localizedError,
+                    loadingWords = _uiState.value.loadingWords - word
+                )
             }
         }
     }
 
-    fun dismissWord(word: String) {
-        _uiState.value = _uiState.value.copy(
-            detectedWords = _uiState.value.detectedWords.filter { it.word != word },
-        )
+    private fun parseErrorMessage(e: Exception): String {
+        return if (e is HttpException) {
+            try {
+                val errorBody = e.response()?.errorBody()?.string()
+                if (errorBody != null) {
+                    val json = JSONObject(errorBody)
+                    json.optString("detail", e.message())
+                } else {
+                    e.message()
+                }
+            } catch (ex: Exception) {
+                e.message()
+            }
+        } else {
+            e.message ?: "Unknown error"
+        }
     }
 
     override fun onCleared() {

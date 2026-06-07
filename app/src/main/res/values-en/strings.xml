@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">나만의 단어장</string>
+    <string name="app_name">InteractiveWord</string>
     <string name="notification_channel_capture">Audio Capture</string>
-    <string name="notification_title_capture">말해봐 - Waiting for Capture</string>
+    <string name="notification_title_capture">InteractiveWord - Waiting for Capture</string>
     <string name="notification_text_capture">Tap to capture Korean words</string>
     <string name="notification_action_capture">Start Capture</string>
     <string name="notification_action_stop">Stop</string>
@@ -12,7 +12,7 @@
 
     <!-- Bottom Nav -->
     <string name="nav_home">Home</string>
-    <string name="nav_dictionary">Dictionary</string>
+    <string name="nav_dictionary">Dict</string>
     <string name="nav_collection">Collection</string>
     <string name="nav_missions">Missions</string>
     <string name="nav_scan">Scan</string>
@@ -34,6 +34,12 @@
     <string name="rank_silver">Silver</string>
     <string name="rank_gold">Gold</string>
     <string name="rank_platinum">Platinum</string>
+    <string name="rank_sapphire">Sapphire</string>
+    <string name="rank_ruby">Ruby</string>
+    <string name="rank_emerald">Emerald</string>
+    <string name="rank_amethyst">Amethyst</string>
+    <string name="rank_pearl">Pearl</string>
+    <string name="rank_obsidian">Obsidian</string>
     <string name="rank_diamond">Diamond</string>
     <string name="rank_master">Master</string>
 
@@ -71,6 +77,8 @@
     <string name="profile_pos_quiz_sub">Identify the part of speech</string>
     <string name="profile_vocab_quiz_title">Vocabulary Quiz</string>
     <string name="profile_vocab_quiz_sub">Test your collected words</string>
+    <string name="profile_example_quiz_title">Example Sentence Quiz</string>
+    <string name="profile_example_quiz_sub">Test your skills with collected example sentences</string>
     <string name="profile_failed_to_load">Failed to load profile</string>
     <string name="profile_daily_mission_status">Daily Mission Status</string>
     <string name="action_start_test">Start Test</string>
@@ -81,9 +89,12 @@
     <string name="collection_word_count">%1$d words</string>
     <string name="collection_slots">Slots: %1$d / %2$d</string>
 
+    <string name="collection_sort_newest">Newest</string>
+    <string name="collection_sort_score">Score</string>
+
     <!-- Dictionary Screen -->
     <string name="dictionary_title">Dictionary</string>
-    <string name="dictionary_search_hint">Search Korean words…</string>
+    <string name="dictionary_search_hint">Search words by meaning…</string>
     <string name="action_search">Search</string>
     <string name="dictionary_search_failed">Search failed: %1$s</string>
     <string name="dictionary_result_count">%1$d results</string>
@@ -118,6 +129,7 @@
     <string name="scan_detected_words">Detected Words (%1$d)</string>
     <string name="scan_listening">Listening…</string>
     <string name="scan_elapsed">%1$ds  /  max 30s</string>
+    <string name="scan_collection_complete">Collection Complete!</string>
     <string name="action_done">Done</string>
 
     <!-- WordCard Screen -->
@@ -188,15 +200,23 @@
     <string name="posquiz_local_note">Part of speech quiz scores are calculated locally at this stage.</string>
     <string name="posquiz_cannot_start">Cannot start part of speech quiz</string>
 
+    <string name="examplequiz_title">Example Sentence Quiz</string>
+    <string name="examplequiz_kr_to_trans">Choose Translation</string>
+    <string name="examplequiz_trans_to_kr">Choose Korean</string>
+    <string name="examplequiz_kr_prompt">Choose the correct translation for this sentence</string>
+    <string name="examplequiz_trans_prompt">Choose the correct Korean for this sentence</string>
+    <string name="examplequiz_no_words">No words with example sentences found.\nPlease add words first!</string>
+
     <!-- Mission display names -->
     <string name="mission_daily_pronunciation">Daily Pronunciation</string>
     <string name="mission_daily_scan">Word Scan</string>
     <string name="mission_daily_word_quiz">Word Quiz</string>
+    <string name="mission_daily_example_quiz">Example Quiz</string>
     <string name="mission_daily_collect_noun">Collect Nouns</string>
 
     <!-- Profile rewards -->
     <string name="profile_reward_title">Customize Profile</string>
-    <string name="profile_reward_desc">Unlock one avatar or background of your choice for every 1500 XP.</string>
+    <string name="profile_reward_desc">Unlock one avatar or background of your choice for every 500 XP.</string>
     <string name="profile_reward_remaining_tickets">Remaining unlocks: %1$d</string>
     <string name="profile_reward_avatar_section">Avatar</string>
     <string name="profile_reward_background_section">Background</string>
@@ -222,7 +242,7 @@
     <string name="profile_asset_bg_campfire">Campfire</string>
     <string name="profile_asset_bg_cyberpunk">Cyberpunk</string>
     <string name="profile_asset_bg_halloween">Halloween</string>
-    <string name="profile_reward_unlock_hint">Unlock one avatar or background for every 1500 XP.</string>
+    <string name="profile_reward_unlock_hint">Unlock one avatar or background for every 500 XP.</string>
     <string name="profile_reward_stat_words">Words</string>
     <string name="profile_reward_stat_rank">Rank</string>
     <string name="profile_reward_stat_xp">Total XP</string>
@@ -250,13 +270,49 @@
     <string name="pronunciation_label_intonation">Intonation</string>
     <string name="pronunciation_label_speed">Speed</string>
     <string name="pronunciation_label_total">Total</string>
+    <string name="pronunciation_label_final">Final Score</string>
+    <string name="pronunciation_label_penalty">Recognition Penalty</string>
+    <string name="penalty_none">None</string>
     <string name="wordcard_translation_listen">Listen to translation</string>
     <string name="wordcard_english_meaning_format">Meaning: %1$s</string>
     <string name="wordcard_point_format">%1$d / 100 pt</string>
     <string name="action_confirm">Confirm</string>
     <string name="pos_noun">Noun</string>
+    <string name="pos_pronoun">Pronoun</string>
+    <string name="pos_numeral">Numeral</string>
     <string name="pos_verb">Verb</string>
     <string name="pos_adjective">Adjective</string>
+    <string name="pos_determiner">Determiner</string>
     <string name="pos_adverb">Adverb</string>
+    <string name="pos_particle">Particle</string>
+    <string name="pos_interjection">Interjection</string>
 
+    <string name="lang_change_title">Change Language</string>
+    <string name="lang_change_warning">Warning: Changing language will permanently delete all saved word cards. Continue?</string>
+    <string name="lang_change_confirm">Change &amp; Delete</string>
+    <string name="lang_change_cancel">Cancel</string>
+
+    <string name="delete_account_title">Delete Account</string>
+    <string name="delete_account_msg">Deleting the account will permanently remove all XP, rank, and word cards. Continue?</string>
+    <string name="delete_account_confirm">Delete</string>
+    <string name="delete_account_cancel">Cancel</string>
+
+    <string name="settings_section_title">User Settings</string>
+    <string name="settings_lang_change">Change Language</string>
+    <string name="settings_lang_sub">Includes word card reset</string>
+    <string name="settings_delete_account">Delete Account</string>
+    <string name="settings_delete_sub">Cannot recover data</string>
+
+    <string name="error_word_empty">Word is empty.</string>
+    <string name="error_word_slot_limit">Word slot limit reached. Complete missions to unlock more.</string>
+    <string name="error_word_already_exists">Word already in your collection.</string>
+    <string name="error_unknown">An unknown error occurred.</string>
+
+    <!-- Notifications -->
+    <string name="noti_rank_up">Rank Up! %1$s</string>
+    <string name="noti_word_slot_increase">Word Slot Increased! (%1$d slots)</string>
+    <string name="noti_ticket_acquired">Customization Ticket Acquired!</string>
+    <string name="noti_duplicate_bonus">\'%1$s\' Duplicate Collection Bonus!</string>
+    <string name="noti_word_best_score_achieved">🎉 New Best Score! (%1$d pts)</string>
+    <string name="noti_word_master_achieved">🎉 Congratulations! Mastered the word \'%1$s\'!</string>
 </resources>

@@ -31,7 +31,13 @@
     <string name="rank_silver">실버</string>
     <string name="rank_gold">골드</string>
     <string name="rank_platinum">플래티넘</string>
-    <string name="rank_diamond">다이아</string>
+    <string name="rank_sapphire">사파이어</string>
+    <string name="rank_ruby">루비</string>
+    <string name="rank_emerald">에메랄드</string>
+    <string name="rank_amethyst">자수정</string>
+    <string name="rank_pearl">진주</string>
+    <string name="rank_obsidian">흑요석</string>
+    <string name="rank_diamond">다이아몬드</string>
     <string name="rank_master">마스터</string>
 
     <string name="home_today_missions">오늘의 미션</string>
@@ -66,6 +72,8 @@
     <string name="profile_pos_quiz_sub">단어의 품사 맞추기</string>
     <string name="profile_vocab_quiz_title">단어 암기 테스트</string>
     <string name="profile_vocab_quiz_sub">수집한 단어로 실력을 테스트해보세요</string>
+    <string name="profile_example_quiz_title">예문 활용 테스트</string>
+    <string name="profile_example_quiz_sub">수집한 단어의 예문으로 실력을 확인하세요</string>
     <string name="profile_failed_to_load">프로필 정보를 불러오지 못했습니다</string>
     <string name="profile_daily_mission_status">일일 미션 상태</string>
     <string name="action_start_test">테스트 시작</string>
@@ -75,8 +83,11 @@
     <string name="collection_word_count">%1$d개의 단어</string>
     <string name="collection_slots">슬롯: %1$d / %2$d</string>
 
+    <string name="collection_sort_newest">추가순</string>
+    <string name="collection_sort_score">점수순</string>
+
     <string name="dictionary_title">사전</string>
-    <string name="dictionary_search_hint">한국어 단어 검색…</string>
+    <string name="dictionary_search_hint">단어 뜻 검색…</string>
     <string name="action_search">검색</string>
     <string name="dictionary_search_failed">검색 실패: %1$s</string>
     <string name="dictionary_result_count">검색 결과 %1$d개</string>
@@ -110,6 +121,7 @@
     <string name="scan_detected_words">감지된 단어 (%1$d개)</string>
     <string name="scan_listening">듣는 중…</string>
     <string name="scan_elapsed">%1$d초  /  최대 30초</string>
+    <string name="scan_collection_complete">수집 완료!</string>
     <string name="action_done">완료</string>
 
     <string name="wordcard_title">단어 카드</string>
@@ -179,18 +191,22 @@
     <string name="posquiz_type_label">품사 맞추기</string>
     <string name="posquiz_local_note">현재 단계에서는 품사 테스트 점수를 로컬로만 계산합니다.</string>
     <string name="posquiz_cannot_start">품사 테스트를 시작할 수 없어요</string>
-    <string name="pos_noun">명사</string>
-    <string name="pos_verb">동사</string>
-    <string name="pos_adjective">형용사</string>
-    <string name="pos_adverb">부사</string>
+
+    <string name="examplequiz_title">예문 활용 테스트</string>
+    <string name="examplequiz_kr_to_trans">번역 예문 맞추기</string>
+    <string name="examplequiz_trans_to_kr">한국어 예문 맞추기</string>
+    <string name="examplequiz_kr_prompt">다음에 알맞은 번역 예문을 고르세요</string>
+    <string name="examplequiz_trans_prompt">다음에 알맞은 한국어 예문을 고르세요</string>
+    <string name="examplequiz_no_words">학습 예문이 포함된 단어가 없습니다.\n단어를 먼저 추가해 보세요!</string>
 
     <string name="mission_daily_pronunciation">일일 발음 연습</string>
     <string name="mission_daily_scan">단어 스캔</string>
     <string name="mission_daily_word_quiz">단어 테스트</string>
+    <string name="mission_daily_example_quiz">예문 테스트</string>
     <string name="mission_daily_collect_noun">명사 단어 수집</string>
 
     <string name="profile_reward_title">프로필 꾸미기</string>
-    <string name="profile_reward_desc">1500 XP마다 원하는 아바타 또는 배경을 하나씩 해금할 수 있어요.</string>
+    <string name="profile_reward_desc">500 XP마다 원하는 아바타 또는 배경을 하나씩 해금할 수 있어요.</string>
     <string name="profile_reward_remaining_tickets">남은 해금권: %1$d개</string>
     <string name="profile_reward_avatar_section">아바타</string>
     <string name="profile_reward_background_section">배경</string>
@@ -216,7 +232,7 @@
     <string name="profile_asset_bg_campfire">모닥불</string>
     <string name="profile_asset_bg_cyberpunk">사이버펑크</string>
     <string name="profile_asset_bg_halloween">할로윈</string>
-    <string name="profile_reward_unlock_hint">1500 XP마다 아바타 또는 배경 1개를 해금할 수 있습니다.</string>
+    <string name="profile_reward_unlock_hint">500 XP마다 아바타 또는 배경 1개를 해금할 수 있습니다.</string>
     <string name="profile_reward_stat_words">단어 수</string>
     <string name="profile_reward_stat_rank">랭크</string>
     <string name="profile_reward_stat_xp">총 XP</string>
@@ -238,5 +254,47 @@
     <string name="pronunciation_label_intonation">억양</string>
     <string name="pronunciation_label_speed">속도</string>
     <string name="pronunciation_label_total">총점</string>
+    <string name="pronunciation_label_final">최종 점수</string>
+    <string name="pronunciation_label_penalty">동일 단어 미인식 페널티</string>
+    <string name="penalty_none">없음</string>
     <string name="action_confirm">확인</string>
+    <string name="pos_noun">명사</string>
+    <string name="pos_pronoun">대명사</string>
+    <string name="pos_numeral">수사</string>
+    <string name="pos_verb">동사</string>
+    <string name="pos_adjective">형용사</string>
+    <string name="pos_determiner">관형사</string>
+    <string name="pos_adverb">부사</string>
+    <string name="pos_particle">조사</string>
+    <string name="pos_interjection">감탄사</string>
+
+    <string name="lang_change_title">학습 언어 변경</string>
+    <string name="lang_change_warning">경고: 학습 언어를 변경하면 기존에 저장된 모든 단어 카드가 삭제됩니다. 정말 변경하시겠습니까?</string>
+    <string name="lang_change_confirm">변경하고 삭제</string>
+    <string name="lang_change_cancel">취소</string>
+
+    <string name="delete_account_title">계정 삭제</string>
+    <string name="delete_account_msg">계정을 삭제하면 모든 경험치, 랭크, 단어 카드가 복구 불가능하게 삭제됩니다. 계속하시겠습니까?</string>
+    <string name="delete_account_confirm">삭제하기</string>
+    <string name="delete_account_cancel">취소</string>
+
+    <string name="settings_section_title">사용자 설정</string>
+    <string name="settings_lang_change">학습 언어 변경</string>
+    <string name="settings_lang_sub">단어 카드 초기화 포함</string>
+    <string name="settings_delete_account">계정 삭제</string>
+    <string name="settings_delete_sub">데이터 복구 불가</string>
+
+    <string name="error_word_empty">단어가 입력되지 않았습니다.</string>
+    <string name="error_word_slot_limit">단어 슬롯 한도에 도달했습니다. 미션을 완료해 슬롯을 늘려보세요.</string>
+    <string name="error_word_already_exists">이미 단어장에 등록된 단어입니다.</string>
+    <string name="error_unknown">알 수 없는 오류가 발생했습니다.</string>
+
+    <!-- Notifications -->
+    <string name="noti_rank_up">랭크 상승! %1$s</string>
+    <string name="noti_word_slot_increase">단어 슬롯 확장! (%1$d개)</string>
+    <string name="noti_ticket_acquired">커스터마이징 티켓 획득!</string>
+    <string name="noti_new_word_added">새 단어 추가: %1$s</string>
+    <string name="noti_duplicate_bonus">%1$s 중복 수집 보너스!</string>
+    <string name="noti_word_best_score_achieved">최고 점수 경신! (%1$d점)</string>
+    <string name="noti_word_master_achieved">축하합니다! %1$s 단어 MASTER 달성!</string>
 </resources>

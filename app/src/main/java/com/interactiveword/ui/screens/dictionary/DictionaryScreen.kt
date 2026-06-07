@@ -132,7 +132,7 @@ fun DictionaryScreen(
                                             if (!result.pos.isNullOrBlank()) {
                                                 Spacer(Modifier.height(4.dp))
                                                 Text(
-                                                    text = stringResource(R.string.dictionary_category, result.pos),
+                                                    text = stringResource(R.string.dictionary_category, getPosString(result.pos)),
                                                     style = MaterialTheme.typography.bodySmall,
                                                     color = BrandGreenLight,
                                                 )
@@ -149,11 +149,16 @@ fun DictionaryScreen(
                                                     )
                                                 )
                                             },
-                                            enabled = !added,
+                                            enabled = !added && !uiState.isSlotFull,
                                             shape = MaterialTheme.shapes.large,
                                             colors = ButtonDefaults.buttonColors(containerColor = BrandGreenLight),
                                         ) {
-                                            Text(if (added) stringResource(R.string.dictionary_added) else stringResource(R.string.action_add))
+                                            val btnText = when {
+                                                added -> stringResource(R.string.dictionary_added)
+                                                uiState.isSlotFull -> "슬롯 부족"
+                                                else -> stringResource(R.string.action_add)
+                                            }
+                                            Text(btnText)
                                         }
                                     }
 
@@ -189,5 +194,22 @@ fun DictionaryScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun getPosString(pos: String?): String {
+    if (pos == null) return ""
+    return when {
+        pos.contains("명사") -> stringResource(R.string.pos_noun)
+        pos.contains("대명사") -> stringResource(R.string.pos_pronoun)
+        pos.contains("수사") -> stringResource(R.string.pos_numeral)
+        pos.contains("동사") -> stringResource(R.string.pos_verb)
+        pos.contains("형용사") -> stringResource(R.string.pos_adjective)
+        pos.contains("관형사") -> stringResource(R.string.pos_determiner)
+        pos.contains("부사") -> stringResource(R.string.pos_adverb)
+        pos.contains("조사") -> stringResource(R.string.pos_particle)
+        pos.contains("감탄사") -> stringResource(R.string.pos_interjection)
+        else -> pos // 매칭 안 되면 원래 글자 그대로
     }
 }

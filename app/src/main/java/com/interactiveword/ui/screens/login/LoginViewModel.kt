@@ -80,7 +80,7 @@ class LoginViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun register(username: String, email: String, password: String, preferredLanguage: String = "ko") {
+    fun register(username: String, email: String?, password: String, preferredLanguage: String = "ko") {
         viewModelScope.launch {
             _uiState.value = LoginUiState.Loading
             try {
@@ -88,6 +88,19 @@ class LoginViewModel(app: Application) : AndroidViewModel(app) {
                 login(username, password)
             } catch (e: Exception) {
                 _uiState.value = LoginUiState.Error(e.message ?: "회원가입 실패")
+            }
+        }
+    }
+    fun demoLogin(username: String, email: String?, password: String, preferredLanguage: String) {
+        viewModelScope.launch {
+            _uiState.value = LoginUiState.Loading
+            try {
+                // 1. 데모 서버 엔드포인트 호출 (가입 및 데이터 이식)
+                userRepo.demoLogin(username, email, password, preferredLanguage)
+                // 2. 가입된 정보로 로그인 진행
+                login(username, password)
+            } catch (e: Exception) {
+                _uiState.value = LoginUiState.Error(e.message ?: "데모 접속 실패")
             }
         }
     }

@@ -5,20 +5,27 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.interactiveword.data.api.RetrofitClient
 import com.interactiveword.data.model.WordCard
+import com.interactiveword.data.repository.UserRepository
 import com.interactiveword.data.repository.WordRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+enum class SortOrder {
+    NEWEST, SCORE
+}
+
 data class CollectionUiState(
     val words: List<WordCard> = emptyList(),
     val maxSlots: Int = 20,
     val isLoading: Boolean = false,
+    val sortOrder: SortOrder = SortOrder.NEWEST
 )
 
 class CollectionViewModel(
     private val repo: WordRepository = WordRepository(),
+    private val userRepo: UserRepository = UserRepository(),
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CollectionUiState())
@@ -33,11 +40,32 @@ class CollectionViewModel(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
             try {
+                val user = userRepo.getMe()
                 val words = repo.getMyWords()
-                _uiState.value = _uiState.value.copy(words = words, isLoading = false)
+                
+                val sortedWords = sortWords(words, _uiState.value.sortOrder)
+
+                _uiState.value = _uiState.value.copy(
+                    words = sortedWords,
+                    maxSlots = user.maxWordSlots,
+                    isLoading = false
+                )
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(isLoading = false)
             }
+        }
+    }
+
+    fun setSortOrder(order: SortOrder) {
+        if (_uiState.value.sortOrder == order) return
+        _uiState.value = _uiState.value.copy(sortOrder = order)
+        _uiState.value = _uiState.value.copy(words = sortWords(_uiState.value.words, order))
+    }
+
+    private fun sortWords(list: List<WordCard>, order: SortOrder): List<WordCard> {
+        return when (order) {
+            SortOrder.NEWEST -> list.sortedByDescending { it.id }
+            SortOrder.SCORE -> list.sortedByDescending { it.wordPoint }
         }
     }
 

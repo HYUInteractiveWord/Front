@@ -2,10 +2,23 @@ package com.interactiveword.ui.screens.dictionary
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.interactiveword.data.repository.UserRepository
 import com.interactiveword.data.repository.WordRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+
+import com.interactiveword.util.WordCardPointManager
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+
+import com.interactiveword.ui.components.XpManager
+import com.interactiveword.ui.components.AppNotification
+import com.interactiveword.ui.components.NotiType
+import com.interactiveword.R
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MenuBook
+import com.interactiveword.ui.theme.BrandGreenLight
 
 data class DictionaryResult(
     val word: String,
@@ -21,11 +34,15 @@ data class DictionaryUiState(
     val addedSuccess: Boolean = false,
     val addedWords: Set<String> = emptySet(),
     val errorMessage: String? = null,
+    val isSlotFull: Boolean = false,
 )
 
-class DictionaryViewModel(
+class DictionaryViewModel @JvmOverloads constructor(
+    application: Application,
     private val repo: WordRepository = WordRepository(),
-) : ViewModel() {
+    private val userRepo: UserRepository = UserRepository(),
+) : AndroidViewModel(application) {
+    private val context = getApplication<Application>()
 
     private val _uiState = MutableStateFlow(DictionaryUiState())
     val uiState: StateFlow<DictionaryUiState> = _uiState
@@ -45,8 +62,12 @@ class DictionaryViewModel(
         )
 
         try {
-            val response = repo.searchDictionary(query)
+            val user = userRepo.getMe()
+            val currentWords = repo.getMyWords()
+            val isFull = currentWords.size >= user.maxWordSlots
 
+            val response = repo.searchDictionary(query)
+            // ... (rest of search logic remains same but uses isFull)
             val candidateResults = response.candidates.map { (word, info) ->
                 DictionaryResult(
                     word = word,
@@ -76,6 +97,7 @@ class DictionaryViewModel(
                 isLoading = false,
                 candidates = results,
                 errorMessage = null,
+                isSlotFull = isFull
             )
         } catch (e: Exception) {
             _uiState.value = _uiState.value.copy(
@@ -89,7 +111,20 @@ class DictionaryViewModel(
     fun addToCollection(word: String) {
         viewModelScope.launch {
             try {
-                repo.createWord(word, source = "dictionary")
+                val newCard = repo.createWord(word, source = "dictionary")
+                // 💡 신규 추가된 단어 ID를 미확인 목록에 등록
+                WordCardPointManager.addUnseenWords(context, listOf(newCard.id))
+
+                // 알림 추가
+                XpManager.emitNotification(
+                    AppNotification(
+                        type = NotiType.NEW_WORD,
+                        message = context.getString(R.string.noti_new_word_added, word),
+                        color = BrandGreenLight,
+                        icon = Icons.Default.MenuBook
+                    )
+                )
+
                 _uiState.value = _uiState.value.copy(
                     addedWords = _uiState.value.addedWords + word,
                     addedSuccess = true,
@@ -109,5 +144,11 @@ class DictionaryViewModel(
         viewModelScope.launch {
             search(query)
         }
+    }
+
+    fun clearAddedSuccess() {
+        _uiState.value = _uiState.value.copy(
+            addedSuccess = false
+        )
     }
 }
