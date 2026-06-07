@@ -27,4 +27,6 @@ class ScanRepository {
         candidates: Map<String, Map<String, String>>,
         scanSource: String = "mic",
     ) = api.processScan(ScanProcessRequest(extractedWords = candidates, scanSource = scanSource))
+
+    suspend fun cleanupTtsTemp() = api.cleanupTtsTemp()
 }

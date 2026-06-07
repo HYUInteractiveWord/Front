@@ -106,4 +106,8 @@ interface ApiService {
 
     @POST("api/auth/demo")
     suspend fun demoLogin(@Body body: RegisterRequest): User
+
+    // ── Cleanup ───────────────────────────────────────────────────────────
+    @DELETE("api/scan/cleanup/tts-temp")
+    suspend fun cleanupTtsTemp(): Map<String, String>
 }

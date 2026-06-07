@@ -99,4 +99,6 @@ class WordRepository {
             file = body,
         )
     }
+
+    suspend fun cleanupTtsTemp() = api.cleanupTtsTemp()
 }

@@ -28,6 +28,7 @@ import org.json.JSONObject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
@@ -64,6 +65,7 @@ class DictionaryVerifyViewModel(
 
     companion object {
         private const val SAMPLE_RATE = 16000
+        private const val MAX_REC_SECONDS = 10
 
         fun factory(
             app: Application,
@@ -180,6 +182,13 @@ class DictionaryVerifyViewModel(
         )
 
         viewModelScope.launch {
+            // 자동 종료 타이머 추가
+            launch {
+                delay(MAX_REC_SECONDS * 1000L)
+                if (recordingActive) {
+                    stopRecording()
+                }
+            }
             try {
                 val pcm = withContext(Dispatchers.IO) { recordMicAudio() }
                 if (pcm.isEmpty()) {
@@ -210,6 +219,7 @@ class DictionaryVerifyViewModel(
                     spokenCorrected = result.spokenCorrected,
                     errorMessage = null,
                 )
+                if (wav.exists()) wav.delete()
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isRecording = false,
@@ -285,6 +295,11 @@ class DictionaryVerifyViewModel(
     }
 
     fun consumeSaveCompleted() {
+        viewModelScope.launch {
+            try {
+                repo.cleanupTtsTemp()
+            } catch (_: Exception) {}
+        }
         _uiState.value = _uiState.value.copy(saveCompleted = false)
     }
 

@@ -112,7 +112,11 @@
     <string name="scan_mic">Microphone</string>
     <string name="scan_mic_sub">Record surrounding audio</string>
     <string name="scan_media">Media</string>
-    <string name="scan_media_sub">Capture segment while playing video</string>
+    <string name="scan_media_sub">Select media to scan for 10s</string>
+    <string name="scan_media_dialog_title">Select Scan Range</string>
+    <string name="scan_media_dialog_desc">Scan with the capture button after the line ends!</string>
+    <string name="scan_media_capture_at_current">Scan at current position</string>
+    <string name="scan_media_dialog_range_label">Expected range (10s)</string>
     <string name="scan_loading_audio">Extracting and analyzing audio…</string>
     <string name="scan_loading_youtube">Analyzing YouTube…</string>
     <string name="scan_loading">Analyzing…</string>

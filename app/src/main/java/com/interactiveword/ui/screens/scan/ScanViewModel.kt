@@ -31,6 +31,8 @@ import com.interactiveword.ui.components.XpManager
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MenuBook
 import com.interactiveword.R
+import android.media.MediaPlayer
+import com.interactiveword.data.api.RetrofitClient
 import com.interactiveword.data.local.LanguageManager
 import com.interactiveword.ui.theme.BrandGreenLight
 import com.interactiveword.util.WordCardPointManager
@@ -68,11 +70,12 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
     private val _uiState = MutableStateFlow(ScanUiState())
     val uiState: StateFlow<ScanUiState> = _uiState.asStateFlow()
 
+    private var mediaPlayer: MediaPlayer? = null
     @Volatile private var recordingActive = false
 
     companion object {
         private const val SAMPLE_RATE = 16000
-        private const val MAX_REC_SECONDS = 30
+        private const val MAX_REC_SECONDS = 10
     }
 
     // ── [1] 마이크 스캔 ─────────────────────────────────────────────────────
@@ -346,6 +349,8 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
             _uiState.value = _uiState.value.copy(
                 isLoading = false, error = "분석 실패: ${e.message}",
             )
+        } finally {
+            if (file.exists()) file.delete()
         }
     }
 
@@ -353,6 +358,41 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
         _uiState.value = _uiState.value.copy(
             detectedWords = _uiState.value.detectedWords.filter { it.word != word }
         )
+    }
+
+    fun cleanupTempFiles() {
+        viewModelScope.launch {
+            try {
+                scanRepo.cleanupTtsTemp()
+            } catch (_: Exception) {}
+        }
+    }
+
+    fun playWordAudio(word: String, pos: String?, definition: String?) {
+        viewModelScope.launch {
+            try {
+                val preview = wordRepo.previewDictionaryWord(
+                    word = word,
+                    definition = definition ?: "",
+                    pos = pos ?: ""
+                )
+                val url = RetrofitClient.resolveStaticUrl(preview.audioPath)
+                if (url != null) {
+                    mediaPlayer?.release()
+                    mediaPlayer = MediaPlayer().apply {
+                        setDataSource(url)
+                        setOnPreparedListener { it.start() }
+                        setOnCompletionListener {
+                            it.release()
+                            mediaPlayer = null
+                        }
+                        prepareAsync()
+                    }
+                }
+            } catch (e: Exception) {
+                // Fail silently or show error in state
+            }
+        }
     }
 
     fun addWordToCollection(word: String, pos: String?, definition: String?) {
@@ -440,5 +480,7 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
     override fun onCleared() {
         super.onCleared()
         recordingActive = false
+        mediaPlayer?.release()
+        mediaPlayer = null
     }
 }

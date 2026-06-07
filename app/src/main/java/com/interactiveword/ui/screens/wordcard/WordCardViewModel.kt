@@ -183,7 +183,14 @@ class WordCardViewModel(
                     delay(1000)
                     val current = _uiState.value
                     if (!current.isRecording) break
-                    _uiState.value = current.copy(recordingSeconds = current.recordingSeconds + 1)
+                    
+                    val nextSeconds = current.recordingSeconds + 1
+                    _uiState.value = current.copy(recordingSeconds = nextSeconds)
+                    
+                    if (nextSeconds >= 10) {
+                        stopRecordingAndSubmit(context)
+                        break
+                    }
                 }
             }
 
@@ -297,6 +304,8 @@ class WordCardViewModel(
                     isSubmittingPronunciation = false,
                     errorMessage = "발음 평가 실패: ${e.message}",
                 )
+            } finally {
+                if (file != null && file.exists()) file.delete()
             }
         }
     }

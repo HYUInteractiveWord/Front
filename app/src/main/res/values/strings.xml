@@ -104,7 +104,11 @@
     <string name="scan_mic">마이크</string>
     <string name="scan_mic_sub">주변 음성 녹음</string>
     <string name="scan_media">미디어</string>
-    <string name="scan_media_sub">영상 재생 중 구간 캡처</string>
+    <string name="scan_media_sub">미디어를 선택해 10초 스캔</string>
+    <string name="scan_media_dialog_title">스캔 구간 선택</string>
+    <string name="scan_media_dialog_desc">원하는 대사가 끝난 뒤 캡쳐 버튼으로 스캔!</string>
+    <string name="scan_media_capture_at_current">현재 위치로 스캔</string>
+    <string name="scan_media_dialog_range_label">예정 구간 (10초)</string>
     <string name="scan_loading_audio">오디오 추출 및 분석 중…</string>
     <string name="scan_loading_youtube">YouTube 분석 중…</string>
     <string name="scan_loading">분석 중…</string>
