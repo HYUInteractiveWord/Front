@@ -91,13 +91,13 @@ fun XpGainOverlay() {
             currentNoti = notification
             visible = true
 
-            // 진동 발생
+            // 진동 발생 (지속 시간 약간 증가 50ms -> 75ms)
             try {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    vibrator.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
+                    vibrator.vibrate(VibrationEffect.createOneShot(75, VibrationEffect.DEFAULT_AMPLITUDE))
                 } else {
                     @Suppress("DEPRECATION")
-                    vibrator.vibrate(50)
+                    vibrator.vibrate(75)
                 }
             } catch (e: Exception) {
                 // 진동 실패 시 무시

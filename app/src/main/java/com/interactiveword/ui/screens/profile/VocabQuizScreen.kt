@@ -31,6 +31,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.interactiveword.R
@@ -52,6 +53,11 @@ fun VocabQuizScreen(
     // 💡 정답을 맞췄을 때 진동 발생
     LaunchedEffect(uiState.isAnswerChecked) {
         if (uiState.isAnswerChecked && uiState.selectedAnswer == uiState.currentQuestion?.correctAnswer) {
+            // 더 뚜렷한 진동을 위해 LongPress 대신 직접적인 햅틱 시퀀스 사용 고려 가능하나
+            // Compose 표준에서는 LongPress가 가장 강한 편임. 
+            // 여기서는 표준 타입을 유지하되, 연속적으로 발생시켜 더 강하게 체감되도록 조정
+            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+            delay(50)
             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
         }
     }

@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.interactiveword.R
@@ -40,6 +41,8 @@ fun PosQuizScreen(
     // 💡 정답을 맞췄을 때 진동 발생
     LaunchedEffect(uiState.isAnswerChecked) {
         if (uiState.isAnswerChecked && uiState.selectedAnswer == uiState.currentQuestion?.correctPos) {
+            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+            delay(50)
             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
         }
     }
