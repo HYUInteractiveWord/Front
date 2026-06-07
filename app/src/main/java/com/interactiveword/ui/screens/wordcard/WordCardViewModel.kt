@@ -264,7 +264,8 @@ class WordCardViewModel(
                     XpManager.emitNotification(
                         AppNotification(
                             type = NotiType.BEST_SCORE,
-                            message = context.getString(R.string.noti_word_best_score_achieved, result.score.toInt()),
+                            messageRes = R.string.noti_word_best_score_achieved,
+                            messageArgs = listOf(result.score.toInt()),
                             color = Color(0xFFFFC107), // Amber/Gold
                             icon = Icons.Default.EmojiEvents
                         )
@@ -278,7 +279,8 @@ class WordCardViewModel(
                     XpManager.emitNotification(
                         AppNotification(
                             type = NotiType.MASTER_ACHIEVED,
-                            message = context.getString(R.string.noti_word_master_achieved, card.koreanWord),
+                            messageRes = R.string.noti_word_master_achieved,
+                            messageArgs = listOf(card.koreanWord),
                             color = Color(0xFFFFC107), // Amber/Gold
                             icon = Icons.Default.EmojiEvents
                         )

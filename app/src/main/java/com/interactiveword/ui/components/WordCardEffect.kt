@@ -37,24 +37,24 @@ fun wordCardEffectStyle(wordPoint: Int): WordCardEffectStyle {
 
         point >= 80 -> WordCardEffectStyle(
             labelRes = R.string.word_rank_expert,
-            borderColor = Color(0xFF9B7EDE),      // 보라색
-            progressColor = Color(0xFF9B7EDE),
+            borderColor = Color(0xFFEF5350),      // 붉은색
+            progressColor = Color(0xFFEF5350),
             containerColor = null,
             showSparkle = false,
         )
 
         point >= 60 -> WordCardEffectStyle(
             labelRes = R.string.word_rank_growing,
-            borderColor = Color(0xFF5B8DEF),      // 파란색
-            progressColor = Color(0xFF5B8DEF),
+            borderColor = Color(0xFF9B7EDE),      // 보라색
+            progressColor = Color(0xFF9B7EDE),
             containerColor = null,
             showSparkle = false,
         )
 
         point >= 40 -> WordCardEffectStyle(
             labelRes = R.string.word_rank_practicing,
-            borderColor = Color(0xFFC0C0C0),      // 은색
-            progressColor = Color(0xFFC0C0C0),
+            borderColor = Color(0xFF64B5F6),      // 밝은 파란색
+            progressColor = Color(0xFF64B5F6),
             containerColor = null,
             showSparkle = false,
         )

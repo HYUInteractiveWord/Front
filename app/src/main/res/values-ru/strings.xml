@@ -53,9 +53,9 @@
     <string name="home_pronunciation_practice_sub">Практика с последними словами</string>
     <string name="home_view_all">Все</string>
     <string name="home_top_rank">Максимальный ранг</string>
-    <string name="home_xp_to_next_rank">До следующего ранга %1$d XP</string>
-    <string name="home_stat_words">Собрано слов</string>
-    <string name="home_stat_today_mission">Задания дня</string>
+    <string name="home_xp_to_next_rank">%1$d XP до следующего ранга</string>
+    <string name="home_stat_words">Собрано</string>
+    <string name="home_stat_today_mission">Миссии</string>
     <string name="home_stat_word_slots">Слоты слов</string>
     <string name="home_capture_service">Служба захвата</string>
     <string name="home_logout">Выйти</string>
@@ -69,8 +69,8 @@
     <string name="profile_all_missions">Все миссии</string>
     <string name="profile_rank_progress">Прогресс ранга</string>
     <string name="profile_top_rank_reached">Максимальный ранг достигнут.</string>
-    <string name="profile_xp_to_next_rank">До следующего ранга %1$d XP</string>
-    <string name="profile_stat_words">Собрано слов</string>
+    <string name="profile_xp_to_next_rank">%1$d XP до следующего ранга</string>
+    <string name="profile_stat_words">Собрано</string>
     <string name="profile_stat_current_rank">Текущий ранг</string>
     <string name="profile_stat_total_xp">Всего XP</string>
     <string name="profile_pos_quiz_title">Тест частей речи</string>
@@ -131,7 +131,7 @@
     <string name="action_start_scan">Начать сканирование</string>
     <string name="scan_detected_words">Обнаружено слов: %1$d</string>
     <string name="scan_listening">Слушаю…</string>
-    <string name="scan_elapsed">%1$dс  /  макс. 30с</string>
+    <string name="scan_elapsed">%1$dс / макс. 10с</string>
     <string name="scan_collection_complete">Сбор завершен!</string>
     <string name="action_done">Готово</string>
 
@@ -143,7 +143,7 @@
     <string name="tutorial_scan_title">Начало сканирования слов</string>
     <string name="tutorial_scan_body">Автоматически находит корейские слова в окружающих звуках или видео. Попробуйте выбрать микрофон или видео из галереи.</string>
     <string name="tutorial_word_card_title">Управление коллекцией</string>
-    <string name="tutorial_word_card_body">Проверяйте значение, перевод и примеры соб란ных слов, а также слушайте правильное произношение через TTS. Вы также можете практиковаться, произнося их самостоятельно.</string>
+    <string name="tutorial_word_card_body">Проверяйте значение, перевод и примеры собранных слов, а также слушайте правильное произношение через TTS. Вы также можете практиковаться, произнося их самостоятельно.</string>
     <string name="tutorial_mission_title">Миссии и тесты</string>
     <string name="tutorial_mission_body">Выполняйте новые миссии каждый день и проходите тесты. Повышайте свой ранг с помощью заработанного XP и открывайте новые предметы профиля.</string>
 
@@ -161,7 +161,7 @@
     <string name="wordcard_eval_title">Результат оценки произношения</string>
     <string name="wordcard_evaluating">Детальный анализ…</string>
     <string name="wordcard_score">Счет: %1$d</string>
-    <string name="wordcard_new_best">Счет</string>
+    <string name="wordcard_new_best">🎉 Новый рекорд!</string>
     <string name="wordcard_clear_record">Очистить запись</string>
     <string name="wordcard_no_eval">Записей оценки произношения пока нет.\nНажмите кнопку записи ниже, чтобы начать.</string>
     <string name="wordcard_master_title">Достижение MASTER</string>
@@ -293,10 +293,10 @@
     <string name="wordcard_point_format">%1$d / 100 pt</string>
     <!-- Word Card Ranks -->
     <string name="word_rank_master">MASTER</string>
-    <string name="word_rank_expert">Профи</string>
-    <string name="word_rank_growing">Рост</string>
+    <string name="word_rank_expert">Эксперт</string>
+    <string name="word_rank_growing">Изучается</string>
     <string name="word_rank_practicing">Практика</string>
-    <string name="word_rank_basic">База</string>
+    <string name="word_rank_basic">Базовый</string>
     <string name="word_rank_new">Новое</string>
 
     <string name="action_confirm">Подтвердить</string>
@@ -335,14 +335,14 @@
     <string name="error_unknown">Произошла неизвестная ошибка.</string>
 
     <!-- Notifications -->
-    <string name="noti_rank_up">Повышение ранга! %1$s</string>
-    <string name="noti_word_slot_increase">Слоты слов увеличены! (%1$d слотов)</string>
+    <string name="noti_rank_up">Новый ранг! %1$s</string>
+    <string name="noti_word_slot_increase">Слоты увеличены! (%1$d)</string>
     <string name="noti_ticket_acquired">Получен билет кастомизации!</string>
-    <string name="noti_new_word_added">Новое слово добавлено: %1$s</string>
-    <string name="noti_duplicate_bonus">Бонус за повторный сбор \'%1$s\'!</string>
+    <string name="noti_new_word_added">Слово добавлено: %1$s</string>
+    <string name="noti_duplicate_bonus">Бонус за повторение \'%1$s\'!</string>
     <string name="noti_word_best_score_achieved">🎉 Новый рекорд! (%1$d баллов)</string>
     <string name="noti_word_master_achieved">🎉 Поздравляем! Вы достигли уровня MASTER для слова \'%1$s\'!</string>
-    <string name="profile_example_quiz_title">Пример запроса на предложения</string>
+    <string name="profile_example_quiz_title">Тест на примеры</string>
 
     <!-- Quiz Exit Dialog -->
     <string name="quiz_exit_title">Прервать тест</string>
