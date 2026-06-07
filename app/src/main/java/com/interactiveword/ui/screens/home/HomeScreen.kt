@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Bolt
+import androidx.compose.material.icons.filled.ConfirmationNumber
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.TrackChanges
@@ -605,6 +606,34 @@ fun HomeProfileDashboardCard(
                     }
                 },
             )
+
+            HorizontalDivider(color = DarkOutline)
+
+            // [영역 5] 현재 보유 티켓 정보
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(MaterialTheme.shapes.large)
+                    .background(Color.Red.copy(alpha = 0.08f))
+                    .border(1.dp, Color.Red.copy(alpha = 0.2f), MaterialTheme.shapes.large)
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.ConfirmationNumber,
+                    contentDescription = null,
+                    tint = Color.Red,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(Modifier.width(10.dp))
+                Text(
+                    text = stringResource(R.string.profile_reward_ticket_owned, remainingTickets),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.Red,
+                    fontWeight = FontWeight.ExtraBold
+                )
+            }
         }
     }
 
