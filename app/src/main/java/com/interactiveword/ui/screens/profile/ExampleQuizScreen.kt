@@ -13,6 +13,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -21,6 +23,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.interactiveword.R
 import com.interactiveword.ui.theme.BrandGreenLight
+import com.interactiveword.ui.theme.DarkMutedText
 import com.interactiveword.ui.theme.DarkOutline
 import com.interactiveword.ui.theme.ErrorRed
 
@@ -31,13 +34,49 @@ fun ExampleQuizScreen(
     vm: ExampleQuizViewModel = viewModel()
 ) {
     val uiState by vm.uiState.collectAsState()
+    var showExitDialog by remember { mutableStateOf(false) }
+    val haptic = LocalHapticFeedback.current
+
+    // 💡 정답을 맞췄을 때 진동 발생
+    LaunchedEffect(uiState.isAnswerChecked) {
+        if (uiState.isAnswerChecked && uiState.selectedAnswer == uiState.currentQuestion?.correctAnswer) {
+            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+        }
+    }
+
+    if (showExitDialog) {
+        AlertDialog(
+            onDismissRequest = { showExitDialog = false },
+            title = { Text(stringResource(R.string.quiz_exit_title)) },
+            text = { Text(stringResource(R.string.quiz_exit_body)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showExitDialog = false
+                    navController.popBackStack()
+                }) {
+                    Text(stringResource(R.string.quiz_exit_confirm), color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showExitDialog = false }) {
+                    Text(stringResource(R.string.quiz_exit_continue))
+                }
+            }
+        )
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.examplequiz_title)) },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = {
+                        if (!uiState.isFinished) {
+                            showExitDialog = true
+                        } else {
+                            navController.popBackStack()
+                        }
+                    }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                     }
                 },
@@ -145,9 +184,9 @@ private fun ExampleQuizContentView(
                         fontWeight = FontWeight.Bold
                     )
 
-                    if (!question.audioPath.isNullOrBlank()) {
+                    if (!question.promptAudioPath.isNullOrBlank()) {
                         Spacer(Modifier.height(12.dp))
-                        IconButton(onClick = { onPlayAudio(question.audioPath) }) {
+                        IconButton(onClick = { onPlayAudio(question.promptAudioPath) }) {
                             Icon(Icons.AutoMirrored.Filled.VolumeUp, null, tint = BrandGreenLight)
                         }
                     }
@@ -181,12 +220,34 @@ private fun ExampleQuizContentView(
                 colors = CardDefaults.cardColors(containerColor = color),
                 border = BorderStroke(if (isSelected || (isAnswerChecked && isCorrect)) 2.dp else 1.dp, borderColor)
             ) {
-                Text(
-                    text = option,
-                    modifier = Modifier.padding(16.dp),
-                    style = MaterialTheme.typography.bodyLarge,
-                    textAlign = TextAlign.Center
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = option,
+                        modifier = Modifier.weight(1f),
+                        style = MaterialTheme.typography.bodyLarge,
+                        textAlign = TextAlign.Start
+                    )
+
+                    // 💡 선택지별 오디오 재생 버튼 추가
+                    val optionAudioPath = question.optionAudioPaths[option]
+                    if (!optionAudioPath.isNullOrBlank()) {
+                        IconButton(
+                            onClick = { onPlayAudio(optionAudioPath) },
+                            modifier = Modifier.size(32.dp)
+                        ) {
+                            Icon(
+                                Icons.AutoMirrored.Filled.VolumeUp,
+                                null,
+                                tint = if (isSelected || (isAnswerChecked && isCorrect)) BrandGreenLight else DarkMutedText,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                    }
+                }
             }
         }
 

@@ -335,4 +335,10 @@
     <string name="noti_duplicate_bonus">\'%1$s\' Duplicate Collection Bonus!</string>
     <string name="noti_word_best_score_achieved">🎉 New Best Score! (%1$d pts)</string>
     <string name="noti_word_master_achieved">🎉 Congratulations! Mastered the word \'%1$s\'!</string>
+
+    <!-- Quiz Exit Dialog -->
+    <string name="quiz_exit_title">Interrupt Test</string>
+    <string name="quiz_exit_body">Are you sure you want to stop the test and leave? Current progress will not be saved.</string>
+    <string name="quiz_exit_confirm">Stop and Leave</string>
+    <string name="quiz_exit_continue">Continue</string>
 </resources>

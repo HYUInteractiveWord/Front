@@ -30,7 +30,8 @@ data class ExampleQuizQuestion(
     val prompt: String,
     val correctAnswer: String,
     val options: List<String>,
-    val audioPath: String? = null
+    val promptAudioPath: String? = null,
+    val optionAudioPaths: Map<String, String?> = emptyMap()
 )
 
 data class ExampleQuizUiState(
@@ -201,6 +202,27 @@ class ExampleQuizViewModel(
         if (wrongOptionsFromSame.size < 3) return null 
 
         val finalOptions = (wrongOptionsFromSame.take(3) + targetCorrect).shuffled()
+        
+        // 💡 모든 선택지의 오디오 경로를 매핑하여 캐시
+        val audioPathMap = mutableMapOf<String, String?>()
+        
+        // 정답 오디오
+        audioPathMap[targetCorrect] = if (isKrToTrans) {
+            getExValue(correctExample, "trans_audio_path", "translation_audio_path")
+        } else {
+            getExValue(correctExample, "audio_path", "tts_audio_path")
+        }
+        
+        // 오답 오디오 찾기
+        for (option in wrongOptionsFromSame) {
+            val matchedEx = allWords.flatMap { it.exampleSentences ?: emptyList<Any>() }
+                .mapNotNull { it as? Map<*, *> }
+                .find { getExValue(it, if (isKrToTrans) "translation" else "korean", "ru", "en", "kr", "sentence") == option }
+            
+            if (matchedEx != null) {
+                audioPathMap[option] = getExValue(matchedEx, if (isKrToTrans) "trans_audio_path" else "audio_path", "translation_audio_path", "tts_audio_path")
+            }
+        }
 
         return if (isKrToTrans) {
             ExampleQuizQuestion(
@@ -209,7 +231,8 @@ class ExampleQuizViewModel(
                 prompt = kr,
                 correctAnswer = trans,
                 options = finalOptions,
-                audioPath = getExValue(correctExample, "audio_path", "tts_audio_path")
+                promptAudioPath = getExValue(correctExample, "audio_path", "tts_audio_path"),
+                optionAudioPaths = audioPathMap
             )
         } else {
             ExampleQuizQuestion(
@@ -218,7 +241,8 @@ class ExampleQuizViewModel(
                 prompt = trans,
                 correctAnswer = kr,
                 options = finalOptions,
-                audioPath = getExValue(correctExample, "trans_audio_path", "translation_audio_path")
+                promptAudioPath = getExValue(correctExample, "trans_audio_path", "translation_audio_path"),
+                optionAudioPaths = audioPathMap
             )
         }
     }

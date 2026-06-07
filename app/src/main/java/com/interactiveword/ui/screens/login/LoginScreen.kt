@@ -12,8 +12,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -29,6 +31,7 @@ import com.interactiveword.ui.navigation.Screen
 @Composable
 fun LoginScreen(navController: NavHostController) {
     val context = LocalContext.current
+    val keyboardController = LocalSoftwareKeyboardController.current
     val app = context.applicationContext as Application
     val vm: LoginViewModel = viewModel(factory = AndroidViewModelFactory.getInstance(app))
     val uiState by vm.uiState.collectAsState()
@@ -116,6 +119,7 @@ fun LoginScreen(navController: NavHostController) {
                 label = { Text(stringResource(R.string.label_username), maxLines = 1, overflow = TextOverflow.Ellipsis) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
+                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(imeAction = ImeAction.Next),
             )
 
             OutlinedTextField(
@@ -125,6 +129,12 @@ fun LoginScreen(navController: NavHostController) {
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardActions = androidx.compose.foundation.text.KeyboardActions(onDone = {
+                    if (isRegisterMode) vm.register(username, null, password, selectedLanguage)
+                    else vm.login(username, password)
+                    keyboardController?.hide()
+                })
             )
 
             if (uiState is LoginUiState.Error) {
@@ -141,6 +151,7 @@ fun LoginScreen(navController: NavHostController) {
                 onClick = {
                     if (isRegisterMode) vm.register(username, null, password, selectedLanguage)
                     else vm.login(username, password)
+                    keyboardController?.hide()
                 },
                 enabled = uiState !is LoginUiState.Loading,
                 modifier = Modifier.fillMaxWidth().height(52.dp),

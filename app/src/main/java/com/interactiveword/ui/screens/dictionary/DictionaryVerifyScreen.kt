@@ -249,7 +249,7 @@ fun DictionaryVerifyScreen(
 
                 Button(
                     onClick = { vm.saveToCollection() },
-                    enabled = uiState.hasRecordedOnce && !uiState.isSaving,
+                    enabled = uiState.hasRecordedOnce && !uiState.isVerifying && !uiState.isSaving,
                     modifier = Modifier.weight(1.3f),
                     shape = MaterialTheme.shapes.large,
                     colors = ButtonDefaults.buttonColors(containerColor = BrandGreenLight),

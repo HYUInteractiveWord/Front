@@ -239,7 +239,6 @@ class DictionaryVerifyViewModel(
 
         viewModelScope.launch {
             try {
-                val localizedContext = LanguageManager.applyLocale(getApplication<Application>())
                 _uiState.value = _uiState.value.copy(isSaving = true, errorMessage = null)
                 val newCard = repo.createWord(
                     _uiState.value.word,
@@ -258,7 +257,8 @@ class DictionaryVerifyViewModel(
                     XpManager.emitNotification(
                         AppNotification(
                             type = NotiType.XP,
-                            message = localizedContext.getString(R.string.noti_duplicate_bonus, _uiState.value.word),
+                            messageRes = R.string.noti_duplicate_bonus,
+                            messageArgs = listOf(_uiState.value.word),
                             color = BrandGreenLight,
                             icon = Icons.Default.MenuBook
                         )
@@ -267,7 +267,8 @@ class DictionaryVerifyViewModel(
                     XpManager.emitNotification(
                         AppNotification(
                             type = NotiType.NEW_WORD,
-                            message = localizedContext.getString(R.string.noti_new_word_added, _uiState.value.word),
+                            messageRes = R.string.noti_new_word_added,
+                            messageArgs = listOf(_uiState.value.word),
                             color = BrandGreenLight,
                             icon = Icons.Default.MenuBook
                         )

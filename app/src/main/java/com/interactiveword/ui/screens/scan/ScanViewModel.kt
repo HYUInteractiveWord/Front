@@ -418,7 +418,6 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
 
         viewModelScope.launch {
             try {
-                val localizedContext = LanguageManager.applyLocale(context)
                 // 💡 백엔드에서 중복 시에도 201(또는 200)과 함께 기존/업데이트된 객체를 리턴함
                 val newCard = wordRepo.createWord(
                     word = word,
@@ -438,7 +437,8 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
                     XpManager.emitNotification(
                         AppNotification(
                             type = NotiType.XP,
-                            message = localizedContext.getString(R.string.noti_duplicate_bonus, word),
+                            messageRes = R.string.noti_duplicate_bonus,
+                            messageArgs = listOf(word),
                             color = BrandGreenLight,
                             icon = Icons.Default.MenuBook
                         )
@@ -447,7 +447,8 @@ class ScanViewModel(app: Application) : AndroidViewModel(app) {
                     XpManager.emitNotification(
                         AppNotification(
                             type = NotiType.NEW_WORD,
-                            message = localizedContext.getString(R.string.noti_new_word_added, word),
+                            messageRes = R.string.noti_new_word_added,
+                            messageArgs = listOf(word),
                             color = BrandGreenLight,
                             icon = Icons.Default.MenuBook
                         )

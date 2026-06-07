@@ -133,7 +133,8 @@ class DictionaryViewModel @JvmOverloads constructor(
                 XpManager.emitNotification(
                     AppNotification(
                         type = NotiType.NEW_WORD,
-                        message = context.getString(R.string.noti_new_word_added, word),
+                        messageRes = R.string.noti_new_word_added,
+                        messageArgs = listOf(word),
                         color = BrandGreenLight,
                         icon = Icons.Default.MenuBook
                     )

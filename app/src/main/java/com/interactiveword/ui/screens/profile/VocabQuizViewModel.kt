@@ -168,8 +168,12 @@ class VocabQuizViewModel(
 
     fun playTts(text: String) {
         val candidates = currentCandidatesCache ?: return
+        // 💡 캐시된 원문과 비교하여 매칭 (화면에는 '/' 앞부분만 보이지만, text 인자는 원본일 수 있음)
         val matchedCandidate = candidates.find {
-            it.word == text || it.definitionTranslated == text || it.definition == text
+            it.word == text || 
+            it.definitionTranslated == text || 
+            it.definitionTranslated.split("/").first().trim() == text ||
+            it.definition == text
         }
 
         val audioPath = if (text == matchedCandidate?.word) {
@@ -220,9 +224,12 @@ class VocabQuizViewModel(
                 // 1. 가져온 단어들을 모두 유효한 퀴즈 후보로 변환
                 val candidates = words.mapNotNull { card ->
                     val definition = card.definition?.trim().orEmpty()
-                    val definitionTranslated = card.definitionTranslated?.trim()
+                    val rawDefinitionTranslated = card.definitionTranslated?.trim()
                         ?: card.definitionEnglish?.trim()
                         ?: definition
+
+                    // 💡 '/'를 기준으로 앞부분(핵심 뜻)만 추출
+                    val definitionTranslated = rawDefinitionTranslated.split("/").first().trim()
 
                     val normalizedPos = normalizePos(card.pos)
                     if (definition.isBlank() || normalizedPos == null) return@mapNotNull null

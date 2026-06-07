@@ -41,7 +41,9 @@ enum class NotiType {
 
 data class AppNotification(
     val type: NotiType,
-    val message: String,
+    val message: String = "",
+    val messageRes: Int = 0,
+    val messageArgs: List<Any> = emptyList(),
     val amount: Int = 0,
     val color: Color = BrandGreenLight,
     val icon: ImageVector = Icons.Default.Star
@@ -52,7 +54,7 @@ object XpManager {
     val notifications = _notifications.asSharedFlow()
 
     suspend fun emitXpGain(amount: Int) {
-        _notifications.emit(AppNotification(NotiType.XP, "XP +$amount!", amount))
+        _notifications.emit(AppNotification(NotiType.XP, amount = amount))
     }
 
     suspend fun emitNotification(notification: AppNotification) {
@@ -143,6 +145,18 @@ fun XpGainOverlay() {
             exit = slideOutVertically(targetOffsetY = { -it }) + fadeOut()
         ) {
             currentNoti?.let { noti ->
+                val displayMessage = when {
+                    noti.messageRes != 0 -> {
+                        if (noti.messageArgs.isNotEmpty()) {
+                            context.getString(noti.messageRes, *noti.messageArgs.toTypedArray())
+                        } else {
+                            context.getString(noti.messageRes)
+                        }
+                    }
+                    noti.type == NotiType.XP -> "XP +${noti.amount}!"
+                    else -> noti.message
+                }
+
                 Surface(
                     modifier = Modifier
                         .padding(top = 100.dp)
@@ -158,7 +172,7 @@ fun XpGainOverlay() {
                         horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         Icon(noti.icon, null, tint = Color.White, modifier = Modifier.size(26.dp))
-                        Text(noti.message, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
+                        Text(displayMessage, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.ExtraBold)
                     }
                 }
             }

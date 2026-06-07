@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.*
@@ -13,6 +14,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -31,11 +34,52 @@ fun PosQuizScreen(
     vm: PosQuizViewModel = viewModel(),
 ) {
     val uiState by vm.uiState.collectAsState()
+    var showExitDialog by remember { mutableStateOf(false) }
+    val haptic = LocalHapticFeedback.current
+
+    // 💡 정답을 맞췄을 때 진동 발생
+    LaunchedEffect(uiState.isAnswerChecked) {
+        if (uiState.isAnswerChecked && uiState.selectedAnswer == uiState.currentQuestion?.correctPos) {
+            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+        }
+    }
+
+    if (showExitDialog) {
+        AlertDialog(
+            onDismissRequest = { showExitDialog = false },
+            title = { Text(stringResource(R.string.quiz_exit_title)) },
+            text = { Text(stringResource(R.string.quiz_exit_body)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showExitDialog = false
+                    navController.popBackStack()
+                }) {
+                    Text(stringResource(R.string.quiz_exit_confirm), color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showExitDialog = false }) {
+                    Text(stringResource(R.string.quiz_exit_continue))
+                }
+            }
+        )
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.posquiz_title)) },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        if (!uiState.isFinished) {
+                            showExitDialog = true
+                        } else {
+                            navController.popBackStack()
+                        }
+                    }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
             )
         },

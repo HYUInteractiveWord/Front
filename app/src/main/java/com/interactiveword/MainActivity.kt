@@ -184,12 +184,17 @@ private fun MainApp() {
     val navBackStack by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStack?.destination?.route
 
+    // 💡 퀴즈 및 로그인 화면에서는 하단바를 숨김
+    val isBottomBarVisible = currentRoute != Screen.Login.route &&
+            currentRoute != Screen.VocabQuiz.route &&
+            currentRoute != Screen.PosQuiz.route &&
+            currentRoute != Screen.ExampleQuiz.route
+
     Scaffold(
         modifier       = Modifier.fillMaxSize(),
         containerColor = DarkBackground,
         bottomBar = {
-            // 💡 로그인 페이지가 아닐 때만 BottomNavBar 표시
-            if (currentRoute != Screen.Login.route) {
+            if (isBottomBarVisible) {
                 BottomNavBar(navController = navController, currentRoute = currentRoute)
             }
         },
@@ -197,7 +202,7 @@ private fun MainApp() {
         Box(modifier = Modifier.fillMaxSize()) {
             AppNavHost(
                 navController = navController,
-                modifier = Modifier.padding(bottom = if (currentRoute != Screen.Login.route) padding.calculateBottomPadding() else 0.dp),
+                modifier = Modifier.padding(bottom = if (isBottomBarVisible) padding.calculateBottomPadding() else 0.dp),
             )
             // 💡 전역 XP 획득 오버레이 추가
             XpGainOverlay()

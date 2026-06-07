@@ -335,4 +335,10 @@
     <string name="noti_word_best_score_achieved">🎉 Новый рекорд! (%1$d баллов)</string>
     <string name="noti_word_master_achieved">🎉 Поздравляем! Вы достигли уровня MASTER для слова \'%1$s\'!</string>
     <string name="profile_example_quiz_title">Пример запроса на предложения</string>
+
+    <!-- Quiz Exit Dialog -->
+    <string name="quiz_exit_title">Прервать тест</string>
+    <string name="quiz_exit_body">Вы уверены, что хотите прервать тест и выйти? Текущий прогресс не будет сохранен.</string>
+    <string name="quiz_exit_confirm">Прервать и выйти</string>
+    <string name="quiz_exit_continue">Продолжить</string>
 </resources>

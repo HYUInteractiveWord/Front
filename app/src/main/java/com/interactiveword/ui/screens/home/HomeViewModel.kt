@@ -72,7 +72,8 @@ class HomeViewModel @JvmOverloads constructor(
                         XpManager.emitNotification(
                             AppNotification(
                                 type = NotiType.RANK_UP,
-                                message = context.getString(R.string.noti_rank_up, RankManager.getRankLabel(context, newRank)),
+                                messageRes = R.string.noti_rank_up,
+                                messageArgs = listOf(RankManager.getRankLabel(context, newRank)),
                                 color = Color(0xFFFFA000), // Gold
                                 icon = Icons.Default.EmojiEvents
                             )
@@ -84,7 +85,8 @@ class HomeViewModel @JvmOverloads constructor(
                         XpManager.emitNotification(
                             AppNotification(
                                 type = NotiType.SLOT_INCREASE,
-                                message = context.getString(R.string.noti_word_slot_increase, user.maxWordSlots),
+                                messageRes = R.string.noti_word_slot_increase,
+                                messageArgs = listOf(user.maxWordSlots),
                                 color = Color(0xFF2196F3), // Blue
                                 icon = Icons.Default.Bolt
                             )
@@ -98,7 +100,7 @@ class HomeViewModel @JvmOverloads constructor(
                         XpManager.emitNotification(
                             AppNotification(
                                 type = NotiType.TICKET,
-                                message = context.getString(R.string.noti_ticket_acquired),
+                                messageRes = R.string.noti_ticket_acquired,
                                 color = Color(0xFFE91E63), // Pink
                                 icon = Icons.Default.ConfirmationNumber
                             )

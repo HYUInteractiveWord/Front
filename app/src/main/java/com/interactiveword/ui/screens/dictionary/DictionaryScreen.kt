@@ -17,6 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -40,6 +41,7 @@ fun DictionaryScreen(
 ) {
     val uiState by vm.uiState.collectAsState()
     val context = LocalContext.current
+    val keyboardController = LocalSoftwareKeyboardController.current
     var showDictionaryTutorial by remember { mutableStateOf(false) }
 
     LaunchedEffect(uiState.userId) {
@@ -94,7 +96,10 @@ fun DictionaryScreen(
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                keyboardActions = KeyboardActions(onSearch = { vm.searchNow() }),
+                keyboardActions = KeyboardActions(onSearch = { 
+                    vm.searchNow()
+                    keyboardController?.hide()
+                }),
                 shape = MaterialTheme.shapes.extraLarge,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = BrandGreenLight,
@@ -105,7 +110,10 @@ fun DictionaryScreen(
             Spacer(Modifier.height(8.dp))
 
             Button(
-                onClick = { vm.searchNow() },
+                onClick = { 
+                    vm.searchNow()
+                    keyboardController?.hide()
+                },
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.extraLarge,
                 colors = ButtonDefaults.buttonColors(containerColor = BrandGreenLight),
