@@ -5,7 +5,7 @@
 
 ---
 
-## 📁 프로젝트 구조
+## 프로젝트 구조
 
 ```
 Android/
@@ -31,14 +31,16 @@ Android/
 │       │   │       └── MissionRepository.kt
 │       │   │
 │       │   ├── service/
-│       │   │   └── CaptureService.kt            # 백그라운드 오디오 캡처 서비스 (Live 모드)
+│       │   │   ├── CaptureService.kt            # MediaProjection 기반 오디오 캡처
+│       │   │   ├── AudioCaptureService.kt       # 알림창 컨트롤 포그라운드 서비스
+│       │   │   └── MediaWatcherService.kt       # 미디어 세션 감지 서비스
 │       │   │
 │       │   └── ui/
 │       │       ├── navigation/
 │       │       │   └── AppNavigation.kt         # 라우트 정의 + NavHost
 │       │       ├── theme/
-│       │       │   ├── Color.kt                 # 다크 테마 컬러 팔레트
-│       │       │   ├── Theme.kt                 # Material3 다크 테마 설정
+│       │       │   ├── Color.kt                 # 게임 민트 라이트 테마 컬러
+│       │       │   ├── Theme.kt                 # Material3 테마 설정
 │       │       │   ├── Type.kt                  # 타이포그래피
 │       │       │   └── Shape.kt                 # 모양 정의
 │       │       ├── components/
@@ -48,11 +50,11 @@ Android/
 │       │       └── screens/
 │       │           ├── login/                   # 로그인 / 회원가입
 │       │           ├── home/                    # 홈 대시보드
-│       │           ├── scan/                    # 단어 스캔 (마이크 / 미디어)
+│       │           ├── scan/                    # 단어 스캔 (마이크 / 미디어 / Live)
 │       │           ├── dictionary/              # 사전 검색
 │       │           ├── collection/              # 단어장
-│       │           ├── wordcard/                # 단어 카드 상세
-│       │           └── profile/                 # 미션
+│       │           ├── wordcard/                # 단어 카드 상세 (발음 연습 포함)
+│       │           └── profile/                 # 미션 및 퀴즈 (POS / Vocab / Example)
 │       │
 │       └── res/
 │           └── xml/
@@ -61,7 +63,7 @@ Android/
 
 ---
 
-## 🏛️ 아키텍처
+## 아키텍처
 
 **MVVM + Repository 패턴** 기반으로 설계되었습니다.
 
@@ -81,23 +83,24 @@ Android/
 
 ---
 
-## 📱 화면 구성
+## 화면 구성
 
 | 화면 | 라우트 | 주요 기능 |
 |---|---|---|
 | **로그인** | `login` | 로그인 / 회원가입, 토큰 자동 복원 |
 | **홈** | `home` | 사용자 정보, 오늘의 미션, 최근 단어 |
-| **스캔** | `scan` | 마이크 녹음, 로컬 미디어 파일 스캔, 단어 추출 결과 확인 |
-| **사전 검색** | `dictionary` | 영어/러시아어 입력 → 한국어 후보 단어 검색 및 단어장 추가 |
-| **단어장** | `collection` | 저장된 단어 목록, 단어 삭제 |
-| **단어 카드** | `word_card/{id}` | 품사·뜻·예문 확인, TTS 재생, 발음 연습 |
-| **미션** | `profile` | 일일 미션 / 전체 미션 목록, XP 보상 |
+| **스캔** | `scan` | 마이크 / 미디어 / YouTube / Live(알림창) 스캔 및 결과 확인 |
+| **사전 검색** | `dictionary` | 다국어 입력 → 한국어 후보 검색 및 검증 후 추가 |
+| **단어장** | `collection` | 저장된 단어 목록 관리 (등급별 색상 표시) |
+| **단어 카드** | `word_card/{id}` | 뜻·예문 확인, TTS 재생, 발음 연습 및 히스토리 |
+| **미션** | `profile` | 일일/전체 미션 목록, 퀴즈 진입점, XP 보상 |
+| **퀴즈** | `pos_quiz` 등 | 품사(POS) / 어휘(Vocab) / 예문(Example) 퀴즈 |
 
 **Bottom Navigation:** 홈 · 사전 · **스캔(FAB)** · 단어장 · 미션
 
 ---
 
-## ⚙️ 스캔 기능 상세
+## 스캔 기능 상세
 
 ### [1] 마이크 스캔
 ```
@@ -120,13 +123,21 @@ Android/
   → POST /api/scan/upload → 동일 파이프라인 처리
 ```
 
-### [3] Live 모드 (예정)
-백그라운드 포그라운드 서비스 + 상단 알림창 상시 표시.  
-`NotificationListenerService` + `MediaSession`으로 현재 재생 중인 앱의 타임스탬프를 읽고, yt-dlp로 해당 구간 오디오를 자동 추출 예정.
+### [3] Live 모드 (알림 컨트롤)
+```
+상단 알림창 '시작' 클릭
+  → AudioCaptureService (포그라운드 서비스) 실행
+  → MediaWatcherService가 현재 재생 중인 미디어(YouTube 등) 감지
+  → 알림창 내 컨트롤러(◀ 시작, 종료 ▶)로 캡처 구간(최대 30초) 조정
+  → '✓ 캡처' 클릭 시 앱으로 복귀하여 자동 스캔 진행
+```
+
+### [4] YouTube 공유 스캔
+YouTube 앱에서 '공유' → 'InteractiveWord' 선택 시 해당 영상의 URL을 자동으로 읽어와 서버에서 오디오를 추출하고 스캔합니다.
 
 ---
 
-## 🌐 API 엔드포인트
+## API 엔드포인트
 
 **Base URL:** `http://10.0.2.2:8000/` (에뮬레이터) / PC IP (실기기)
 
@@ -136,18 +147,21 @@ Android/
 | `POST` | `/api/auth/login` | 로그인 → JWT 발급 |
 | `GET` | `/api/auth/me` | 현재 사용자 정보 |
 | `GET` | `/api/dictionary/search?word=` | 단어 검색 (LLM 기반) |
+| `POST` | `/api/dictionary/preview` | 단어 상세 정보 미리보기 (사전 추가 전) |
 | `GET` | `/api/words/` | 단어장 조회 |
 | `POST` | `/api/words/` | 단어 추가 |
-| `DELETE` | `/api/words/{id}` | 단어 삭제 |
-| `POST` | `/api/scan/upload` | 오디오 업로드 → STT + 어휘 추출 |
+| `POST` | `/api/words/quiz-result` | 퀴즈 결과 제출 및 통계 반영 |
+| `POST` | `/api/scan/youtube` | YouTube URL 기반 오디오 스캔 |
+| `POST` | `/api/scan/upload` | 오디오 파일 업로드 → STT + 어휘 추출 |
 | `POST` | `/api/scan/process` | 추출 단어 → 단어 카드 생성 |
-| `POST` | `/api/pronunciation/submit` | 발음 점수 제출 |
+| `POST` | `/api/pronunciation/submit` | 발음 점수 및 녹음 파일 제출 |
+| `GET` | `/api/pronunciation/{id}/history` | 특정 단어의 발음 연습 기록 조회 |
 | `GET` | `/api/missions/daily` | 오늘의 미션 |
 | `POST` | `/api/missions/{id}/complete` | 미션 완료 처리 |
 
 ---
 
-## 🛠️ 기술 스택
+## 🛠기술 스택
 
 | 분류 | 라이브러리 |
 |---|---|
@@ -162,21 +176,24 @@ Android/
 
 ---
 
-## 🎨 디자인 시스템
+## 디자인 시스템
 
-다크 테마 전용입니다.
+'게임 민트(Game Mint)' 라이트 테마를 적용하여 밝고 경쾌한 학습 환경을 제공합니다.
 
-| 역할 | 색상 | HEX |
-|---|---|---|
-| 주요 강조 (버튼·완료) | BrandGreenLight | `#82E0A8` |
-| 보조 강조 (미디어·슬라이더) | BrandAmberLight | `#E8C97A` |
-| 배경 | DarkBackground | `#1A1A1A` |
-| 카드/서피스 | DarkSurface | `#222222` |
-| 보조 텍스트 | DarkMutedText | `#B3B3B3` |
+| 역할 | 색상 | HEX | 비고 |
+|---|---|---|---|
+| 배경 | GameBgMain | `#F5F7FF` | 연한 블루/그레이 톤 |
+| 카드 배경 | GameBgCard | `#FFFFFF` | 순백색 |
+| 주요 강조 | GameMint | `#00C896` | 메인 민트 컬러 |
+| 포인트 컬러 | GameCoral | `#FF6B6B` | 강조 및 에러 |
+| 보조 포인트 | GameGold | `#FFD700` | 레어 등급 및 미션 |
+| 텍스트 (메인) | GameTextDark | `#1A1A2E` | 짙은 네이비 |
+| 텍스트 (보조) | GameTextLight | `#9999BB` | 연한 블루그레이 |
+| 테두리 | GameBorder | `#EEEEF5` | 은은한 경계선 |
 
 ---
 
-## 🚀 개발 환경 설정
+## 개발 환경 설정
 
 ### 필수 조건
 - Android Studio Hedgehog 이상
@@ -192,21 +209,25 @@ Android/
 4. Run (▶) 또는 `Shift+F10`으로 빌드 및 설치
 
 ### 권한
-앱 최초 실행 시 다음 권한을 허용해야 합니다:
-- **마이크** — 마이크 스캔 기능
-- **알림** — Live 모드 상단 알림 (Android 13+)
+앱 기능을 온전히 사용하려면 다음 권한을 허용해야 합니다:
+- **마이크 (`RECORD_AUDIO`)** — 마이크 스캔
+- **알림 (`POST_NOTIFICATIONS`)** — Live 모드 컨트롤 (Android 13+)
+- **알림 접근 (`NotificationListener`)** — 미디어 재생 정보 감지
+- **다른 앱 위에 그리기** — (선택) 백그라운드 캡처 서비스 지원
 
 ---
 
-## 📌 개발 현황
+## 개발 현황
 
-- [x] 로그인 / 회원가입
-- [x] 홈 대시보드
-- [x] 마이크 스캔
-- [x] 미디어 파일 스캔
-- [x] 사전 검색 (LLM 기반 다국어 → 한국어)
-- [x] 단어장 조회 / 삭제
-- [x] 미션 목록
-- [ ] Live 모드 (백그라운드 서비스 + 알림창)
-- [ ] 단어 카드 TTS 재생
-- [ ] 발음 연습 (피치 분석)
+- 로그인 / 회원가입
+- 홈 대시보드
+- 마이크 스캔
+- 미디어 파일 스캔
+- YouTube URL / 공유 스캔
+- Live 모드 (백그라운드 서비스 + 알림창 컨트롤러)
+- 사전 검색 (LLM 기반 다국어 >> 한국어)
+- 단어장 조회 / 삭제 (등급 시스템 포함)
+- 미션 및 퀴즈 (POS, Vocab, Example 모드)
+- 단어 카드 TTS 재생
+- 발음 연습 (피치 분석 및 히스토리 기록)
+- 디자인 시스템 (게임 민트 라이트 테마 교체)
