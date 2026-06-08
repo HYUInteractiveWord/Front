@@ -93,7 +93,7 @@
 
     <!-- Dictionary Screen -->
     <string name="dictionary_title">Словарь</string>
-    <string name="dictionary_search_hint">Поиск слов по смыслу…</string>
+    <string name="dictionary_search_hint">Поиск слов…</string>
     <string name="action_search">Поиск</string>
     <string name="dictionary_search_failed">Ошибка поиска: %1$s</string>
     <string name="dictionary_result_count">Результатов: %1$d</string>
@@ -232,6 +232,8 @@
     <!-- Profile rewards -->
     <string name="mission_collect_noun">Сбор сущ.</string>
     <string name="mission_ready_to_claim">Готово! Нажмите для XP</string>
+    <string name="profile_reward_title">Настройка профиля</string>
+    <string name="profile_reward_title">Настройка профиля</string>
     <string name="profile_reward_desc">За каждые 500 XP можно разблокировать один аватар или фон на выбор.</string>
     <string name="profile_reward_remaining_tickets">Доступно разблокировок: %1$d</string>
     <string name="profile_reward_avatar_section">Аватар</string>
