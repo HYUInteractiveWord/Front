@@ -18,10 +18,12 @@ enum class SortOrder {
 
 data class CollectionUiState(
     val words: List<WordCard> = emptyList(),
+    val filteredWords: List<WordCard> = emptyList(),
     val maxSlots: Int = 20,
     val isLoading: Boolean = false,
     val sortOrder: SortOrder = SortOrder.NEWEST,
     val userId: Int? = null,
+    val searchQuery: String = "",
 )
 
 class CollectionViewModel(
@@ -52,16 +54,52 @@ class CollectionViewModel(
                     isLoading = false,
                     userId = user.id
                 )
+                applyFilter()
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(isLoading = false)
             }
         }
     }
 
+    fun onSearchQueryChange(query: String) {
+        _uiState.value = _uiState.value.copy(searchQuery = query)
+        applyFilter()
+    }
+
+    private fun applyFilter() {
+        val query = _uiState.value.searchQuery.trim()
+        val allWords = _uiState.value.words
+        
+        val filtered = if (query.isEmpty()) {
+            allWords
+        } else {
+            allWords.filter { card ->
+                // 한국어 단어 검색
+                val wordMatch = card.koreanWord.contains(query, ignoreCase = true)
+                
+                // 뜻 부분 검색 (the plants in forest / 나무 식으로 되어 있을 때 슬래시 앞부분)
+                // 현재 설명에 따르면 'wood / the plants in forest' 식으로 저장됨.
+                // 한국어 뜻이 뒤에 있는 경우: 'wood / 나무' -> query가 '나무'인 경우
+                val definitionMatch = card.definitionTranslated?.let { def ->
+                    val mainDef = if (def.contains("/")) {
+                        def.split("/").first().trim()
+                    } else {
+                        def.trim()
+                    }
+                    mainDef.contains(query, ignoreCase = true)
+                } ?: false
+                
+                wordMatch || definitionMatch
+            }
+        }
+        _uiState.value = _uiState.value.copy(filteredWords = filtered)
+    }
+
     fun setSortOrder(order: SortOrder) {
         if (_uiState.value.sortOrder == order) return
-        _uiState.value = _uiState.value.copy(sortOrder = order)
-        _uiState.value = _uiState.value.copy(words = sortWords(_uiState.value.words, order))
+        val sortedAll = sortWords(_uiState.value.words, order)
+        _uiState.value = _uiState.value.copy(sortOrder = order, words = sortedAll)
+        applyFilter()
     }
 
     private fun sortWords(list: List<WordCard>, order: SortOrder): List<WordCard> {

@@ -24,12 +24,20 @@ import com.interactiveword.ui.theme.DarkMutedText
 import com.interactiveword.ui.theme.DarkOutline
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Sort
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.background
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.lifecycle.repeatOnLifecycle
 import com.interactiveword.util.WordCardPointManager
+import com.interactiveword.ui.theme.DarkOutline
+import com.interactiveword.ui.theme.DarkMutedText
+import com.interactiveword.ui.theme.BrandGreenLight
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,6 +48,7 @@ fun CollectionScreen(
     val uiState by vm.uiState.collectAsState()
     val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
     val context = LocalContext.current
+    val keyboardController = LocalSoftwareKeyboardController.current
     var showWordCardTutorial by remember { mutableStateOf(false) }
 
     LaunchedEffect(uiState.userId) {
@@ -134,13 +143,36 @@ fun CollectionScreen(
             ) {
                 item {
                     Column {
+                        // 🔍 검색창 추가 (Dictionary 검색창 스타일)
+                        OutlinedTextField(
+                            value = uiState.searchQuery,
+                            onValueChange = { vm.onSearchQueryChange(it) },
+                            placeholder = { Text(stringResource(R.string.dictionary_search_hint), color = DarkMutedText) },
+                            leadingIcon = {
+                                Icon(Icons.Filled.Search, contentDescription = null, tint = DarkMutedText)
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                            keyboardActions = KeyboardActions(onSearch = {
+                                keyboardController?.hide()
+                            }),
+                            shape = MaterialTheme.shapes.extraLarge,
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = BrandGreenLight,
+                                unfocusedBorderColor = DarkOutline,
+                            ),
+                        )
+
+                        Spacer(Modifier.height(16.dp))
+
                         Row(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
                             modifier = Modifier.fillMaxWidth(),
                         ) {
                             Text(
-                                stringResource(R.string.collection_word_count, uiState.words.size),
+                                stringResource(R.string.collection_word_count, uiState.filteredWords.size),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = DarkMutedText,
                             )
@@ -172,7 +204,7 @@ fun CollectionScreen(
                     }
                 }
 
-                items(uiState.words, key = { it.id }) { card ->
+                items(uiState.filteredWords, key = { it.id }) { card ->
                     // 단어장에서 아직 "보지 않은" 신규 단어들만 등장 애니메이션 적용
                     val isUnseen = WordCardPointManager.isWordUnseen(context, card.id)
 

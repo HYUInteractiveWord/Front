@@ -287,20 +287,26 @@ fun HomeScreen(
                 Spacer(Modifier.height(8.dp))
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(IntrinsicSize.Max),
                 ) {
                     QuickActionCard(
                         label = stringResource(R.string.home_word_scan),
                         subLabel = stringResource(R.string.home_word_scan_sub),
                         icon = Icons.Filled.Mic,
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight(),
                         onClick = { navController.navigate(Screen.Scan.route) },
                     )
                     QuickActionCard(
                         label = stringResource(R.string.home_pronunciation_practice),
                         subLabel = stringResource(R.string.home_pronunciation_practice_sub),
                         icon = Icons.Filled.TrackChanges,
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight(),
                         onClick = {
                             uiState.recentWords.firstOrNull()?.let {
                                 navController.navigate(Screen.WordCard.createRoute(it.id))
