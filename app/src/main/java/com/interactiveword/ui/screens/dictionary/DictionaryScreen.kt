@@ -8,6 +8,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -92,6 +93,13 @@ fun DictionaryScreen(
                 placeholder = { Text(stringResource(R.string.dictionary_search_hint), color = DarkMutedText) },
                 leadingIcon = {
                     Icon(Icons.Filled.Search, contentDescription = null, tint = DarkMutedText)
+                },
+                trailingIcon = {
+                    if (uiState.query.isNotEmpty()) {
+                        IconButton(onClick = { vm.onQueryChange("") }) {
+                            Icon(Icons.Filled.Close, contentDescription = "Clear", tint = DarkMutedText)
+                        }
+                    }
                 },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,

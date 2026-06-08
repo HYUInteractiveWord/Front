@@ -25,6 +25,7 @@ import com.interactiveword.ui.theme.DarkOutline
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.background
@@ -150,6 +151,13 @@ fun CollectionScreen(
                             placeholder = { Text(stringResource(R.string.dictionary_search_hint), color = DarkMutedText) },
                             leadingIcon = {
                                 Icon(Icons.Filled.Search, contentDescription = null, tint = DarkMutedText)
+                            },
+                            trailingIcon = {
+                                if (uiState.searchQuery.isNotEmpty()) {
+                                    IconButton(onClick = { vm.onSearchQueryChange("") }) {
+                                        Icon(Icons.Filled.Close, contentDescription = "Clear", tint = DarkMutedText)
+                                    }
+                                }
                             },
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true,
