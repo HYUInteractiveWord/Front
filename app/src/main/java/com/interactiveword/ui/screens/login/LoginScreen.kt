@@ -5,6 +5,8 @@ import android.app.Application
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -25,6 +27,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.interactiveword.R
 import com.interactiveword.ShareIntentHolder
+import com.interactiveword.data.api.RetrofitClient
 import com.interactiveword.data.local.LanguageManager
 import com.interactiveword.ui.navigation.Screen
 
@@ -40,6 +43,8 @@ fun LoginScreen(navController: NavHostController) {
     var password by rememberSaveable { mutableStateOf("") }
     var isRegisterMode by rememberSaveable { mutableStateOf(false) }
     var selectedLanguage by rememberSaveable { mutableStateOf(LanguageManager.getSavedLanguage(context)) }
+    var showSettingsDialog by rememberSaveable { mutableStateOf(false) }
+    var tempBaseUrl by remember { mutableStateOf(RetrofitClient.baseUrl) }
 
     val isInputValid = username.isNotBlank() && password.isNotBlank()
 
@@ -71,6 +76,23 @@ fun LoginScreen(navController: NavHostController) {
             .imePadding(), // 키보드 올라올 때 스크롤 가능하게 밀어줌
         contentAlignment = Alignment.Center,
     ) {
+        // Settings Button at top right
+        IconButton(
+            onClick = {
+                tempBaseUrl = RetrofitClient.baseUrl
+                showSettingsDialog = true
+            },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(16.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Settings,
+                contentDescription = "Settings",
+                tint = MaterialTheme.colorScheme.primary
+            )
+        }
+
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -195,6 +217,39 @@ fun LoginScreen(navController: NavHostController) {
                     )
                 }
             }
+        }
+
+        if (showSettingsDialog) {
+            AlertDialog(
+                onDismissRequest = { showSettingsDialog = false },
+                title = { Text("Server Settings") },
+                text = {
+                    Column {
+                        Text("Enter Backend Base URL:", style = MaterialTheme.typography.bodyMedium)
+                        Spacer(Modifier.height(8.dp))
+                        OutlinedTextField(
+                            value = tempBaseUrl,
+                            onValueChange = { tempBaseUrl = it },
+                            placeholder = { Text("http://1.2.3.4:8000/") },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = {
+                        RetrofitClient.updateBaseUrl(context, tempBaseUrl)
+                        showSettingsDialog = false
+                    }) {
+                        Text("Save")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showSettingsDialog = false }) {
+                        Text("Cancel")
+                    }
+                }
+            )
         }
     }
 }

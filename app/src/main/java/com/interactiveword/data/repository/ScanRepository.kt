@@ -11,7 +11,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 
 class ScanRepository {
-    private val api = RetrofitClient.api
+    private val api get() = RetrofitClient.api
 
     suspend fun uploadAudio(file: File, scanSource: String = "mic"): ScanUploadResponse {
         val requestFile = file.asRequestBody("audio/wav".toMediaTypeOrNull())

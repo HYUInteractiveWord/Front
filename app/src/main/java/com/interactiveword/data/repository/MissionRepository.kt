@@ -4,7 +4,7 @@ import com.interactiveword.data.api.RetrofitClient
 import com.interactiveword.data.model.Mission
 
 class MissionRepository {
-    private val api = RetrofitClient.api
+    private val api get() = RetrofitClient.api
 
     suspend fun getDailyMissions(): List<Mission> = api.getDailyMissions()
 

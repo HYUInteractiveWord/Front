@@ -6,7 +6,7 @@ import com.interactiveword.data.model.RegisterRequest
 import com.interactiveword.data.model.User
 
 class UserRepository {
-    private val api = RetrofitClient.api
+    private val api get() = RetrofitClient.api
 
     suspend fun register(username: String, email: String?, password: String, preferredLanguage: String = "ko"): User =
         api.register(RegisterRequest(username, email, password, preferredLanguage))

@@ -1,5 +1,7 @@
 package com.interactiveword.data.api
 
+import android.content.Context
+import com.interactiveword.data.local.SettingsManager
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -8,7 +10,24 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
 
-    private const val BASE_URL = "http://13.209.74.220:8000/"
+    private var _baseUrl: String = SettingsManager.DEFAULT_BASE_URL
+    val baseUrl: String get() = _baseUrl
+
+    fun init(context: Context) {
+        _baseUrl = SettingsManager.getBaseUrl(context)
+        recreateApi()
+    }
+
+    fun updateBaseUrl(context: Context, newUrl: String) {
+        val sanitizedUrl = if (newUrl.endsWith("/")) newUrl else "$newUrl/"
+        SettingsManager.saveBaseUrl(context, sanitizedUrl)
+        _baseUrl = sanitizedUrl
+        recreateApi()
+    }
+
+    private fun recreateApi() {
+        _api = buildApi()
+    }
 
     fun resolveStaticUrl(path: String?): String? {
         if (path.isNullOrBlank()) return null
@@ -21,12 +40,22 @@ object RetrofitClient {
             return normalizedPath
         }
 
-        return BASE_URL.trimEnd('/') + "/" + normalizedPath
+        return _baseUrl.trimEnd('/') + "/" + normalizedPath
     }
 
     // JWT 토큰 - TokenManager에서 주입
     var authToken: String? = null
-    val api: ApiService by lazy {
+
+    private var _api: ApiService? = null
+    val api: ApiService
+        get() {
+            if (_api == null) {
+                _api = buildApi()
+            }
+            return _api!!
+        }
+
+    private fun buildApi(): ApiService {
         val logging = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
@@ -44,8 +73,8 @@ object RetrofitClient {
             }
             .build()
 
-        Retrofit.Builder()
-            .baseUrl(BASE_URL)
+        return Retrofit.Builder()
+            .baseUrl(_baseUrl)
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()

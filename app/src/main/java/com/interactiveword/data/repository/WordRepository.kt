@@ -18,7 +18,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 
 class WordRepository {
-    private val api = RetrofitClient.api
+    private val api get() = RetrofitClient.api
 
     suspend fun getMyWords(): List<WordCard> = api.getMyWords()
 

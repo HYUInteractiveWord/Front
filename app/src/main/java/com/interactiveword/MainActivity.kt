@@ -47,6 +47,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import android.net.Uri
 import com.interactiveword.data.local.LanguageManager
+import com.interactiveword.data.api.RetrofitClient
 import com.interactiveword.service.AudioCaptureService
 import com.interactiveword.ui.navigation.AppNavHost
 import com.interactiveword.ui.navigation.Screen
@@ -82,6 +83,7 @@ class MainActivity : ComponentActivity() {
         )
         extractYouTubeUrl(intent)?.let { ShareIntentHolder.pendingYoutubeUrl.value = it }
         handleCaptureIntent(intent)
+        RetrofitClient.init(this)
         requestNotificationPermission()
         setContent {
             InteractiveWordTheme {
