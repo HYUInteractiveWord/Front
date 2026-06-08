@@ -303,17 +303,32 @@ fun ScanScreen(
 
                     item {
                         Spacer(Modifier.height(16.dp))
+                        val isAnyWordLoading = uiState.loadingWords.isNotEmpty()
                         Button(
                             onClick = {
-                                vm.cleanupTempFiles()
-                                navController.navigate(Screen.Collection.route) {
-                                    popUpTo(Screen.Scan.route) { inclusive = false }
+                                if (!isAnyWordLoading) {
+                                    vm.cleanupTempFiles()
+                                    navController.navigate(Screen.Collection.route) {
+                                        popUpTo(Screen.Scan.route) { inclusive = false }
+                                    }
                                 }
                             },
+                            enabled = !isAnyWordLoading,
                             modifier = Modifier.fillMaxWidth(),
                             shape = MaterialTheme.shapes.extraLarge,
-                            colors = ButtonDefaults.buttonColors(containerColor = BrandGreenLight)
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = BrandGreenLight,
+                                disabledContainerColor = BrandGreenLight.copy(alpha = 0.5f)
+                            )
                         ) {
+                            if (isAnyWordLoading) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(20.dp),
+                                    color = Color.White,
+                                    strokeWidth = 2.dp
+                                )
+                                Spacer(Modifier.width(8.dp))
+                            }
                             Text(stringResource(R.string.scan_collection_complete))
                         }
                     }
