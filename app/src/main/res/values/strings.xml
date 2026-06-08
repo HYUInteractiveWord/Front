@@ -16,6 +16,7 @@
     <string name="nav_missions">미션</string>
     <string name="nav_scan">스캔</string>
 
+    <string name="action_demo_register">데모 가입</string>
     <string name="login_title">로그인</string>
     <string name="register_title">회원가입</string>
     <string name="label_username">아이디</string>
@@ -224,6 +225,8 @@
     <string name="mission_collect_noun">명사 수집</string>
     <string name="mission_ready_to_claim">완료! 탭하여 보상 받기</string>
 
+    <string name="profile_reward_unlock_confirm_title">해금 확인</string>
+    <string name="profile_reward_unlock_confirm_msg">해당 아이템을 획득하시겠습니까?</string>
     <string name="profile_reward_title">프로필 꾸미기</string>
     <string name="profile_reward_desc">500 XP마다 원하는 아바타 또는 배경을 하나씩 해금할 수 있어요.</string>
     <string name="profile_reward_remaining_tickets">남은 해금권: %1$d개</string>
@@ -333,4 +336,6 @@
     <string name="quiz_exit_body">정말 테스트를 중단하고 나가시겠습니까? 현재까지의 진행 상황은 저장되지 않습니다.</string>
     <string name="quiz_exit_confirm">중단하고 나가기</string>
     <string name="quiz_exit_continue">계속하기</string>
+    <string name="yes">예</string>
+    <string name="no">아니오</string>
 </resources>

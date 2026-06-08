@@ -210,7 +210,7 @@ fun LoginScreen(navController: NavHostController) {
                     enabled = uiState !is LoginUiState.Loading && isInputValid
                 ) {
                     Text(
-                        text = "DEMO Register",
+                        text = stringResource(R.string.action_demo_register),
                         color = Color(0xFFF97316), // 주황색
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold

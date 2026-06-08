@@ -18,6 +18,7 @@
     <string name="nav_scan">Сканер</string>
 
     <!-- Login Screen -->
+    <string name="action_demo_register">ДЕМО-регистрация</string>
     <string name="login_title">Войти</string>
     <string name="register_title">Регистрация</string>
     <string name="label_username">Имя пользователя</string>
@@ -232,6 +233,8 @@
     <!-- Profile rewards -->
     <string name="mission_collect_noun">Сбор сущ.</string>
     <string name="mission_ready_to_claim">Готово! Нажмите для XP</string>
+    <string name="profile_reward_unlock_confirm_title">Подтверждение разблокировки</string>
+    <string name="profile_reward_unlock_confirm_msg">Вы хотите разблокировать этот предмет?</string>
     <string name="profile_reward_title">Настройка профиля</string>
     <string name="profile_reward_desc">За каждые 500 XP можно разблокировать один аватар или фон на выбор.</string>
     <string name="profile_reward_remaining_tickets">Доступно разблокировок: %1$d</string>
@@ -351,4 +354,6 @@
     <string name="quiz_exit_body">Вы уверены, что хотите прервать тест и выйти? Текущий прогресс не будет сохранен.</string>
     <string name="quiz_exit_confirm">Прервать и выйти</string>
     <string name="quiz_exit_continue">Продолжить</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
 </resources>

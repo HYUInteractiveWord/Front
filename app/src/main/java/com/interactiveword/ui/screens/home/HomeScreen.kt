@@ -29,8 +29,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -409,6 +411,9 @@ fun HomeProfileDashboardCard(
 ) {
     val context = LocalContext.current
     val userKey = user.id.toString()
+    val haptic = LocalHapticFeedback.current
+
+    var assetToUnlock by remember { mutableStateOf<Pair<ProfileRewardAsset, Boolean>?>(null) }
 
     // 1. 커스터마이징 로드
     var selectedAvatarId by remember(user.id) {
@@ -579,11 +584,7 @@ fun HomeProfileDashboardCard(
                         selectedAvatarId = asset.id
                         saveSelectedProfileAsset(context, userKey, "selected_avatar", asset.id)
                     } else if (remainingTickets > 0) {
-                        val updated = unlockedAvatars + asset.id
-                        unlockedAvatars = updated
-                        selectedAvatarId = asset.id
-                        saveUnlockedProfileAssets(context, userKey, "unlocked_avatars", updated)
-                        saveSelectedProfileAsset(context, userKey, "selected_avatar", asset.id)
+                        assetToUnlock = asset to true
                     }
                 },
             )
@@ -600,14 +601,45 @@ fun HomeProfileDashboardCard(
                         selectedBackgroundId = asset.id
                         saveSelectedProfileAsset(context, userKey, "selected_background", asset.id)
                     } else if (remainingTickets > 0) {
-                        val updated = unlockedBackgrounds + asset.id
-                        unlockedBackgrounds = updated
-                        selectedBackgroundId = asset.id
-                        saveUnlockedProfileAssets(context, userKey, "unlocked_backgrounds", updated)
-                        saveSelectedProfileAsset(context, userKey, "selected_background", asset.id)
+                        assetToUnlock = asset to false
                     }
                 },
             )
+
+            if (assetToUnlock != null) {
+                val (asset, isAvatar) = assetToUnlock!!
+                AlertDialog(
+                    onDismissRequest = { assetToUnlock = null },
+                    title = { Text(stringResource(R.string.profile_reward_unlock_confirm_title)) },
+                    text = { Text(stringResource(R.string.profile_reward_unlock_confirm_msg)) },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            if (isAvatar) {
+                                val updated = unlockedAvatars + asset.id
+                                unlockedAvatars = updated
+                                selectedAvatarId = asset.id
+                                saveUnlockedProfileAssets(context, userKey, "unlocked_avatars", updated)
+                                saveSelectedProfileAsset(context, userKey, "selected_avatar", asset.id)
+                            } else {
+                                val updated = unlockedBackgrounds + asset.id
+                                unlockedBackgrounds = updated
+                                selectedBackgroundId = asset.id
+                                saveUnlockedProfileAssets(context, userKey, "unlocked_backgrounds", updated)
+                                saveSelectedProfileAsset(context, userKey, "selected_background", asset.id)
+                            }
+                            assetToUnlock = null
+                        }) {
+                            Text(stringResource(R.string.yes))
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { assetToUnlock = null }) {
+                            Text(stringResource(R.string.no))
+                        }
+                    }
+                )
+            }
 
             HorizontalDivider(color = DarkOutline)
 
