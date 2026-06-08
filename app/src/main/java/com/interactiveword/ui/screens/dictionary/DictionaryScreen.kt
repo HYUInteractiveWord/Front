@@ -249,8 +249,8 @@ fun DictionaryScreen(
 private fun getPosString(pos: String?): String {
     if (pos == null) return ""
     return when {
-        pos.contains("명사") -> stringResource(R.string.pos_noun)
         pos.contains("대명사") -> stringResource(R.string.pos_pronoun)
+        pos.contains("명사") -> stringResource(R.string.pos_noun)
         pos.contains("수사") -> stringResource(R.string.pos_numeral)
         pos.contains("동사") -> stringResource(R.string.pos_verb)
         pos.contains("형용사") -> stringResource(R.string.pos_adjective)

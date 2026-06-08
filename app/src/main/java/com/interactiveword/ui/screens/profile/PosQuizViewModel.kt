@@ -351,8 +351,8 @@ class PosQuizViewModel(
         val pos = raw?.trim().orEmpty()
         if (pos.isBlank()) return null
         return when {
-            "명사" in pos -> "명사"
             "대명사" in pos -> "대명사"
+            "명사" in pos -> "명사"
             "수사" in pos -> "수사"
             "동사" in pos -> "동사"
             "형용사" in pos -> "형용사"
@@ -369,8 +369,8 @@ class PosQuizViewModel(
 private fun getPosString(pos: String?): String {
     if (pos == null) return ""
     return when {
-        pos.contains("명사") -> stringResource(R.string.pos_noun)
         pos.contains("대명사") -> stringResource(R.string.pos_pronoun)
+        pos.contains("명사") -> stringResource(R.string.pos_noun)
         pos.contains("수사") -> stringResource(R.string.pos_numeral)
         pos.contains("동사") -> stringResource(R.string.pos_verb)
         pos.contains("형용사") -> stringResource(R.string.pos_adjective)
